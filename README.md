@@ -13,7 +13,7 @@
 [开源大模型食用指南](https://github.com/datawhalechina/self-llmn)<br>
 
 + 检索增强生成 ( Retrieval Augmented Generation, RAG)<br>
-[A-Guide-to-Retrieval-Augmented-LLM](https://github.com/Wang-Shuo/A-Guide-to-Retrieval-Augmented-LLM)
+[A-Guide-to-Retrieval-Augmented-LLM](https://github.com/Wang-Shuo/A-Guide-to-Retrieval-Augmented-LLM)<br>
 [Awesome-LLM-RAG](https://github.com/jxzhangjhu/Awesome-LLM-RAG)
 
 + 课程系列<br>
