@@ -14,6 +14,7 @@
 
 + 检索增强生成 ( Retrieval Augmented Generation, RAG)<br>
 [A-Guide-to-Retrieval-Augmented-LLM](https://github.com/Wang-Shuo/A-Guide-to-Retrieval-Augmented-LLM)
+[Awesome-LLM-RAG](https://github.com/jxzhangjhu/Awesome-LLM-RAG)
 
 + 课程系列<br>
 [普林斯顿COS597G顿-陈丹琦-Understanding Large Language Models](https://www.cs.princeton.edu/courses/archive/fall22/cos597G/)<br>
