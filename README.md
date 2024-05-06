@@ -1,30 +1,34 @@
 # llm-learning
-个人的大模型学习仓库
+个人的大模型学习仓库。
 
-+ 综述类论文<br>
-[A Survey of Large Language Models](https://arxiv.org/pdf/2303.18223)<br>
-[A Survey of Large Language Models Github](https://github.com/RUCAIBox/LLMSurvey/tree/main)<br>
-[LLM4Rec-Awesome-Papers](https://github.com/WLiK/LLM4Rec-Awesome-Papers)
+### 一、大模型应用开发<br>
+>⭐[DataWhale-动手学大模型应用开发](https://github.com/datawhalechina/llm-universe/tree/main)<br>
+>⭐[DataWhale-知识库助⼿项⽬](https://github.com/logan-zou/Chat_with_Datawhale_langchain)<br>
+>[DataWhale-面向开发者的大模型手册(吴恩达课程)](https://github.com/datawhalechina/llm-cookbook)<br>
+>[A-Guide-to-Retrieval-Augmented-LLM](https://github.com/Wang-Shuo/A-Guide-to-Retrieval-Augmented-LLM)<br>
+>[Awesome-LLM-RAG](https://github.com/jxzhangjhu/Awesome-LLM-RAG)
 
-+ DataWhale系列<br>
-⭐[动手学大模型应用开发](https://github.com/datawhalechina/llm-universe/tree/main)<br>
-⭐[面向开发者的大模型手册(吴恩达课程) - LLM Cookbook-](https://github.com/datawhalechina/llm-cookbook)<br>
-[大模型基础](https://github.com/datawhalechina/so-large-lm/tree/main)<br>
-[开源大模型食用指南](https://github.com/datawhalechina/self-llmn)<br>
+这一部分主要结合实际项目进行学习，技术点：
++ 检索增强生成 ( Retrieval Augmented Generation, RAG)
++ 提示工程（Prompt Enginnering）
++ 开发框架：LangChian
 
-+ 检索增强生成 ( Retrieval Augmented Generation, RAG)<br>
-[A-Guide-to-Retrieval-Augmented-LLM](https://github.com/Wang-Shuo/A-Guide-to-Retrieval-Augmented-LLM)<br>
-[Awesome-LLM-RAG](https://github.com/jxzhangjhu/Awesome-LLM-RAG)
+#### 1、知识库助手项目
 
-+ 课程系列<br>
-[普林斯顿COS597G顿-陈丹琦-Understanding Large Language Models](https://www.cs.princeton.edu/courses/archive/fall22/cos597G/)<br>
-[斯坦福CS324 - Large Language Models](https://stanford-cs324.github.io/winter2022/)<br>
-[普林斯顿COS597G顿-陈丹琦-Understanding Large Language Models](https://www.cs.princeton.edu/courses/archive/fall22/cos597G/)<br>
 
-+ 工具<br>
+
+### 二、 工具系列
 [Kimi：一款面向普通用户（C端）的智能助手，旨在提供高效的信息查询和对话服务。](https://kimi.moonshot.cn/)
 [ChatGPT(科学上网)](https://chat.openai.com/)
 [天工API](https://www.tiangong.cn/)
 
-+ 书籍<br>
-[《大语言模型》作者：赵鑫](https://llmbook-zh.github.io/)<br>
+
+### 三、大模型部署和微调<br>
+[DataWhale-开源大模型食用指南](https://github.com/datawhalechina/self-llmn)<br>
+[DataWhale-大模型基础](https://github.com/datawhalechina/so-large-lm/tree/main)<br>
+
+### 四、 LLM+Rec
+[LLM4Rec-Awesome-Papers](https://github.com/WLiK/LLM4Rec-Awesome-Papers)
+
+
+
