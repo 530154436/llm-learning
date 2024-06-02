@@ -1,2 +1,4 @@
 openai==1.30.3
 jupyter==1.0.0
+redlines==0.4.2
+panel
