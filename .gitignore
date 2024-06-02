@@ -1,0 +1,11 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Distribution / packaging
+.idea/
+.github/
+
+# Environments
+venv/
+
+data/
