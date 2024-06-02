@@ -3,7 +3,7 @@ __pycache__/
 
 # Distribution / packaging
 .idea/
-.github/
+./github/
 
 # Environments
 venv/
