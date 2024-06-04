@@ -2,9 +2,9 @@
 # -*- coding:utf-8 -*--
 # Chat GPT 工具类
 import os
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from openai import OpenAI
-from openai.types import CompletionUsage
+from openai.types import CompletionUsage, ModerationCreateResponse
 from openai.types.chat import ChatCompletion
 
 
@@ -73,9 +73,9 @@ class OpenAiChat(object):
         """
         返回生成的回复内容以及使用的 token 数量。
         :return
-            content: 生成的回复内容。
-            token_dict: 包含'prompt_tokens'、'completion_tokens'和'total_tokens'的字典，
-                        分别表示提示的 token 数量、生成的回复的 token 数量和总的 token 数量。
+        content: 生成的回复内容。
+        token_dict: 包含'prompt_tokens'、'completion_tokens'和'total_tokens'的字典，
+                    分别表示提示的 token 数量、生成的回复的 token 数量和总的 token 数量。
         """
         completion = self.create_completion(messages)
         if len(completion.choices) > 0:
@@ -89,6 +89,27 @@ class OpenAiChat(object):
             return content, token_dict
         return None
 
+    def moderation(self, _input: Union[str, List[str]]) -> List[dict]:
+        """
+        Moderation API 是一个有效的内容审查工具。
+        目标：确保内容符合 OpenAI 的使用政策，帮助开发人员识别和过滤各种类别的违禁内容，例如仇恨、自残、色情和暴力等。
+        文档：https://platform.openai.com/docs/guides/moderation/quickstart
+        :return
+        flagged：true表示如果模型将内容归类为潜在有害内容，否则为false。
+        categories：包含每个类别违规标记的字典。对于每个类别，如果模型将相应类别标记为违规，则为true，否则为false。
+        category_scores：包含模型输出的每个类别的原始分数的字典，表示模型对输入违反 OpenAI 针对该类别的政策的置信度。
+        """
+        response: ModerationCreateResponse = self.client.moderations.create(
+            input=_input,
+            timeout=self.timeout
+        )
+        data = []
+        if response:
+            for result in response.results:
+                data.append(result.to_dict())
+            return data
+        return None
+
 
 if __name__ == "__main__":
     _text = "中国的首都是哪里"
@@ -99,8 +120,10 @@ if __name__ == "__main__":
     chat_robot = OpenAiChat()
     # print(chat_robot.get_completion(_prompt))
 
-    _messages = [
-        {'role': 'system', 'content': '你是一个助理， 并以 Seuss 苏斯博士的风格作出回答。'},
-        {'role': 'user', 'content': '就快乐的小鲸鱼为主题给我写一首短诗'}
-    ]
-    print(chat_robot.get_completion_and_token_count(_messages))
+    # _messages = [
+    #     {'role': 'system', 'content': '你是一个助理， 并以 Seuss 苏斯博士的风格作出回答。'},
+    #     {'role': 'user', 'content': '就快乐的小鲸鱼为主题给我写一首短诗'}
+    # ]
+    # print(chat_robot.get_completion_and_token_count(_messages))
+
+    print(chat_robot.moderation("你是个傻屌。"))
