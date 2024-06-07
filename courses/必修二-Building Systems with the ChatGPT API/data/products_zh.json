@@ -67,7 +67,7 @@
     },
     "MobiTech PowerCase": {
         "name": "MobiTech PowerCase",
-        "category": "专业手机",
+        "category": "智能手机和配件",
         "brand": "MobiTech",
         "model_number": "MT-PC20",
         "warranty": "1 year",
@@ -78,7 +78,7 @@
     },
     "SmartX MiniPhone": {
         "name": "SmartX MiniPhone",
-        "category": "专业手机",
+        "category": "智能手机和配件",
         "brand": "SmartX",
         "model_number": "SX-MP5",
         "warranty": "1 year",
@@ -89,7 +89,7 @@
     },
     "MobiTech Wireless Charger": {
         "name": "MobiTech Wireless Charger",
-        "category": "专业手机",
+        "category": "智能手机和配件",
         "brand": "MobiTech",
         "model_number": "MT-WC10",
         "warranty": "1 year",
@@ -100,7 +100,7 @@
     },
     "SmartX EarBuds": {
         "name": "SmartX EarBuds",
-        "category": "专业手机",
+        "category": "智能手机和配件",
         "brand": "SmartX",
         "model_number": "SX-EB20",
         "warranty": "1 year",
