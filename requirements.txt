@@ -14,4 +14,4 @@ xpinyin==0.7.6
 pypdf==4.2.0
 yt_dlp
 pydub==0.25.1
-
+spark_ai_python==0.3.31

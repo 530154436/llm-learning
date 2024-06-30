@@ -7,17 +7,19 @@ from openai import OpenAI
 from openai.types import CompletionUsage, ModerationCreateResponse
 from openai.types.chat import ChatCompletion
 
+from src.utils.decorators import handle_exception
+
 
 class OpenAiChat(object):
     # api_key = os.environ.get("OPENAI_API_KEY")
     # base_url = "https://api.openai.com/v1"
     # api_key = os.environ.get("IDATARIVER_API_KEY")
     # base_url = "https://apiok.us/api/openai/v1"
-    api_key = os.environ.get("CHAT_ANYWHERE_API_KEY")
+    api_key = os.environ.get("CHAT_ANYWHERE_API_KEY")  # ~/.zshrc
     base_url = "https://api.chatanywhere.com.cn/v1"
 
     def __init__(self, model: str = "gpt-3.5-turbo", temperature: int = 0,
-                 max_tokens: int = 500, timeout: int = 60):
+                 max_tokens: int = 81920, timeout: int = 60):
         """
         文档：https://platform.openai.com/docs/quickstart
         :param model: 调用的模型，默认为 gpt-3.5-turbo(ChatGPT)，有内测资格的用户可以选择 gpt-4
@@ -31,6 +33,7 @@ class OpenAiChat(object):
         self.timeout: int = timeout
         self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
 
+    @handle_exception(max_retry=5)
     def create_completion(self, messages: List[dict]) -> ChatCompletion:
         """
         1、系统消息(system message)：以系统身份发送消息，提供了一个总体的指示。有助于设置助手的行为和角色，并作为对话的高级指示。
@@ -111,19 +114,39 @@ class OpenAiChat(object):
         return None
 
 
+class SparkAiChat(OpenAiChat):
+    base_url = "https://spark-api-open.xf-yun.com/v1"
+    api_key = f'{os.environ.get("SPARKAI_API_KEY")}:{os.environ.get("SPARKAI_API_SECRET")}'
+
+    def __init__(self, model: str = "generalv3.5", temperature: int = 0,
+                 max_tokens: int = 80960, timeout: int = 60):
+        """
+        文档：https://www.xfyun.cn/doc/spark/Web.html#_1-接口说明
+        :param model: 调用的模型，默认为 generalv3.5指向Max版本;
+        :param temperature: 模型输出的温度系数，控制输出的随机程度；值越大，生成的回复越随机。默认为 0。
+        :param max_tokens: 生成回复的最大 token 数量。默认为 500。
+        :param timeout: 超时时间
+        """
+        super().__init__(model, temperature, max_tokens, timeout)
+
+
 if __name__ == "__main__":
     _text = "中国的首都是哪里"
     _prompt = f"""
     请将三个反引号之间的文本总结成一句话。
     ```{_text}```
     """
-    chat_robot = OpenAiChat()
+    _messages = [
+        {'role': 'system', 'content': '你是一个助理， 并以 Seuss 苏斯博士的风格作出回答。'},
+        {'role': 'user', 'content': '就快乐的小鲸鱼为主题给我写一首短诗'}
+    ]
+
+    # chat_robot = OpenAiChat()
     # print(chat_robot.get_completion(_prompt))
-
-    # _messages = [
-    #     {'role': 'system', 'content': '你是一个助理， 并以 Seuss 苏斯博士的风格作出回答。'},
-    #     {'role': 'user', 'content': '就快乐的小鲸鱼为主题给我写一首短诗'}
-    # ]
     # print(chat_robot.get_completion_and_token_count(_messages))
+    # print(chat_robot.moderation("你是个傻屌。"))
 
-    print(chat_robot.moderation("你是个傻屌。"))
+    chat_robot = SparkAiChat()
+    print(chat_robot.get_completion(_prompt))
+    # print(chat_robot.get_completion_from_messages(_messages))
+    # print(chat_robot.get_completion_and_token_count(_messages))

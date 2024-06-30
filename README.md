@@ -21,6 +21,7 @@
 [Kimi：一款面向普通用户（C端）的智能助手，旨在提供高效的信息查询和对话服务。](https://kimi.moonshot.cn/)
 [ChatGPT(科学上网)](https://chat.openai.com/)
 [天工API](https://www.tiangong.cn/)
+[Prompt Engineering Guide 提示工程指南](https://www.promptingguide.ai/zh)
 
 
 ### 三、大模型部署和微调<br>
