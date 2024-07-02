@@ -15,7 +15,7 @@ class SparkAiChatWSS(object):
     SPARKAI_API_SECRET = os.environ.get("SPARKAI_API_SECRET")
     SPARKAI_API_KEY = os.environ.get("SPARKAI_API_KEY")
 
-    def __init__(self, model: str = "generalv3.5", temperature: float = 0.01,
+    def __init__(self, model: str = "generalv3.5", temperature: float = 0.1,
                  max_tokens: int = 8192, timeout: int = 60):
         """
         星火认知大模型Spark3.5 Max的URL值，其他版本大模型URL值请前往文档（https://www.xfyun.cn/doc/spark/Web.html）查看
@@ -43,19 +43,21 @@ class SparkAiChatWSS(object):
         )
 
     @handle_exception(max_retry=5)
-    def get_completions(self, prompt: str):
+    def get_completion(self, prompt: str):
         messages = [
             ChatMessage(role="user", content=prompt)
         ]
-        return self.client.get_completions_from_message(messages)
+        return self.get_completion_from_message(messages)
 
     @handle_exception(max_retry=5)
-    def get_completions_from_message(self, messages: List[Union[ChatMessage, dict]]):
+    def get_completion_from_message(self, messages: List[Union[ChatMessage, dict]]):
         chat_messages = []
         for message in messages:
             if isinstance(message, dict):
                 chat_messages.append(ChatMessage(role=message.get("role"),
                                                  content=message.get("content")))
+            elif isinstance(message, ChatMessage):
+                chat_messages.append(message)
 
         handler = ChunkPrintHandler()
         a = self.client.generate([chat_messages], callbacks=[handler])
@@ -72,6 +74,6 @@ if __name__ == "__main__":
         {'role': 'user', 'content': _text}
     ]
 
-    # print(SparkAiChatWSS().get_completions(_text))
-    print(SparkAiChatWSS().get_completions_from_message(_message))
+    print(SparkAiChatWSS().get_completion(_text))
+    # print(SparkAiChatWSS().get_completion_from_message(_message))
 

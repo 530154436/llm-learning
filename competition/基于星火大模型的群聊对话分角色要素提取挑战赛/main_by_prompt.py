@@ -87,10 +87,10 @@ def check_and_complete_json_format(data):
 
 
 if __name__ == "__main__":
-    train_data = read_json("dataset/train.json")
-    test_data = read_json("dataset/test_data.json")
-    PROMPT_PP = ''.join(open("prompts/preprocessing.tmpl").readlines())
-    PROMPT_EXTRACT = ''.join(open("prompts/zero_shot.tmpl").readlines())
+    train_data = read_json("dataset/train_pp.json")
+    test_data = read_json("dataset/test_data_pp.json")
+    PROMPT_EXTRACT = ''.join(open("prompts/baseline.tmpl").readlines())
+    # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot_v2.tmpl").readlines())
     retry_count = 5  # 重试次数
     result = []
     error_data = []
@@ -100,52 +100,30 @@ if __name__ == "__main__":
         index += 1
         is_success = False
         chat_text = data["chat_text"]
+        for i in range(retry_count):
+            try:
+                prompt = PROMPT_EXTRACT.format(content=chat_text)
+                res = SparkAiChatWSS().get_completion(prompt)
+                print("index:", index, ", result:", res.replace("\n", ""))
+                infos = convert_all_json_in_text_to_dict(res)
+                infos = check_and_complete_json_format(infos)
+                if infos:
+                    result.append({
+                        "infos": infos,
+                        "index": index
+                    })
+                    is_success = True
+                    break
+            except Exception as e:
+                print("index:", index, ", error:", e)
+                # continue
+        if not is_success:
+            data["index"] = index
+            error_data.append(data)
+            result.append({
+                "infos": [],
+                "index": index
+            })
 
-        prompt = PROMPT_PP.format(content=chat_text, delimiter="####")
-        _messages = [
-            {'role': 'system', 'content': '你是一个自然语言处理工程师，请处理群聊对话中的文本信息。'},
-            {'role': 'user', 'content': prompt}
-        ]
-        # res = SparkAiChat().get_completion_from_messages(_messages)
-        # res = OpenAiChat().get_completion_from_messages(_messages)
-        res = SparkAiChatWSS().get_completions_from_message(_messages)
-        new_data = deepcopy(data)
-        new_data["chat_text"] = res.replace("```", "")
-        new_datas.append(new_data)
-        print("index:", index)
-        print(res)
-        print()
-        print()
-        # break
-    with open("test_data_new.json", encoding="utf8", mode='w') as f:
-        json.dump(new_datas, f, ensure_ascii=False)
-
-    #
-    #     for i in range(retry_count):
-    #         try:
-    #
-    #             prompt = PROMPT_EXTRACT.format(content=)
-    #             res = SparkAiChat().get_completion(prompt)
-    #             print("index:", index, ", result:", res.replace("\n", ""))
-    #             infos = convert_all_json_in_text_to_dict(res)
-    #             infos = check_and_complete_json_format(infos)
-    #             if infos:
-    #                 result.append({
-    #                     "infos": infos,
-    #                     "index": index
-    #                 })
-    #                 is_success = True
-    #                 break
-    #         except Exception as e:
-    #             print("index:", index, ", error:", e)
-    #             # continue
-    #     if not is_success:
-    #         data["index"] = index
-    #         error_data.append(data)
-    #         result.append({
-    #             "infos": [],
-    #             "index": index
-    #         })
-    #
-    # # 保存输出
-    # write_json("output.json", result)
+    # 保存输出
+    write_json("output.json", result)
