@@ -2,11 +2,9 @@
 # -*- coding:utf-8 -*--
 # 基于星火大模型的群聊对话分角色要素提取挑战赛-Lora微调与prompt构造
 # https://blog.csdn.net/qq_44511981/article/details/140043813?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22140043813%22%2C%22source%22%3A%22qq_44511981%22%7D
-import csv
 import json
 from tqdm import tqdm
 from src.utils.io import read_json
-from src.utils.spark_ai_chat import SparkAiChatWSS
 
 
 def make_finetune_dataset(file: str, prompt_file: str, max_length: int = 8000):
@@ -34,6 +32,6 @@ def make_finetune_dataset(file: str, prompt_file: str, max_length: int = 8000):
 
 
 if __name__ == "__main__":
-    # 0702
+    # 0703
     make_finetune_dataset("dataset/train_pp.json", "prompts/zero_shot.tmpl")
     make_finetune_dataset("dataset/test_data_pp.json", "prompts/zero_shot.tmpl")
