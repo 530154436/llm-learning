@@ -89,7 +89,8 @@ def check_and_complete_json_format(data):
 if __name__ == "__main__":
     train_data = read_json("dataset/train_pp.json")
     test_data = read_json("dataset/test_data_pp.json")
-    PROMPT_EXTRACT = ''.join(open("prompts/baseline.tmpl").readlines())
+    # PROMPT_EXTRACT = ''.join(open("prompts/baseline.tmpl").readlines())
+    PROMPT_EXTRACT = ''.join(open("prompts/zero_shot.tmpl").readlines())
     # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot_v2.tmpl").readlines())
     retry_count = 5  # 重试次数
     result = []
