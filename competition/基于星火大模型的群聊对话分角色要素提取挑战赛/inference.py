@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*--
+# 零基础入门大模型技术竞赛
+# https://datawhaler.feishu.cn/wiki/VIy8ws47ii2N79kOt9zcXnbXnuS
 import json
-from copy import deepcopy
-
+from typing import List
 from tqdm import tqdm
 from src.utils.io import read_json, write_json
-from src.utils.chat_robot import SparkAiChat, OpenAiChat
 from src.utils.spark_ai_chat import SparkAiChatWSS
 
 
@@ -86,25 +86,22 @@ def check_and_complete_json_format(data):
     return data
 
 
-if __name__ == "__main__":
-    train_data = read_json("dataset/train_pp.json")
-    test_data = read_json("dataset/test_data_pp.json")
-    # PROMPT_EXTRACT = ''.join(open("prompts/baseline.tmpl").readlines())
-    PROMPT_EXTRACT = ''.join(open("prompts/zero_shot.tmpl").readlines())
-    # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot_v2.tmpl").readlines())
+def core_run(dataset: List[dict], prompt_template: str,
+             model: str = "generalv3.5",):
+    """
+    调用星火大模型进行推理
+    """
     retry_count = 5  # 重试次数
     result = []
     error_data = []
-
-    new_datas = []
-    for index, data in tqdm(enumerate(test_data)):
+    for index, data in tqdm(enumerate(dataset)):
         index += 1
         is_success = False
         chat_text = data["chat_text"]
         for i in range(retry_count):
             try:
-                prompt = PROMPT_EXTRACT.format(content=chat_text)
-                res = SparkAiChatWSS().get_completion(prompt)
+                prompt = prompt_template.format(content=chat_text)
+                res = SparkAiChatWSS(model=model).get_completion(prompt)
                 print("index:", index, ", result:", res.replace("\n", ""))
                 infos = convert_all_json_in_text_to_dict(res)
                 infos = check_and_complete_json_format(infos)
@@ -125,6 +122,19 @@ if __name__ == "__main__":
                 "infos": [],
                 "index": index
             })
-
     # 保存输出
     write_json("output.json", result)
+
+
+if __name__ == "__main__":
+    # test_data = read_json("dataset/test_data.json")
+    test_data = read_json("dataset/test_data_pp.json")
+
+    # 提示工程（非微调）
+    # PROMPT_EXTRACT = ''.join(open("prompts/baseline.tmpl").readlines())
+    PROMPT_EXTRACT = ''.join(open("prompts/zero_shot.tmpl").readlines())
+    # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot_v2.tmpl").readlines())
+    core_run(test_data, PROMPT_EXTRACT)
+
+    # 提示工程（微调）
+

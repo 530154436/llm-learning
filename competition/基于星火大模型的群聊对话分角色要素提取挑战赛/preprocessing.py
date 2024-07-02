@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*--
-# 预处理步骤
+# 预处理步骤（正则表达式）
 # 1、删除群聊对话记录中的重复内容。
 # 2、删除特殊符号，如"[链接]"、"[图片]"、"[文件]"、"[撤回消息]"、"[抱拳]"、"[未知消息]"、"[微笑]"等以及一些分隔线、引用信息。
 # 3、对于一个人连续的对话将其合并成一个对话
@@ -88,14 +88,14 @@ def merge_chat(chat_text: str):
             if not last_name:
                 last_name = name
             if conversations:
-                texts.append(f"<{last_name}>：{' '.join(conversations)}")
+                texts.append(f"{last_name}：{' '.join(conversations)}")
             conversations.clear()
             last_name = name
         if conversation:
             conversations.append(conversation)
 
     if conversations:
-        texts.append(f"<{last_name}>：{' '.join(conversations)}")
+        texts.append(f"{last_name}：{' '.join(conversations)}")
     return "\n".join(texts)
 
 
