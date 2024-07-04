@@ -6,7 +6,7 @@ import json
 from typing import List
 from tqdm import tqdm
 from src.utils.io import read_json, write_json
-from src.utils.spark_ai_chat import SparkAiChatWSS
+from src.utils.spark_ai_chat import SparkAiChatWSS, SparkAiChatWSS4Finetune
 
 
 class JsonFormatError(Exception):
@@ -86,8 +86,7 @@ def check_and_complete_json_format(data):
     return data
 
 
-def core_run(dataset: List[dict], prompt_template: str,
-             model: str = "generalv3.5",):
+def core_run(dataset: List[dict], prompt_template: str, is_finetune: bool = False):
     """
     调用星火大模型进行推理
     """
@@ -101,7 +100,10 @@ def core_run(dataset: List[dict], prompt_template: str,
         for i in range(retry_count):
             try:
                 prompt = prompt_template.format(content=chat_text)
-                res = SparkAiChatWSS(model=model).get_completion(prompt)
+                if not is_finetune:
+                    res = SparkAiChatWSS().get_completion(prompt)
+                else:
+                    res = SparkAiChatWSS4Finetune().get_completion(prompt)
                 print("index:", index, ", result:", res.replace("\n", ""))
                 infos = convert_all_json_in_text_to_dict(res)
                 infos = check_and_complete_json_format(infos)
@@ -128,13 +130,16 @@ def core_run(dataset: List[dict], prompt_template: str,
 
 if __name__ == "__main__":
     # test_data = read_json("dataset/test_data.json")
-    test_data = read_json("dataset/test_data_pp.json")
 
     # 提示工程（非微调）
-    # PROMPT_EXTRACT = ''.join(open("prompts/baseline.tmpl").readlines())
-    PROMPT_EXTRACT = ''.join(open("prompts/zero_shot.tmpl").readlines())
-    # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot_v2.tmpl").readlines())
-    core_run(test_data, PROMPT_EXTRACT)
+    # test_data = read_json("dataset/test_data_pp.json")
+    # # PROMPT_EXTRACT = ''.join(open("prompts/baseline.tmpl").readlines())
+    # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot.tmpl").readlines())
+    # # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot_v2.tmpl").readlines())
+    # core_run(test_data, PROMPT_EXTRACT)
 
     # 提示工程（微调）
-
+    test_data = read_json("dataset/test_data_pp_finetune_v2.jsonl")
+    test_data = [{"chat_text": i.get("input")} for i in test_data]
+    PROMPT_EXTRACT = ''.join(open("prompts/zero_shot.tmpl").readlines())
+    core_run(test_data, PROMPT_EXTRACT, is_finetune=True)

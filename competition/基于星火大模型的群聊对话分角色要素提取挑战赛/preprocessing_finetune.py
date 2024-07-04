@@ -34,9 +34,9 @@ def make_finetune_train_set(file: str, prompt_file: str):
             res = SparkAiChatWSS().get_completion(prompt)
             print(res)
             line_write = {
-                "instruction": instruction,
-                "input": json.dumps(res, ensure_ascii=False),
-                "output": json.dumps(infos, ensure_ascii=False)
+                # "instruction": instruction,
+                "input": json.dumps(instruction + "\n" + res.replace("markdown", ""), ensure_ascii=False),
+                "target": json.dumps(infos, ensure_ascii=False)
             }
             # 因为数据共有130行，为了能满足训练需要的1500条及以上，我们将正常训练数据扩充12倍。
             for time in range(12):

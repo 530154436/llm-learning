@@ -64,6 +64,18 @@ class SparkAiChatWSS(object):
         return a.generations[0][0].text
 
 
+class SparkAiChatWSS4Finetune(SparkAiChatWSS):
+
+    SPARKAI_URL = 'wss://spark-api-n.xf-yun.com/v3.1/chat'
+    SPARKAI_APP_ID = os.environ.get("SPARKAI_APP_ID")
+    SPARKAI_API_SECRET = os.environ.get("SPARKAI_API_SECRET")
+    SPARKAI_API_KEY = os.environ.get("SPARKAI_API_KEY")
+
+    def __init__(self, model: str = "patchv3", temperature: float = 0.1,
+                 max_tokens: int = 8192, timeout: int = 60):
+        super().__init__(model, temperature, max_tokens, timeout)
+
+
 if __name__ == "__main__":
     # 测试模型配置是否正确
     _text = "你好"
@@ -74,6 +86,8 @@ if __name__ == "__main__":
         {'role': 'user', 'content': _text}
     ]
 
-    print(SparkAiChatWSS().get_completion(_text))
+    # print(SparkAiChatWSS().get_completion(_text))
     # print(SparkAiChatWSS().get_completion_from_message(_message))
+
+    print(SparkAiChatWSS4Finetune().get_completion_from_message(_message))
 

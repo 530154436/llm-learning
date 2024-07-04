@@ -7,7 +7,7 @@ from tqdm import tqdm
 from src.utils.io import read_json
 
 
-def make_finetune_dataset(file: str, prompt_file: str, max_length: int = 8000):
+def make_finetune_dataset(file: str, prompt_file: str, max_length: int = 4000):
     data = read_json(file)
     PROMPT = ''.join(open(prompt_file).readlines())
     save_file = file.split(".")[0] + "_finetune_v2.jsonl"
@@ -33,5 +33,5 @@ def make_finetune_dataset(file: str, prompt_file: str, max_length: int = 8000):
 
 if __name__ == "__main__":
     # 0703
-    make_finetune_dataset("dataset/train_pp.json", "prompts/zero_shot.tmpl")
-    make_finetune_dataset("dataset/test_data_pp.json", "prompts/zero_shot.tmpl")
+    make_finetune_dataset("dataset/train_pp.json", "prompts/zero_shot.tmpl", max_length=4000)  # 官网说最长4k，否则会截断
+    make_finetune_dataset("dataset/test_data_pp.json", "prompts/zero_shot.tmpl", max_length=8000)
