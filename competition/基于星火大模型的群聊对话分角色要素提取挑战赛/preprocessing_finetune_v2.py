@@ -7,10 +7,11 @@ from tqdm import tqdm
 from src.utils.io import read_json
 
 
-def make_finetune_dataset(file: str, prompt_file: str, max_length: int = 4000):
+def make_finetune_dataset(file: str, prompt_file: str, max_length: int = 4000, version: int = None):
     data = read_json(file)
     PROMPT = ''.join(open(prompt_file).readlines())
-    save_file = file.split(".")[0] + "_finetune_v2.jsonl"
+    version = f"_v{version}" if version else ""
+    save_file = file.split(".")[0] + f"_finetune{version}.jsonl"
     with open(save_file, 'w', encoding='utf-8') as writer:
         for index, row in tqdm(enumerate(data, start=1), total=len(data)):
             chat_text = row["chat_text"]
@@ -32,6 +33,11 @@ def make_finetune_dataset(file: str, prompt_file: str, max_length: int = 4000):
 
 
 if __name__ == "__main__":
-    # 0703
-    make_finetune_dataset("dataset/train_pp.json", "prompts/zero_shot.tmpl", max_length=4000)  # 官网说最长4k，否则会截断
-    make_finetune_dataset("dataset/test_data_pp.json", "prompts/zero_shot.tmpl", max_length=8000)
+    # 0703-26.58485
+    # 官网说最长4k，否则会截断
+    # make_finetune_dataset("dataset/train_pp.json", "prompts/zero_shot.tmpl", max_length=4000)
+    # make_finetune_dataset("dataset/test_data_pp.json", "prompts/zero_shot.tmpl", max_length=8000)
+
+    # 0704-官网说最长4k，否则会截断
+    make_finetune_dataset("dataset/train_pp.json", "prompts/zero_shot_v3.tmpl", max_length=4000, version=3)
+    make_finetune_dataset("dataset/test_data_pp.json", "prompts/zero_shot_v3.tmpl", max_length=8000, version=3)

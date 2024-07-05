@@ -86,7 +86,8 @@ def check_and_complete_json_format(data):
     return data
 
 
-def core_run(dataset: List[dict], prompt_template: str, is_finetune: bool = False):
+def core_run(dataset: List[dict], prompt_template: str,
+             is_finetune: bool = False, save_file: str = "output.json"):
     """
     调用星火大模型进行推理
     """
@@ -125,7 +126,7 @@ def core_run(dataset: List[dict], prompt_template: str, is_finetune: bool = Fals
                 "index": index
             })
     # 保存输出
-    write_json("output.json", result)
+    write_json(save_file, result)
 
 
 if __name__ == "__main__":
@@ -134,12 +135,19 @@ if __name__ == "__main__":
     # 提示工程（非微调）
     # test_data = read_json("dataset/test_data_pp.json")
     # # PROMPT_EXTRACT = ''.join(open("prompts/baseline.tmpl").readlines())
-    # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot.tmpl").readlines())
+    # # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot.tmpl").readlines())
     # # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot_v2.tmpl").readlines())
+    # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot_v3.tmpl").readlines())
     # core_run(test_data, PROMPT_EXTRACT)
 
-    # 提示工程（微调）
-    test_data = read_json("dataset/test_data_pp_finetune_v2.jsonl")
+    # 20240703-微调-26.58
+    # test_data = read_json("dataset/test_data_pp_finetune.jsonl")
+    # test_data = [{"chat_text": i.get("input")} for i in test_data]
+    # PROMPT_EXTRACT = ''.join(open("prompts/zero_shot.tmpl").readlines())
+    # core_run(test_data, PROMPT_EXTRACT, is_finetune=True)
+
+    # 20240704-微调-27.07576
+    test_data = read_json("dataset/test_data_pp_finetune_v3.jsonl")
     test_data = [{"chat_text": i.get("input")} for i in test_data]
-    PROMPT_EXTRACT = ''.join(open("prompts/zero_shot.tmpl").readlines())
-    core_run(test_data, PROMPT_EXTRACT, is_finetune=True)
+    PROMPT_EXTRACT = ''.join(open("prompts/zero_shot_v3.tmpl").readlines())
+    core_run(test_data, PROMPT_EXTRACT, is_finetune=True, save_file="zero_shot_v3.output.json")
