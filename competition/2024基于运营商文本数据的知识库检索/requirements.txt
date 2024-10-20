@@ -1,0 +1,4 @@
+query = pd.read_csv(QUERY_DIR)
+sub = pd.read_csv("/kaggle/input/ccf-rag-sub/submit_example.csv")
+display(query.head(3))
+display(sub.head(3))

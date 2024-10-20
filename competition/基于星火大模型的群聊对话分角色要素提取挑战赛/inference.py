@@ -6,7 +6,7 @@ import json
 from typing import List
 from tqdm import tqdm
 from src.utils.io import read_json, write_json
-from src.utils.spark_ai_chat import SparkAiChatWSS, SparkAiChatWSS4Finetune
+from src.utils.chat_spark_ai import SparkAiChatWSS, SparkAiChatWSS4Finetune
 
 
 class JsonFormatError(Exception):

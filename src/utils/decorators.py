@@ -3,7 +3,6 @@
 # @author: zhengchubin
 # @time: 2021/5/18 9:21
 # @function:    一些常用的装饰器
-import asyncio
 import time
 import functools
 import traceback

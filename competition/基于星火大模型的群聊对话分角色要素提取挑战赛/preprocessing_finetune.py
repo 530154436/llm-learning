@@ -15,7 +15,7 @@ import csv
 import json
 from tqdm import tqdm
 from src.utils.io import read_json
-from src.utils.spark_ai_chat import SparkAiChatWSS
+from src.utils.chat_spark_ai import SparkAiChatWSS
 
 
 def make_finetune_train_set(file: str, prompt_file: str):

@@ -1,6 +1,0 @@
-[大模型RAG的迭代路径](https://mp.weixin.qq.com/s/kTZc1UpAzpSNanRx82ZRtg)
-[面向大语言模型的检索增强生成技术：综述 [译]](https://baoyu.io/translations/ai-paper/2312.10997-retrieval-augmented-generation-for-large-language-models-a-survey)
-[一文读懂「RAG，Retrieval-Augmented Generation」检索增](https://download.csdn.net/blog/column/12545383/135714213)
-[模块化RAG：RAG新范式，像乐高一样搭建 万字长文](https://www.53ai.com/news/RAG/2024080440218.html)
-[模块化知识库 中科院-GoMate 实现方案详解](https://github.com/gomate-community/GoMate/tree/main)
-[来自工业界的开源知识库 RAG 项目最全细节对比](https://hustyichi.github.io/2024/07/08/compare/)
