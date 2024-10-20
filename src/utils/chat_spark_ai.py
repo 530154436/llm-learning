@@ -3,6 +3,7 @@
 import os
 from typing import List, Union
 
+from src.utils.chat_openai import OpenAiChat
 from src.utils.decorators import handle_exception
 from sparkai.core.messages import ChatMessage
 from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler
@@ -76,18 +77,38 @@ class SparkAiChatWSS4Finetune(SparkAiChatWSS):
         super().__init__(model, temperature, max_tokens, timeout)
 
 
+class SparkAiChat(OpenAiChat):
+    base_url = "https://spark-api-open.xf-yun.com/v1"
+    api_key = f'{os.environ.get("SPARKAI_API_KEY")}:{os.environ.get("SPARKAI_API_SECRET")}'
+
+    def __init__(self, model: str = "generalv3.5", temperature: int = 0,
+                 max_tokens: int = 8192, timeout: int = 60):
+        """
+        文档：https://www.xfyun.cn/doc/spark/Web.html#_1-接口说明
+        :param model: 调用的模型，默认为 generalv3.5指向Max版本;
+        :param temperature: 模型输出的温度系数，控制输出的随机程度；值越大，生成的回复越随机。默认为 0。
+        :param max_tokens: 生成回复的最大 token 数量。默认为 500。
+        :param timeout: 超时时间
+        """
+        super().__init__(model, temperature=temperature, max_tokens=max_tokens, timeout=timeout)
+
+
 if __name__ == "__main__":
     # 测试模型配置是否正确
-    _text = "你好"
-    _message = [
+    _prompt = "中国的首都是哪里"
+    _messages = [
         # ChatMessage(role="system", content="你是一个智能客服。"),
         # ChatMessage(role="user", content=_text)
         {'role': 'system', 'content': '你是一个智能客服.'},
-        {'role': 'user', 'content': _text}
+        {'role': 'user', 'content': _prompt}
     ]
 
-    # print(SparkAiChatWSS().get_completion(_text))
-    # print(SparkAiChatWSS().get_completion_from_message(_message))
+    # print(SparkAiChatWSS().get_completion(_prompt))
+    # print(SparkAiChatWSS().get_completion_from_message(_messages))
+    # print(SparkAiChatWSS4Finetune().get_completion_from_message(_messages))
 
-    print(SparkAiChatWSS4Finetune().get_completion_from_message(_message))
+    chat_robot = SparkAiChat()
+    print(chat_robot.get_completion(_prompt))
+    print(chat_robot.get_completion_from_messages(_messages))
+    print(chat_robot.get_completion_with_usage(_messages))
 
