@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*--
 import fitz
 from pathlib import Path
-from typing import Union
+from typing import Union, List
 from io import BytesIO
 from tqdm import tqdm
 
@@ -17,7 +17,7 @@ class PdfParserUsingPyMuPDF(object):
     def __init__(self, chunk_size: int = 1000):
         self.chunk_size = chunk_size
 
-    def parse(self, fnm: Union[str, Path]):
+    def parse(self, fnm: Union[str, Path], verbose: bool = False) -> List[str]:
         """
         Asynchronously extracts text from a PDF file and returns it in chunks.
         表格格式：
@@ -30,7 +30,9 @@ class PdfParserUsingPyMuPDF(object):
         final_tables = []
         # Open the PDF file using pdfplumber
         doc = fitz.open(fnm) if isinstance(fnm, (str, Path)) else fitz.open(BytesIO(fnm))
-        for page in tqdm(doc, total=len(doc), desc="get pages"):
+        if verbose:
+            doc = tqdm(doc, total=len(doc), desc="get pages")
+        for page in doc:
             table = page.find_tables()
             table = list(table)
             for ix, tab in enumerate(table):
