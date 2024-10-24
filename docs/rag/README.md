@@ -23,7 +23,7 @@ Qwen2.5 : 模型部分使用阿里推出的 Qwen 2.5 系列，为检索增强生
 [GoMate是一款配置化模块化的Retrieval-Augmented Generation (RAG) 框架](https://github.com/gomate-community/GoMate)
 [来自工业界的知识库 RAG 服务(五)，模块化知识库 GoMate 实现方案详解](https://github.com/gomate-community/GoMate/tree/main)
 [来自工业界的开源知识库 RAG 项目最全细节对比](https://hustyichi.github.io/2024/07/08/compare/)
-
+[FastGPT-基于 LLM 大语言模型的知识库问答系统](https://github.com/labring/FastGPT)
 
 文档解析
 [开源 Python PDF 解析器库](https://products.documentprocessing.com/zh/parser/python/pymupdf/)

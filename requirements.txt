@@ -8,3 +8,4 @@ pymupdf==1.24.11
 tqdm==4.66.5
 jupyter==1.1.1
 pandas==2.2.3
+pymupdf4llm==0.0.17
