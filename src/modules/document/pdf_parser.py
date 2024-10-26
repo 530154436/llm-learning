@@ -5,6 +5,8 @@ import pymupdf4llm
 from pathlib import Path
 from typing import Union, List
 from io import BytesIO
+
+from pymupdf.table import TableFinder, Table
 from tqdm import tqdm
 
 
@@ -26,9 +28,10 @@ class PdfParserUsingPyMuPDF(object):
         """
         tables = []
         table = page.find_tables()
+        # print(table, TableFinder)
         for ix, tab in enumerate(list(table)):
             tab = tab.extract()
-            tab = list(map(lambda x: [str(t) for t in x], tab))
+            tab = list(map(lambda x: list(map(lambda y: y if y is not None else '', x)), tab))
 
             # 转换为 Markdown 格式
             header = tab[0]  # 假设第一行是表头
@@ -43,8 +46,7 @@ class PdfParserUsingPyMuPDF(object):
             tables.append(markdown_table)
         return tables
 
-    def parse(self, fnm: Union[str, Path],
-              verbose: bool = False, clip: int = 0) -> List[str]:
+    def parse(self, fnm: Union[str, Path], verbose: bool = False, clip: int = None) -> List[str]:
         """
         解析pdf文件
         1、表格格式：
@@ -57,8 +59,7 @@ class PdfParserUsingPyMuPDF(object):
         :param clip: 页眉、页脚高度，默认为0
         :return:
         """
-        final_texts = []
-        final_tables = []
+        final = []
         # Open the PDF file using pdfplumber
         doc = fitz.open(fnm) if isinstance(fnm, (str, Path)) else fitz.open(BytesIO(fnm))
         if verbose:
@@ -66,17 +67,18 @@ class PdfParserUsingPyMuPDF(object):
         for i, page in enumerate(doc):
 
             # 删除页眉和页脚（假设它们在特定区域）
-            crop = None
-            if clip > 0:
+            if isinstance(clip, int) and clip > 0:
                 crop = fitz.Rect(0, clip, page.rect.width, page.rect.height - clip)
-            text = page.get_text(clip=crop)
-            final_texts.extend(text)
+                text = page.get_text(clip=crop)
+            else:
+                text = page.get_text()
+            final.append(text)
 
             # 提取表格
-            final_tables.extend(self.parse_table(page))
+            final.extend(self.parse_table(page))
 
         doc.close()
-        return final_texts + final_tables
+        return final
 
 
 class PdfParserUsingPymupdf4llm(object):
@@ -95,10 +97,11 @@ class PdfParserUsingPymupdf4llm(object):
 if __name__ == "__main__":
     from src.conf.config import BASE_DIR
     file = BASE_DIR.joinpath("data", "temp", "AY01.pdf")
+    # file = BASE_DIR.joinpath("data", "temp", "AF01.pdf")
 
-    # pdf_parser = PdfParserUsingPyMuPDF()
-    # contents = pdf_parser.parse(file, clip=80)
-    # print(contents)
+    pdf_parser = PdfParserUsingPyMuPDF()
+    contents = pdf_parser.parse(file, clip=80)
+    print(contents)
 
-    result = PdfParserUsingPymupdf4llm().parse(file)
-    print(result)
+    # result = PdfParserUsingPymupdf4llm().parse(file)
+    # print(result)
