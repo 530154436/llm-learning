@@ -34,8 +34,18 @@ class PdfParserUsingPdfPlumber(object):
 
         return "\n".join(markdown_table)
 
+    def is_inside(self, small_bbox, big_bbox):
+        """
+        bbox（x0, top, x1, bottom）
+        判断small_bbox是否在big_bbox中
+        """
+        return (small_bbox[0] >= big_bbox[0] and
+                small_bbox[1] >= big_bbox[1] and
+                small_bbox[2] <= big_bbox[2] and
+                small_bbox[3] <= big_bbox[3])
 
-    def parse(self, fnm: Union[str, Path], verbose: bool = False, clip: int = None) -> List[str]:
+    def parse(self, fnm: Union[str, Path], verbose: bool = False,
+              clip: int = None, with_table: bool = False) -> List[str]:
         """
         提取页面中的文本和表格内容，保持顺序。
         """
@@ -62,10 +72,16 @@ class PdfParserUsingPdfPlumber(object):
                 final_tables.append(markdown_table)
 
             # 获取页面文本内容， TODO: 文本中会包含表格的数据
+            # # 获取每个单词及其边界框
+            # table_bboxes = [table.bbox for table in tables]
+            # for word in words:
+            #     # 过滤表格文本
+            #     word_bbox = (word['x0'], word['top'], word['x1'], word['bottom'])
+            #     if not any(self.is_inside(word_bbox, table_bbox) for table_bbox in table_bboxes):
+            #         valid_words.append(word['text'])
             if page.extract_text():
                 final_texts.append(page.extract_text())
         return final_texts
-
 
 
 if __name__ == "__main__":
