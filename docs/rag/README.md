@@ -26,4 +26,9 @@ Qwen2.5 : 模型部分使用阿里推出的 Qwen 2.5 系列，为检索增强生
 [FastGPT-基于 LLM 大语言模型的知识库问答系统](https://github.com/labring/FastGPT)
 
 文档解析
-[开源 Python PDF 解析器库](https://products.documentprocessing.com/zh/parser/python/pymupdf/)
+[pymupdf](https://products.documentprocessing.com/zh/parser/python/pymupdf/)
+[pdfplumber](https://github.com/jsvine/pdfplumber/)
+[pdfplumber说明文档翻译](https://blog.csdn.net/hbh112233abc/article/details/125521584)
+[【预处理】大模型下开源文档解析工具总结及技术思考](https://mp.weixin.qq.com/s?__biz=Mzg4NjI0NDg0Ng==&mid=2247484415&idx=1&sn=6b2a075e77c3355344d2d40d5d84e45c&chksm=cf9dd77ef8ea5e68f048a3d6f5caca04fe87885efe00ca7d347f6fc9a86cc43ab40a11fa0990#rd)
+[Python处理PDF的第三方库对比](https://dothinking.github.io/2021-01-02-Python%E5%A4%84%E7%90%86PDF%E7%9A%84%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93%E5%AF%B9%E6%AF%94/)
+

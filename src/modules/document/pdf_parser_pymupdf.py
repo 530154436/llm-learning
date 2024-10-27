@@ -5,8 +5,6 @@ import pymupdf4llm
 from pathlib import Path
 from typing import Union, List
 from io import BytesIO
-
-from pymupdf.table import TableFinder, Table
 from tqdm import tqdm
 
 
@@ -59,7 +57,8 @@ class PdfParserUsingPyMuPDF(object):
         :param clip: 页眉、页脚高度，默认为0
         :return:
         """
-        final = []
+        final_texts = []
+        final_tables = []
         # Open the PDF file using pdfplumber
         doc = fitz.open(fnm) if isinstance(fnm, (str, Path)) else fitz.open(BytesIO(fnm))
         if verbose:
@@ -72,13 +71,13 @@ class PdfParserUsingPyMuPDF(object):
                 text = page.get_text(clip=crop)
             else:
                 text = page.get_text()
-            final.append(text)
+            final_texts.append(text)
 
             # 提取表格
-            final.extend(self.parse_table(page))
+            final_tables.extend(self.parse_table(page))
 
         doc.close()
-        return final
+        return final_texts + final_tables
 
 
 class PdfParserUsingPymupdf4llm(object):
@@ -101,7 +100,8 @@ if __name__ == "__main__":
 
     pdf_parser = PdfParserUsingPyMuPDF()
     contents = pdf_parser.parse(file, clip=80)
-    print(contents)
+    for _page in contents:
+        print(_page)
 
     # result = PdfParserUsingPymupdf4llm().parse(file)
     # print(result)
