@@ -58,7 +58,7 @@ def traverse_directory(directory_path):
 
 
 if __name__ == "__main__":
-    from src.conf.config import BASE_DIR
+    from llm_common.src.conf.config import BASE_DIR
     # directory_path = './'  # 替换为你的Markdown文件目录路径
     # traverse_directory(directory_path)
     process_markdown_file(BASE_DIR.joinpath("llm-deploy", "README.md"))

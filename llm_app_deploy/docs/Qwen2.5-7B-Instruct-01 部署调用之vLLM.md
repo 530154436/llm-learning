@@ -1,19 +1,25 @@
-# 03-Qwen2.5-7B-Instruct vLLM 部署调用
+## 模型下载与环境配置
+### 模型下载  
 
-## **vLLM 简介**
+使用 `modelscope` 中的 `snapshot_download` 函数下载模型，第一个参数为模型名称，参数 `cache_dir`为模型的下载路径。
 
-`vLLM` 框架是一个高效的大语言模型**推理和部署服务系统**，具备以下特性：
+先切换到 `autodl-tmp` 目录，`cd /root/autodl-tmp` 
 
-- **高效的内存管理**：通过 `PagedAttention` 算法，`vLLM` 实现了对 `KV` 缓存的高效管理，减少了内存浪费，优化了模型的运行效率。
-- **高吞吐量**：`vLLM` 支持异步处理和连续批处理请求，显著提高了模型推理的吞吐量，加速了文本生成和处理速度。
-- **易用性**：`vLLM` 与 `HuggingFace` 模型无缝集成，支持多种流行的大型语言模型，简化了模型部署和推理的过程。兼容 `OpenAI` 的 `API` 服务器。
-- **分布式推理**：框架支持在多 `GPU` 环境中进行分布式推理，通过模型并行策略和高效的数据通信，提升了处理大型模型的能力。
-- **开源共享**：`vLLM` 由于其开源的属性，拥有活跃的社区支持，这也便于开发者贡献和改进，共同推动技术发展。
+然后新建名为 `model_download.py` 的 `python` 脚本，并在其中输入以下内容并保存
 
+```python
+# model_download.py
+from modelscope import snapshot_download
+model_dir = snapshot_download('qwen/Qwen2.5-7B-Instruct', cache_dir='/root/autodl-tmp', revision='master')
+```
 
+然后在终端中输入 `python model_download.py` 执行下载，这里需要耐心等待一段时间直到模型下载完成。
 
-## 环境准备  
+> 注意：记得修改 `cache_dir` 为你的模型下载路径哦~
 
+![03-1](./images/03-1.png)
+
+### 环境配置
 本文基础环境如下：
 
 ```
@@ -40,34 +46,16 @@ pip install transformers==4.44.2
 pip install vllm==0.6.1.post2
 ```
 
-> 考虑到部分同学配置环境可能会遇到一些问题，我们在AutoDL平台准备了 `Qwen2.5` 的环境镜像，点击下方链接并直接创建 `AutoDL` 示例即可。
-> ***https://www.codewithgpu.com/i/datawhalechina/self-llm/Qwen2.5-self-llm***
+## 一、vLLM 部署调用
 
+###  vLLM简介 
+`vLLM` 框架是一个高效的大语言模型**推理和部署服务系统**，具备以下特性：
 
-
-## 模型下载  
-
-使用 `modelscope` 中的 `snapshot_download` 函数下载模型，第一个参数为模型名称，参数 `cache_dir`为模型的下载路径。
-
-先切换到 `autodl-tmp` 目录，`cd /root/autodl-tmp` 
-
-然后新建名为 `model_download.py` 的 `python` 脚本，并在其中输入以下内容并保存
-
-```python
-# model_download.py
-from modelscope import snapshot_download
-model_dir = snapshot_download('qwen/Qwen2.5-7B-Instruct', cache_dir='/root/autodl-tmp', revision='master')
-```
-
-然后在终端中输入 `python model_download.py` 执行下载，这里需要耐心等待一段时间直到模型下载完成。
-
-> 注意：记得修改 `cache_dir` 为你的模型下载路径哦~
-
-![03-1](./images/03-1.png)
-
-
-
-## **代码准备**
+- **高效的内存管理**：通过 `PagedAttention` 算法，`vLLM` 实现了对 `KV` 缓存的高效管理，减少了内存浪费，优化了模型的运行效率。
+- **高吞吐量**：`vLLM` 支持异步处理和连续批处理请求，显著提高了模型推理的吞吐量，加速了文本生成和处理速度。
+- **易用性**：`vLLM` 与 `HuggingFace` 模型无缝集成，支持多种流行的大型语言模型，简化了模型部署和推理的过程。兼容 `OpenAI` 的 `API` 服务器。
+- **分布式推理**：框架支持在多 `GPU` 环境中进行分布式推理，通过模型并行策略和高效的数据通信，提升了处理大型模型的能力。
+- **开源共享**：`vLLM` 由于其开源的属性，拥有活跃的社区支持，这也便于开发者贡献和改进，共同推动技术发展。
 
 ### **Python脚本**
 

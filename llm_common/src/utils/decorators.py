@@ -6,7 +6,7 @@
 import time
 import functools
 import traceback
-from src.utils.logger import LOGGER
+from llm_common.src.utils.logger import LOGGER
 
 print_success_info = '[触发重试机制-第%s次成功]: 调用方法 --> [%s]'
 print_error_info = '[触发重试机制-第%s次失败]: 调用方法 --> [%s], \n%s'

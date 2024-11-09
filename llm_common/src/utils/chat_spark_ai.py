@@ -2,11 +2,10 @@
 # -*- coding:utf-8 -*--
 import os
 from typing import List, Union
-
-from src.utils.chat_openai import OpenAiChat
-from src.utils.decorators import handle_exception
 from sparkai.core.messages import ChatMessage
 from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler
+from llm_common.src.utils.chat_openai import OpenAiChat
+from llm_common.src.utils.decorators import handle_exception
 
 
 class SparkAiChatWSS(object):

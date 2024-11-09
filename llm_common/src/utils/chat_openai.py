@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*--
 # Chat GPT 工具类
+import json
 import os
+import time
 from typing import List, Tuple, Union
 from openai import OpenAI
 from openai.types import CompletionUsage, ModerationCreateResponse
 from openai.types.chat import ChatCompletion
 
-from src.utils.decorators import handle_exception
+from llm_common.src.utils.decorators import handle_exception
 
 
 class OpenAiChat(object):
@@ -19,19 +21,24 @@ class OpenAiChat(object):
     base_url = "https://api.chatanywhere.com.cn/v1"
 
     def __init__(self, model: str = "gpt-4o-mini", temperature: int = 0,
-                 max_tokens: int = 81920, timeout: int = 60):
+                 max_tokens: int = 8192, timeout: int = 60, trace: bool = False):
         """
         文档：https://platform.openai.com/docs/quickstart
         :param model: 调用的模型，默认为 gpt-3.5-turbo(ChatGPT)，有内测资格的用户可以选择 gpt-4
         :param temperature: 模型输出的温度系数，控制输出的随机程度；值越大，生成的回复越随机。默认为 0。
         :param max_tokens: 生成回复的最大 token 数量。默认为 500。
         :param timeout: 超时时间
+        :param trace: 记录并统计大模型调用的token消费情况
         """
         self.model: str = model
         self.temperature: int = temperature
         self.max_tokens: int = max_tokens
         self.timeout: int = timeout
         self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
+
+        # 跟踪分析大模型调用性能
+        self.trace = trace
+        self.tracer = []
 
     @handle_exception(max_retry=5)
     def create_completion(self, messages: List[dict]) -> ChatCompletion:
@@ -47,6 +54,7 @@ class OpenAiChat(object):
                 {'role':'user', 'content':'I don\'t know'}
             ]
         """
+        start_time = time.time()
         completion = self.client.chat.completions.create(
             messages=messages,
             model=self.model,
@@ -54,6 +62,14 @@ class OpenAiChat(object):
             temperature=self.temperature,
             max_tokens=self.max_tokens
         )
+        # 跟踪大模型token使用、耗时等信息以便分析
+        end_time = time.time()
+        if self.trace:
+            self.tracer.append({"message_len": len(json.dumps(messages, ensure_ascii=False)),
+                                "total_tokens": completion.usage.total_tokens,
+                                "prompt_tokens": completion.usage.prompt_tokens,
+                                "completion_tokens": completion.usage.completion_tokens,
+                                "cost_time": round(end_time-start_time, 6)})
         return completion
 
     def get_completion_from_messages(self, messages: List[dict]) -> str:
@@ -64,13 +80,6 @@ class OpenAiChat(object):
         if len(completion.choices) > 0:
             return completion.choices[0].message.content
         return None
-
-    def get_completion(self, prompt: str) -> str:
-        """
-        返回生成的回复内容
-        """
-        message = [{"role": "user", "content": prompt}]
-        return self.get_completion_from_messages(message)
 
     def get_completion_with_usage(self, messages: List[dict]) -> Tuple[str, CompletionUsage]:
         """
@@ -86,6 +95,16 @@ class OpenAiChat(object):
             usage: CompletionUsage = completion.usage
             return content, usage
         return None
+
+    def get_completion(self, prompt: str, system: str = None) -> str:
+        """
+        返回生成的回复内容
+        """
+        message = []
+        if system is not None:
+            message.append({"role": "system", "content": system})
+        message.append({"role": "user", "content": prompt})
+        return self.get_completion_from_messages(message)
 
     def moderation(self, _input: Union[str, List[str]]) -> List[dict]:
         """
@@ -120,7 +139,8 @@ if __name__ == "__main__":
         {'role': 'user', 'content': '就快乐的小鲸鱼为主题给我写一首短诗'}
     ]
 
-    chat_robot = OpenAiChat()
+    chat_robot = OpenAiChat(trace=True)
     print(chat_robot.get_completion(_prompt))
     print(chat_robot.get_completion_with_usage(_messages))
-    print(chat_robot.moderation("你是个傻屌。"))
+    print(chat_robot.moderation("你是不是傻。"))
+    print(chat_robot.tracer)
