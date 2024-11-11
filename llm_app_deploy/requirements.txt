@@ -3,5 +3,5 @@ fastapi==0.111.1
 pydantic==2.7.4
 gunicorn==22.0.0
 uvicorn==0.30.3
-openai==1.37.1
+openai==1.52.0
 vllm==v0.6.3

@@ -5,7 +5,7 @@ ENV LC_ALL=C.UTF-8
 
 # 实际工作目录：通过外部挂载代码+模型作为工作目录（docker run -w /data/devNFS/zhengchubin/llm-learning/llm_app_deploy）
 RUN echo `pwd`
-#
+# /workspace
 COPY requirements.txt /workspace
 
 RUN ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
