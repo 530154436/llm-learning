@@ -10,7 +10,8 @@ COPY requirements.txt /workspace
 
 RUN ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN python -m pip install --upgrade pip setuptools wheel -i http://maven.qizhidao.net:8081/repository/algo-public/simple/ --trusted-host maven.qizhidao.net
-RUN python -m pip install --no-cache -r requirements.txt -i http://maven.qizhidao.net:8081/repository/algo-public/simple/ --trusted-host maven.qizhidao.net
+# RUN python -m pip install --no-cache -r requirements.txt -i http://maven.qizhidao.net:8081/repository/algo-public/simple/ --trusted-host maven.qizhidao.net
+RUN python -m pip install --no-cache -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
 
 EXPOSE ${APP_PORT}
 RUN which gunicorn
