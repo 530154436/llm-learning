@@ -1,5 +1,5 @@
 #FROM mix-docker-registry.qizhidao.net/library/pytorch:2.1.2-cuda12.1-cudnn8-runtime
-FROM pytorch/pytorch:2.1.2-cuda12.1-cudnn8-runtime
+FROM pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 

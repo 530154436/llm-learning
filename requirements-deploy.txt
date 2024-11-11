@@ -1,0 +1,2 @@
+# Requires PyTorch 2.4.0
+vllm==v0.6.3

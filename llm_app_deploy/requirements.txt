@@ -5,4 +5,5 @@ fastapi==0.115.4
 pydantic==2.9.2
 openai==1.52.0
 requests==2.32.3
+# Requires PyTorch 2.4.0
 vllm==v0.6.3
