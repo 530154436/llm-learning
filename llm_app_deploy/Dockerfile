@@ -1,4 +1,3 @@
-#FROM mix-docker-registry.qizhidao.net/library/pytorch:2.1.2-cuda12.1-cudnn8-runtime
 FROM pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -14,5 +13,5 @@ RUN python -m pip install --upgrade pip setuptools wheel -i http://maven.qizhida
 RUN python -m pip install --no-cache -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
 
 EXPOSE ${APP_PORT}
+# /opt/conda/bin/gunicorn
 RUN echo `which gunicorn`
-#
