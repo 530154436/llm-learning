@@ -14,5 +14,5 @@ RUN python -m pip install --upgrade pip setuptools wheel -i http://maven.qizhida
 RUN python -m pip install --no-cache -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
 
 EXPOSE ${APP_PORT}
-RUN which gunicorn
+RUN echo `which gunicorn`
 #
