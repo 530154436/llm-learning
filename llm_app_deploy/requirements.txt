@@ -1,7 +1,7 @@
-flowdata==0.1.4
-fastapi==0.111.1
-pydantic==2.7.4
 gunicorn==22.0.0
 uvicorn==0.30.3
+flowdata==0.1.5
+fastapi==0.115.4
+pydantic==2.9.2
 openai==1.52.0
 vllm==v0.6.3
