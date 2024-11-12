@@ -15,7 +15,7 @@ DEVICE = "cuda"  # 使用CUDA
 DEVICE_ID = "0"  # CUDA设备ID，如果未设置则为空
 CUDA_DEVICE = f"{DEVICE}:{DEVICE_ID}" if DEVICE_ID else DEVICE  # 组合CUDA设备信息
 
-# 加载预训练的分词器和模型
+# 加载预训练的分词器和模型: 15112MiB
 BASE_DIR = Path(__file__).parent.parent
 model_name_or_path = BASE_DIR.joinpath('data/models/Qwen2.5-7B-Instruct').__str__()
 print(model_name_or_path)
@@ -77,8 +77,12 @@ async def create_item(request: Request):
     return answer  # 返回响应
 
 
-# 主函数入口
 if __name__ == '__main__':
     # 启动FastAPI应用
     # 用6006端口可以将autodl的端口映射到本地，从而在本地使用api
     uvicorn.run(app, host='0.0.0.0', port=6006, workers=1)  # 在指定端口和主机上启动应用
+
+    # 测试用例
+    # curl http://localhost:6006/ -H "Content-Type: application/json" -d '{
+    #   "prompt": "你是谁？"
+    # }'
