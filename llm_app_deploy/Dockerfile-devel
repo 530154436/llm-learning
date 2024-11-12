@@ -1,5 +1,5 @@
 # 15521147129/llm:vllm0.6.3
-FROM nvidia/cuda:12.2.2-cudnn8-runtime-ubuntu22.04
+FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV PYTHON_VERSION=3.10
