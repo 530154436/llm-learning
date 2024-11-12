@@ -13,7 +13,9 @@ RUN ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 COPY sources.list /etc/apt/sources.list
 RUN apt-get update && \
     apt-get install -y \
-    git \
+    net-tools \
+    openssh-server \
+    curl \
     python3 \
     python3-pip \
     python3-dev \
