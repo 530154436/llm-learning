@@ -17,7 +17,8 @@ CUDA_DEVICE = f"{DEVICE}:{DEVICE_ID}" if DEVICE_ID else DEVICE  # 组合CUDA设�
 
 # 加载预训练的分词器和模型
 BASE_DIR = Path(__file__).parent.parent
-model_name_or_path = BASE_DIR.joinpath('data/models/Qwen2.5-7B-Instruct')
+model_name_or_path = BASE_DIR.joinpath('data/models/Qwen2.5-7B-Instruct').__str__()
+print(model_name_or_path)
 TOKENIZER = AutoTokenizer.from_pretrained(model_name_or_path, use_fast=False)
 MODEL = AutoModelForCausalLM.from_pretrained(model_name_or_path, device_map="auto", torch_dtype=torch.bfloat16)
 
