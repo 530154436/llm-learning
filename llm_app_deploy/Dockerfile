@@ -28,7 +28,6 @@ RUN echo `python --version`
 # 安装Python依赖
 COPY requirements.txt /requirements.txt
 RUN python -m pip install --no-cache --upgrade pip setuptools wheel -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
-RUN python -m pip install --retries=3 --no-cache -r requirements.txt  -i http://maven.qizhidao.net:8081/repository/algo-public/simple/ --trusted-host maven.qizhidao.net
-
+RUN python -m pip install --no-cache -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
 # /usr/local/bin/gunicorn
 RUN echo `which gunicorn`
