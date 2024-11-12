@@ -5,5 +5,9 @@ fastapi==0.115.4
 pydantic==2.9.2
 openai==1.52.0
 requests==2.32.3
-# Requires torch==2.4.0
+
+# torch==2.4.0
+# transformers==4.46.2
+# torch==2.4.0
+# torchvision==0.19.0
 vllm==0.6.3.post1
