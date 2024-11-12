@@ -13,3 +13,5 @@
 cd llm-learning/llm_app_deploy/
 python -u app_fastapi.py
 
+
+/bin/bash app_vllm.sh
