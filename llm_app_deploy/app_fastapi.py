@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*--
 import gc
+from pathlib import Path
+
 from fastapi import FastAPI, Request
 from transformers import AutoTokenizer, AutoModelForCausalLM, GenerationConfig
 import uvicorn
@@ -14,7 +16,8 @@ DEVICE_ID = "0"  # CUDA设备ID，如果未设置则为空
 CUDA_DEVICE = f"{DEVICE}:{DEVICE_ID}" if DEVICE_ID else DEVICE  # 组合CUDA设备信息
 
 # 加载预训练的分词器和模型
-model_name_or_path = 'dev-nfs/zhengchubin/llm-learning/data/models/Qwen2.5-7B-Instruct'
+BASE_DIR = Path(__file__).parent.parent
+model_name_or_path = BASE_DIR.joinpath('data/models/Qwen2.5-7B-Instruct')
 TOKENIZER = AutoTokenizer.from_pretrained(model_name_or_path, use_fast=False)
 MODEL = AutoModelForCausalLM.from_pretrained(model_name_or_path, device_map="auto", torch_dtype=torch.bfloat16)
 
