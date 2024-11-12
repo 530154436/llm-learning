@@ -8,4 +8,4 @@ nohup python -m vllm.entrypoints.openai.api_server \
 --model data/models/Qwen2.5-7B-Instruct \
 --served-model-name Qwen2.5-7B-Instruct \
 --gpu-memory-utilization 0.8 \
---max-model-len 2560 > server.log &
+--max-model-len 2400 > server.log &

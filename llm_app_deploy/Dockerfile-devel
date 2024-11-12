@@ -23,6 +23,7 @@ RUN apt-get update && \
 
 RUN ln -s /usr/bin/python3.10 /usr/bin/python
 RUN echo `which python`
+RUN echo `python --version`
 
 # 安装Python依赖
 COPY requirements.txt /requirements.txt
