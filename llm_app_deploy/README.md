@@ -16,3 +16,7 @@ python -u app_fastapi.py
 
 cd llm-learning/
 /bin/bash app_vllm.sh
+
+
+vLLM 源码解读系列
+https://github.com/PaddleJitLab/CUDATutorial/blob/develop/docs/16_vllm_source_code/01_vllm_arch.md

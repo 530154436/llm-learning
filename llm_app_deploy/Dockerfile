@@ -14,6 +14,8 @@ COPY sources.list /etc/apt/sources.list
 RUN apt-get update && \
     apt-get install -y \
     net-tools \
+    htop \
+    vim \
     openssh-server \
     curl \
     python3 \

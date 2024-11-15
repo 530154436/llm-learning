@@ -11,3 +11,4 @@ accelerate==1.1.1
 # torch==2.4.0
 # torchvision==0.19.0
 vllm==0.6.3.post1
+vllm-flash-attn==2.6.2
