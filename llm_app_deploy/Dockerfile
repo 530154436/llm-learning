@@ -29,8 +29,8 @@ RUN echo `python --version`
 
 # 安装Python依赖
 COPY requirements.txt /requirements.txt
-RUN python -m pip install --no-cache --upgrade pip setuptools wheel -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
-RUN python -m pip install --retries=3 --no-cache -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+RUN python -m pip install --no-cache --upgrade pip setuptools wheel -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple --trusted-host mirrors.tuna.tsinghua.edu.cn
+RUN python -m pip install --retries=3 --no-cache -r requirements.txt -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple --trusted-host mirrors.tuna.tsinghua.edu.cn
 
 # /usr/local/bin/gunicorn
 RUN echo `which gunicorn`
