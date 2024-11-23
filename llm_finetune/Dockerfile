@@ -1,5 +1,5 @@
 # 15521147129/llm:vllm0.6.3
-FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04
+FROM nvidia/cuda:12.2.2-cudnn8-runtime-ubuntu22.04
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV PYTHON_VERSION=3.10
@@ -13,7 +13,10 @@ RUN ln -fs /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 COPY sources.list /etc/apt/sources.list
 RUN apt-get update && \
     apt-get install -y \
+    gcc \
     net-tools \
+    htop \
+    vim \
     openssh-server \
     curl \
     python3 \
@@ -27,8 +30,8 @@ RUN echo `python --version`
 
 # 安装Python依赖
 COPY requirements.txt /requirements.txt
-RUN python -m pip install --no-cache --upgrade pip setuptools wheel -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
-RUN python -m pip install --no-cache -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple --trusted-host mirrors.aliyun.com
+RUN python -m pip install --no-cache --upgrade pip setuptools wheel -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple --trusted-host mirrors.tuna.tsinghua.edu.cn
+RUN python -m pip install --retries=3 --no-cache -r requirements.txt -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple --trusted-host mirrors.tuna.tsinghua.edu.cn
 
 # /usr/local/bin/gunicorn
 RUN echo `which gunicorn`

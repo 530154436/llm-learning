@@ -1,4 +1,5 @@
 # 15521147129/llm:vllm0.6.3
+# FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04
 FROM nvidia/cuda:12.2.2-cudnn8-runtime-ubuntu22.04
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -28,7 +29,7 @@ RUN echo `which python`
 RUN echo `python --version`
 
 # 安装Python依赖
-COPY requirements.txt /requirements.txt
+COPY requirements-vllm.txt /requirements.txt
 RUN python -m pip install --no-cache --upgrade pip setuptools wheel -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple --trusted-host mirrors.tuna.tsinghua.edu.cn
 RUN python -m pip install --retries=3 --no-cache -r requirements.txt -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple --trusted-host mirrors.tuna.tsinghua.edu.cn
 
