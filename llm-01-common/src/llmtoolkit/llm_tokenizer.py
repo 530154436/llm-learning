@@ -44,6 +44,8 @@ def get_token_ids_for_openai(
     :param model: 要使用的模型名称。
     :param verbose: 是否打印详细信息
     :return int: 输入字符串中的标记数量。
+
+    https://github.com/openai/tiktoken/blob/main/tiktoken
     """
     # gpt-3.5-turbo -> cl100k_base
     encoding_name: str = tiktoken.encoding_name_for_model(model_name=model)
@@ -55,20 +57,15 @@ def get_token_ids_for_openai(
     return token_ids
 
 
-def num_token_in_string_qwen(
+def num_token_in_string(
     input_str: str,
     model: str = "qwen-plus",
 ) -> int:
-    """千问模型系列-计算给定字符串中的token数量。"""
-    return len(get_token_ids_for_qwen(input_str, model=model, verbose=False))
-
-
-def num_token_in_string_openai(
-    input_str: str,
-    model: str = "gpt-3.5-turbo"
-) -> int:
-    """OpenAI模型系列-计算给定字符串中的token数量。"""
-    return len(get_token_ids_for_openai(input_str, model=model, verbose=False))
+    """计算给定字符串中的token数量。"""
+    if model.startswith('qwen'):
+        return len(get_token_ids_for_qwen(input_str, model=model, verbose=False))
+    else:
+        return len(get_token_ids_for_openai(input_str, model=model, verbose=False))
 
 
 def num_token_in_message(
@@ -82,19 +79,15 @@ def num_token_in_message(
     num_tokens = 0
     for message in messages:
         for key, value in message.items():
-            if model.startswith('qwen'):
-                num_tokens += num_token_in_string_qwen(value, model=model)
-            else:
-                num_tokens += num_token_in_string_openai(value, model=model)
+            num_tokens += num_token_in_string(value, model=model)
     return num_tokens
 
 
 if __name__ == "__main__":
     print(get_token_ids_for_qwen("你好，你怎么样？"))               # [108386, 3837, 56568, 104472, 11319]
     print(get_token_ids_for_openai("Hello, how are you?"))       # [9906, 11, 1268, 527, 499, 30]
-    print(num_token_in_string_qwen("你好，你怎么样？"))             # 5
-    print(num_token_in_string_openai("Hello, how are you?"))     # 6
-
+    print(num_token_in_string("你好，你怎么样？", model="qwen-plus"))  # 5
+    print(num_token_in_string("Hello, how are you?", model="gpt-3.5-turbo"))  # 6
     _message = [
         {"role": "system", "content": "你好，你怎么样？"},
         {"role": "user", "content": "我很好，谢谢."}

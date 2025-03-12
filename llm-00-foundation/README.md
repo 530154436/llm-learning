@@ -32,3 +32,8 @@
 
 ### 引用
 赵鑫, 李军毅, 周昆, 唐天一, 和 文继荣. [大语言模型](https://llmbook-zh.github.io/). 高等教育出版社, 2024, 北京. 
+
+
+大语言模型：从理论到实践（第二版）
+https://intro-llm.github.io/
+https://github.com/intro-llm/intro-llm-code
