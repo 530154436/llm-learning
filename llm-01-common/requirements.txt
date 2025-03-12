@@ -1,4 +1,3 @@
-spark_ai_python==0.3.31
 openai==1.52.0
 langchain==0.3.0
 langchain-core==0.3.0
@@ -9,3 +8,5 @@ jupyter==1.1.1
 pandas==2.2.3
 modelscope==1.19.2
 requests==2.32.3
+tiktoken==0.9.0
+dashscope==1.19.2
