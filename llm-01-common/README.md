@@ -1,0 +1,6 @@
+[Coggle 8月竞赛学习：高效使用ChatGPT](https://mp.weixin.qq.com/s/x2o-MdB5XVPElNv_RCzYSw)
+[ChatGPT Prompt工程浅谈](https://blog.csdn.net/DragonGirI/article/details/128923740)
+[神奇的Prompt工程](https://github.com/yunwei37/Awesome-Prompt-Engineering-ZH-CN)
+[Prompts 精选](https://github.com/langgptai/wonderful-prompts?tab=readme-ov-file#prompt-%E7%94%9F%E6%88%90%E4%BC%98%E5%8C%96)
+[ChatGPT 中文指南](https://github.com/EmbraceAGI/awesome-chatgpt-zh)
+[Promptify](https://github.com/promptslab/Promptify/tree/main?tab=readme-ov-file)
