@@ -32,6 +32,10 @@
 
 ### 引用
 赵鑫, 李军毅, 周昆, 唐天一, 和 文继荣. [大语言模型](https://llmbook-zh.github.io/). 高等教育出版社, 2024, 北京. 
+配套代码：
+[LLMBox](https://github.com/RUCAIBox/LLMBox/tree/main) 是作者团队围绕英文综述论文所开发的综合性大语言模型代码库，用于支持大模型训练与评测的学术研究工作。
+[YuLan-Chat-3](https://github.com/RUC-GSAI/YuLan-Chat) 经历了完整的从头预训练、指令微调以及人类对齐的训练过程，包含 12B 的参数规模，预训练数据量达到 1.68T 词元。
+[YuLan-Mini](https://github.com/RUC-GSAI/YuLan-Mini) YuLan-Mini 是一个 2.4B 参数量的轻量化语言模型。
 
 
 大语言模型：从理论到实践（第二版）
