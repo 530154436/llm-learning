@@ -41,3 +41,10 @@
 大语言模型：从理论到实践（第二版）
 https://intro-llm.github.io/
 https://github.com/intro-llm/intro-llm-code
+
+大语言模型训练数据(2024.11.12)
+https://arxiv.org/html/2411.07715v1
+
+数据处理框架
+https://github.com/modelscope/data-juicer/blob/main/README_ZH.md
+https://github.com/FlagOpen/FlagData/tree/main
