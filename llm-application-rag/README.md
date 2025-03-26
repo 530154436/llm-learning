@@ -15,6 +15,17 @@ Qwen2.5 : 模型部分使用阿里推出的 Qwen 2.5 系列，为检索增强生
 配置 Ollama 以高效调度 Qwen2.5 系列模型。
 使用 Ollama 配置的名为 bge-m3 的 embedding 模型实现检索向量化处理。
 
+综述
+https://github.com/lizhe2004/Awesome-LLM-RAG-Application
+
+
+框架
+https://github.com/gomate-community/TrustRAG
+https://github.com/langgenius/dify
+https://github.com/infiniflow/ragflow/tree/main
+https://github.com/labring/FastGPT/blob/main/README.md
+
+
 
 [大模型RAG的迭代路径](https://mp.weixin.qq.com/s/kTZc1UpAzpSNanRx82ZRtg)
 [面向大语言模型的检索增强生成技术：综述 [译]](https://baoyu.io/translations/ai-paper/2312.10997-retrieval-augmented-generation-for-large-language-models-a-survey)
