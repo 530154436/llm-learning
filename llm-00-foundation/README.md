@@ -37,6 +37,11 @@
 [YuLan-Chat-3](https://github.com/RUC-GSAI/YuLan-Chat) 经历了完整的从头预训练、指令微调以及人类对齐的训练过程，包含 12B 的参数规模，预训练数据量达到 1.68T 词元。
 [YuLan-Mini](https://github.com/RUC-GSAI/YuLan-Mini) YuLan-Mini 是一个 2.4B 参数量的轻量化语言模型。
 
+读书笔记-参考博客
+https://www.zhihu.com/people/anch3or/search?keyword=%E8%B5%B5%E9%91%AB&pathBefore=%2Fpeople%2Fanch3or
+
+大佬的学习总结笔记
+https://www.huaxiaozhuan.com/#huggingface_transformer
 
 大语言模型：从理论到实践（第二版）
 https://intro-llm.github.io/
@@ -44,13 +49,3 @@ https://github.com/intro-llm/intro-llm-code
 
 大语言模型训练数据(2024.11.12)
 https://arxiv.org/html/2411.07715v1
-
-数据处理框架
-https://github.com/modelscope/data-juicer/blob/main/README_ZH.md
-https://github.com/FlagOpen/FlagData/tree/main
-
-语种检测
-https://github.com/RUC-GSAI/Yulan-GARDEN/blob/main/utils/evaluator/LangIdentifier.py
-https://github.com/apachecn/fasttext-doc-zh/blob/master/doc/zh/language-identification.md
-https://fasttext.apachecn.org/#/doc/zh/language-identification
-https://blog.csdn.net/weixin_45114252/article/details/111053988

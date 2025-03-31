@@ -1,3 +1,4 @@
+## 词元化（tokenization）
 
 transformers-tokenizer
 https://huggingface.co/learn/nlp-course/zh-CN/chapter6/1?fw=pt
@@ -16,3 +17,5 @@ FastTokenizer：高性能文本处理库
 https://github.com/GreatV/fast_tokenizer
 
 
+第三篇：ChatGPT背后强大而神秘的力量，用最简单的语言讲解Transformer架构之Tokenizer
+https://zhuanlan.zhihu.com/p/686444517
