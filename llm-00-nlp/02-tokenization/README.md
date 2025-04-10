@@ -1,3 +1,19 @@
+<nav>
+<a href="#一分词的基本概念">一、分词的基本概念</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#11-模型输入编码-encode阶段">1.1 模型输入（编码 Encode）阶段</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#12-模型输出解码-decode阶段">1.2 模型输出（解码 Decode）阶段</a><br/>
+<a href="#二分词流程">二、分词流程</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#21-标准化normalization">2.1 标准化（normalization）</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#22-预分词pre-tokenization">2.2 预分词（Pre-tokenization）</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#23-模型model">2.3 模型（Model）</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#24-分词后处理post-tokenization">2.4 分词后处理（Post-tokenization）</a><br/>
+<a href="#三分词算法">三、分词算法</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#31-按单词划分word-based">3.1 按单词划分（Word-based）</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#32-按字符划分character-based">3.2 按字符划分（Character-based）</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#33-按子词切分-subword-tokenization">3.3 按子词切分 (Subword tokenization)</a><br/>
+<a href="#参考引用">参考引用</a><br/>
+</nav>
+
 
 ## 一、分词的基本概念
 
@@ -176,79 +192,18 @@ Post-tokenization主要包括：
 | 代表模型 | GPT,GPT-2,RoBERTa,BART,和DeBERTa<br>开源大规模语言模型如Llama系列、Mistral、Qwen | BERT        | T5            |
 
 
-#### 3.3.1 BPE（Byte-Pair Encoding）
-字节对编码 (Byte-Pair Encoding，BPE) 最初是作为一种压缩文本的算法开发的，最早是由Philip Gage于1994年在《A New Algorithm for Data Compression》一文中提出，后来被 OpenAI 在预训练 GPT 模型时用于分词器（Tokenizer）。它被许多 Transformer 模型使用，包括 GPT、GPT-2、RoBERTa、BART 和 DeBERTa。
-
-BPE 算法从一组基本符号（例如字母和边界字符）开始，迭代地寻找语料库中的两个相邻词元，并将它们替换为新的词元，这一过程被称为`合并`。
-合并的选择标准是计算两个连续词元的共现频率，也就是每次迭代中，最频繁出现的一对词元会被选择与合并。
-合并过程将一直持续达到预定义的词表大小。
-
-
-
-#### 3.3.2 B-BPE（Byte-level BPE）
-字节级别的 BPE（Byte-level BPE, B-BPE）是 BPE 算法的一种拓展。
-它将字节视为合并操作的基本符号，从而可以实现更细粒度的分割，且解决了未登录词问题。
-具体来说，如果将所有 Unicode 字符都视为基本字符，那么包含所有可能基本字符的基本词表会非常庞大（例如将中文的每个汉字当作一个基本字符）。
-而将字节作为基本词表可以设置基本词库的大小为 256，同时确保每个基本字符都包含在词汇中。 
-例如，GPT-2 的词表大小为 50,257 ，包括 256 个字节的基本词元、一个特殊的文末词元以及通过 50,000 次合并学习到的词元。
-
-### 3.2 WordPiece
-WordPiece 是谷歌内部非公开的分词算法，最初是由谷歌研究人员在开发语音搜索系统时提出的。
-随后，在 2016 年被用于机器翻译系统，并于 2018 年被 BERT 采用作为分词器。
-WordPiece 分词和 BPE 分词的想法非常相似，都是通过迭代合并连续的词元，但是合并的选择标准略有不同。
-在合并前，`WordPiece`分词算法会首先训练一个语言模型，并用这个语言模型对所有可能的词元对进行评分。然后，在每次合并时，它都会选择使得训练数据的似然性增加最多的词元对。
-与 BPE 类似，Word Piece 分词算法也是从一个小的词汇表开始，其中包括模型使用的特殊词元和初始词汇表。
-由于它是通过添加前缀（如 BERT 的##）来识别子词的，因此每个词的初始拆分都是将前缀添加到词内的所有字符上。
-举例来说，“word”会被拆分为：“w##o ##r ##d”。与 BPE 方法的另一个不同点在于，WordPiece 分词算法并不选择最频繁的词对，而是使用下面的公式为每个词对计算分数：
-
-$$
-得分=\frac{词对出现的频率}{第一个词出现的频率\times 第二个词出现的频率} \\
-$$
-### 3.3 SentencePiece
-### 3.4 Unigram
-与 BPE 分词和 WordPiece 分词不同，Unigram 分词方法从语料库的一组足够大的字符串或词元初始集合开始，迭代地删除其中的词元，直到达到预期的词表大小。
-它假设从当前词表中删除某个词元，并计算训练语料的似然增加情况，以此来作为选择标准。
-这个步骤是基于一个训练好的一元语言模型来进行的。
-为估计一元语言模型，它采用期望最大化（Expectation–Maximization, EM）算法：
-在每次迭代中，首先基于旧的语言模型找到当前最优的分词方式，然后重新估计一元概率从而更新语言模型。
-这个过程中一般使用动态规划算法（即`维特比算法`，Viterbi Algorithm）来高效地找到语言模型对词汇的最优分词方式。采用这种分词方法的代表性模型包括 T5 和 mBART。
-
-
-#### 分词器的选用
-虽然直接使用已有的分词器较为方便（例如 OPT和 GPT-3使用了 GPT-2的分词器），但是使用为预训练语料专门训练或设计的分词器会更加有效，尤其是对于那些混合了多领域、多语言和多种格式的语料。
-最近的大语言模型通常使用 SentencePiece 代码库为预训练语料训练定制化的分词器，这一代码库支持字节级别的 BPE 分词和 Unigram 分词。
-
-首先，分词器必须具备无损重构的特性，即其分词结果能够准确无误地还原为原始输入文本。其次，分词器应具有高压缩率，即在给定文本数据的情况下，经过分词处理后的词元数量应尽可能少，从而实现更为高效的文本编码和存储。具体来说，压缩比可以通过将原始文本的 UTF-8 字节数除以分词器生成的词元数（即每个词元的平均字节数）来计算：
-
-$$
-压缩率=\frac{UTF-8字节数}{词元数} \\
-$$
-
-值得注意的是，在扩展现有的大语言模型（如继续预训练或指令微调）的同时，还需要意识到原始分词器可能无法较好地适配实际需求。
-此外，为进一步提高某些特定能力（如数学能力），还可能需要针对性地设计分词器。例如，BPE 分词器可能将整数 7,481 分词为“7 481”，而将整数 74,815 分词为“748 15”。
+详细参考：
++ [分词器（1）BPE.md](分词器（1）BPE.md)
++ [分词器（2）WordPiece.md](分词器（2）WordPiece.md)
++ [分词器（3）Unigram.md](分词器（3）Unigram.md)
 
 
 ## 参考引用
-1. [BPE vs WordPiece：理解Tokenizer的工作原理与子词分割方法](https://github.com/Hoper-J/AI-Guide-and-Demos-zh_CN/blob/master/Guide/21. BPE vs WordPiece：理解 Tokenizer 的工作原理与子词分割方法.md)<br>
-2. [第三篇：ChatGPT背后强大而神秘的力量，用最简单的语言讲解Transformer架构之Tokenizer](https://zhuanlan.zhihu.com/p/686444517)<br>
-
-【LLM基础知识】LLMs-Tokenizer知识总结笔记v2.0
-https://www.53ai.com/news/LargeLanguageModel/2024080625837.html
-全网最全的大模型分词器（Tokenizer）总结.md
-https://github.com/luhengshiwo/LLMForEverybody/blob/main/01-第一章-预训练/全网最全的大模型分词器（Tokenizer）总结.md
-
-transformers-tokenizer
-https://huggingface.co/learn/nlp-course/zh-CN/chapter6/1?fw=pt
-https://github.com/huggingface/tokenizers
-LLM中的Tokenizers
-https://www.bilibili.com/video/BV1q94y1a7NU
-https://www.huaxiaozhuan.com/%E5%B7%A5%E5%85%B7/huggingface_transformer/chapters/1_tokenizer.html
-openai-tokenizer
-https://zhuanlan.zhihu.com/p/592399697
-tiktokenizer-可视化
-https://github.com/openai/tiktoken/blob/main/README.md
-https://tiktokenizer.vercel.app/
-千问-tokenizer
-https://github.com/QwenLM/Qwen/blob/main/tokenization_note_zh.md
-FastTokenizer：高性能文本处理库
-https://github.com/GreatV/fast_tokenizer
+1. [第三篇：ChatGPT背后强大而神秘的力量，用最简单的语言讲解Transformer架构之Tokenizer](https://zhuanlan.zhihu.com/p/686444517)<br>
+2. [【LLM基础知识】LLMs-Tokenizer知识总结笔记v2.0](https://www.53ai.com/news/LargeLanguageModel/2024080625837.html)<br>
+3. [全网最全的大模型分词器（Tokenizer）总结.md](https://github.com/luhengshiwo/LLMForEverybody/blob/main/01-第一章-预训练/全网最全的大模型分词器（Tokenizer）总结.md)<br>
+4. [transformers-tokenizer](https://huggingface.co/learn/nlp-course/zh-CN/chapter6/1?fw=pt)<br>
+5. [LLM中的Tokenizers-bilibili视频](https://www.bilibili.com/video/BV1q94y1a7NU)<br>
+6. [tiktokenizer-可视化](https://tiktokenizer.vercel.app/)<br>
+7. [千问-tokenizer](https://github.com/QwenLM/Qwen/blob/main/tokenization_note_zh.md)<br>
+8. [FastTokenizer：高性能文本处理库](https://github.com/GreatV/fast_tokenizer)<br>
