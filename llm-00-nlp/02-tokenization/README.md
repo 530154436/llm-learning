@@ -63,25 +63,61 @@ Normalization主要包括以下几个方面：
 from tokenizers.normalizers import BertNormalizer
 from transformers import AutoTokenizer, BertTokenizerFast
 
-tokenizer: BertTokenizerFast = AutoTokenizer.from_pretrained("bert-base-uncased")
+tokenizer: BertTokenizerFast = AutoTokenizer.from_pretrained("google-bert/bert-base-uncased")
 normalizer: BertNormalizer = tokenizer.backend_tokenizer.normalizer
 # hello how are u?
+print(normalizer.normalize_str("Héllò hôw are U?"))
+
+tokenizer: BertTokenizerFast = AutoTokenizer.from_pretrained("google-bert/bert-base-cased")
+normalizer: BertNormalizer = tokenizer.backend_tokenizer.normalizer
+# Héllò hôw are U?
 print(normalizer.normalize_str("Héllò hôw are U?"))
 ```
 
 ### 2.2 预分词（Pre-tokenization）
 
-Pre-tokenization是基于一些简单的规则（如空格和标点）进行初步的文本分割，这一步骤是为了将文本初步拆解为更小的单元，如句子和词语；对于英文等使用空格分隔的语言来说，这一步相对直接，但对于中文等无空格分隔的语言，则可能直接进入下一步。
+Pre-tokenization是基于一些简单的规则（如`空格`和`标点符号`）进行初步的文本分割，这一步骤是为了将文本初步拆解为更小的单元，如句子和词语；对于英文等使用空格分隔的语言来说，这一步相对直接，但对于中文等无空格分隔的语言，则可能直接进入下一步。通常使用 tokenizer 对象的 pre_tokenizer 属性的 `pre_tokenize_str()` 方法进行预分词。
++ `BERT` tokenizer 在空白和标点符号上进行分割，不保留空格。
++ `GPT-2` 的 tokenizer 也会在空格和标点符号上进行分割，但它保留空格，并用 Ġ 符号替换它们，使得在解码 tokens 时能够恢复原始空格，并且不会忽略双空格。
++ `T5` 使用 SentencePiece 算法进行分词。T5 tokenizer 保留空格并用特定 token 替换它们（例如 ▁），但只在空格上进行分割，不考虑标点符号。此外，它会在句子开头默认添加一个空格，并忽略 are 和 you 之间的双空格。
+```python
+from tokenizers.pre_tokenizers import BertPreTokenizer, ByteLevel, Sequence
+from transformers import AutoTokenizer, BertTokenizerFast, GPT2TokenizerFast, T5TokenizerFast
 
+tokenizer: BertTokenizerFast = AutoTokenizer.from_pretrained("google-bert/bert-base-cased")
+pre_tokenizer: BertPreTokenizer = tokenizer.backend_tokenizer.pre_tokenizer
+# [('Hello', (0, 5)), (',', (5, 6)), ('how', (7, 10)), ('are', (11, 14)), ('you', (16, 19)), ('?', (19, 20))]
+print(pre_tokenizer.pre_tokenize_str("Hello, how are  you?"))
 
+tokenizer: GPT2TokenizerFast = AutoTokenizer.from_pretrained("openai-community/gpt2")
+pre_tokenizer: ByteLevel = tokenizer.backend_tokenizer.pre_tokenizer
+# [('Hello', (0, 5)), (',', (5, 6)), ('Ġhow', (6, 10)), ('Ġare', (10, 14)), ('Ġ', (14, 15)), ('Ġyou', (15, 19)), ('?', (19, 20))]
+print(pre_tokenizer.pre_tokenize_str("Hello, how are  you?"))
 
-## Model
+tokenizer: T5TokenizerFast = AutoTokenizer.from_pretrained("AI-ModelScope/t5-small")
+pre_tokenizer: Sequence = tokenizer.backend_tokenizer.pre_tokenizer
+# [('▁Hello,', (0, 6)), ('▁how', (7, 10)), ('▁are', (11, 14)), ('▁you?', (16, 20))]
+print(pre_tokenizer.pre_tokenize_str("Hello, how are  you?"))
+```
 
-Model是分词的核心部分，在Pre-tokenization的基础上，根据选定的模型或算法（BPE，WordPiece，Unigram语言模型（LM）或SentencePiece等）进行更细致的处理，包括通过大量文本数据，根据算法规则生成词汇表(Vocabulary)，然后依据词汇表，将文本拆分为Token。
+### 2.3 模型（Model）
 
-在自然语言处理模型中，确定合适的词汇表大小是一个关键步骤，它直接影响模型的性能、效率以及适应性。理想的词汇表应该在保证模型性能和效率的同时，满足特定任务和数据集的需求。
+Model是分词的核心部分，在Pre-tokenization的基础上，根据选定的模型或算法（BPE、WordPiece、Unigram或SentencePiece等）进行更细致的处理，包括通过大量文本数据，根据算法规则生成词汇表(Vocabulary)，然后依据词汇表，将文本拆分为Token。 在自然语言处理模型中，确定合适的词汇表大小是一个关键步骤，它直接影响模型的性能、效率以及适应性。理想的词汇表应该在保证模型性能和效率的同时，满足特定任务和数据集的需求。
 
-## Post-tokenization
++ **较大词汇表**：可以提高模型覆盖不同词汇和表达的能力，有助于更好地理解和生成文本。然而，它也会增加计算负担和资源需求，可能导致训练和推理过程变慢，甚至引起词嵌入空间的稀疏性问题。
++ **较小词汇表**：减少计算资源的需求，但可能限制模型的表现力，使其难以捕捉复杂的语言结构。
+
+不同的NLP任务对词汇表大小有不同的要求。例如，精细的文本生成任务可能需要较大的词汇量来捕捉更多细节，而一些简单的分类任务则可能只需较小的词汇表就能高效运行。此外，考虑到不同语言间的结构差异及数据集中文本的多样性，设计理想的词汇表也需要考虑具体的应用场景和需求。在实际应用中，可能需要通过实验和调整来找到最适合特定模型和任务的词汇表大小，下面是各大LLM词汇表的大小和性能对比：
+
+| 模型                | 分词器                      | 词汇表大小   | 主要特点/性能概述                                                              |
+|-------------------|--------------------------|---------|------------------------------------------------------------------------|
+| BERT-base-cased   | WordPiece                | 28,996  | 区分大小写的预训练模型，适用于多种NLP任务。                                                |
+| BERT-base-uncased | WordPiece                | 30,522  | 不区分大小写的版本，同样广泛应用于各类NLP任务。                                              |
+| T5-small          | SentencePiece            | 32,100  | 采用统一框架处理所有NLP任务，包括文本生成、翻译等。                                            |
+| GPT-2             | Byte Pair Encoding (BPE) | 50,257  | 扩展了词汇表和参数规模，显著提升了生成能力和理解复杂度。                                           |
+| Qwen              | Byte Pair Encoding (BPE) | 151,646 | https://qwen.readthedocs.io/zh-cn/latest/getting_started/concepts.html |
+
+### 2.4 分词后处理（Post-tokenization）
 
 Post-tokenization主要包括：
 
@@ -89,62 +125,74 @@ Post-tokenization主要包括：
 - **特殊Token添加**：根据模型需求，在序列的适当位置添加特殊Token（如[CLS], [SEP]）。
 - **构建注意力掩码**：对于需要的模型，构建注意力掩码以区分实际Token和填充Token。
 
-
-
 ## 三、分词算法
-
 
 根据切分粒度的不同，分词策略可以分为以下几种：
 
-按词切分 (Word-based)
+### 3.1 按单词划分（Word-based）
+按照词进行分词，根据空格或标点进行分割。例如："Today is sunday"→[today, is, sunday, .]<br>
 
-word_based_tokenization
+优点：
++ 简单直观，易于理解和实现。<br>
 
-例如直接利用 Python 的 split() 函数按空格进行分词：
+缺点：
++ `词汇表过大`：由于需要涵盖语料库中的所有词语，这会导致词汇表异常庞大。<br>
++ `未登陆词问题`（Out-Of-Vocabulary, OOV）：对于不在词汇表中的词，模型通常无法识别，只能将其标记为未知符号（[UNK]），影响了对新词的适应能力。<br>
++ `低频词训练不足`：受限于词汇表大小，一些出现频率较低的词可能被排除在外，导致这些词在模型训练中得不到充分学习。<br>
++ `形态学信息丢失`：对于英语等语言，不同形式的同一个词（如"look", "looks", "looking", "looked"）被视为不同的词，增加了词汇量，并且使得模型难以学习到这些词之间的关系，既增加了训练冗余，也加剧了大词汇量的问题。<br>
 
-tokenized_text = "Jim Henson was a puppeteer".split()
-print(tokenized_text)
-['Jim', 'Henson', 'was', 'a', 'puppeteer']
-这种策略的问题是会将文本中所有出现过的独立片段都作为不同的 token，从而产生巨大的词表。而实际上很多词是相关的，例如 “dog” 和 “dogs”、“run” 和 “running”，如果给它们赋予不同的编号就无法表示出这种关联性。
+### 3.2 按字符划分（Character-based）
+按照单字符进行分词，将每个字符（包括标点符号）视为一个单独的单元。例如："Today is sunday"→[t， o， d，a，y，i, s, s，u，n，d，a，y，.]<br>
 
-词表就是一个映射字典，负责将 token 映射到对应的 ID（从 0 开始）。神经网络模型就是通过这些 token ID 来区分每一个 token。
+优点：
++ 词汇量小：与基于词的方法相比，基于字符的词汇表要小得多，因为只需要考虑构成语言的所有字符，而不是所有的单词组合。<br>
++ 减少未知标记（OOV）问题：由于每个单词都可以从字符构建，因此减少了遇到词汇外单词的情况，提高了模型对未见过单词的适应能力。<br>
 
-当遇到不在词表中的词时，分词器会使用一个专门的 
- token 来表示它是 unknown 的。显然，如果分词结果中包含很多 
- 就意味着丢失了很多文本信息，因此一个好的分词策略，应该尽可能不出现 unknown token。
+缺点：
++ `粒度过细`：一个完整的词被分解成多个字符，这导致每个字符或token的信息密度较低，不利于捕捉词或短语的整体意义。<br>
++ `训练成本高、解码效率低`：由于需要处理更多的token（即字符），模型训练时间增加，同时解码过程也会变得更慢、效率更低。<br>
++ `在某些语言中字符的意义有限`：特别是在那些字符本身不携带完整意义的语言中（如英语等使用字母文字的语言），单个字符无法传达有效的信息，必须结合其他字符才能表达完整的意思。<br>
 
-按字符切分 (Character-based)
 
-character_based_tokenization
+### 3.3 按子词切分 (Subword tokenization)
+基于子词的分词方法旨在结合基于词和基于字符的分词法的优点，同时克服它们各自的缺点。这种方法通过将单词切分成更小但具有一定语义意义的子词来实现。
++ 高频词保持完整：如"dog"这样的高频词不会被分割。
++ 低频词被拆分为有意义的子词：例如"dogs"会被拆分为["dog", "##s"]。这种方法允许用一个有限的词汇表解决所有单词的分词问题，同时尽量减少词汇表的大小。
 
-这种策略把文本切分为字符而不是词语，这样就只会产生一个非常小的词表，并且很少会出现词表外的 tokens。
+优点：
++ `降低词汇表大小`：可以通过组合少量的sub-word构建更大的词，例如“unfortunately”可以被分解为“un-”，“for-”，“tun-”，“ate-”，“ly”。这与英语中的词根词缀拼词法类似，使得这些片段也可以用于构造其他词。
++ `学习词之间的关系`：相比传统分词方法，能够更好地捕捉词缀间的关系，比如"old"、"older"和"oldest"之间的关系。
++ `平衡OOV问题`：解决了传统分词法无法很好处理未知或罕见词汇的问题，同时避免了基于字符的方法粒度过细的问题。Subword方法通过“拼词”的方式处理许多罕见词汇，其粒度介于词和字符之间，提供了较好的OOV处理能力。
 
-但是从直觉上来看，字符本身并没有太大的意义，因此将文本切分为字符之后就会变得不容易理解。这也与语言有关，例如中文字符会比拉丁字符包含更多的信息，相对影响较小。此外，这种方式切分出的 tokens 会很多，例如一个由 10 个字符组成的单词就会输出 10 个 tokens，而实际上它们只是一个词。
 
-因此现在广泛采用的是一种同时结合了按词切分和按字符切分的方式——按子词切分 (Subword tokenization)。
+常见的主流子词切分算法如下：
 
-**按子词切分 (Subword) **
+| 模型   | BPE/BBPE                            | WordPiece                                    | Unigram                      |
+|------|-------------------------------------|----------------------------------------------|------------------------------|
+| 训练   | 从一个小的词汇表开始，学习合并token的规则             | 从一个小的词汇表开始，学习合并token的规则                      | 从一个大的词汇表开始，学习移除token的规则      |
+| 训练步骤 | 合并对应最常见的token对                      | 根据频率对得分最高的token对进行合并<br>优先考虑单个token出现频率较低的组合 | 移除那些在整个语料库上会导致最小化损失的所有tokens |
+| 学习   | 合并规则和词汇表                            | 只有词汇表                                        | 包含每个token分数的词汇表              |
+| 编码   | 将单词分割成字符，并应用在训练过程中学到的合并             | 从开头开始查找属于词汇表中最长的子词，然后对其余部分重复此过程              | 使用训练中学到的分数找到最可能的token分割方式    |
+| 代表模型 | GPT,GPT-2,RoBERTa,BART,和DeBERTa<br>开源大规模语言模型如Llama系列、Mistral、Qwen | BERT        | T5            |
 
-高频词直接保留，低频词被切分为更有意义的子词。例如 “annoyingly” 是一个低频词，可以切分为 “annoying” 和 “ly”，这两个子词不仅出现频率更高，而且词义也得以保留。下图展示了对 “Let’s do tokenization!“ 按子词切分的结果：
 
-bpe_subword
+#### 3.3.1 BPE（Byte-Pair Encoding）
+字节对编码 (Byte-Pair Encoding，BPE) 最初是作为一种压缩文本的算法开发的，最早是由Philip Gage于1994年在《A New Algorithm for Data Compression》一文中提出，后来被 OpenAI 在预训练 GPT 模型时用于分词器（Tokenizer）。它被许多 Transformer 模型使用，包括 GPT、GPT-2、RoBERTa、BART 和 DeBERTa。
 
-可以看到，“tokenization” 被切分为了 “token” 和 “ization”，不仅保留了语义，而且只用两个 token 就表示了一个长词。这种策略只用一个较小的词表就可以覆盖绝大部分文本，基本不会产生 unknown token。尤其对于土耳其语等黏着语，几乎所有的复杂长词都可以通过串联多个子词构成。
-
-#### BPE 分词
-在 1994 年，BPE 算法被提出，最早用于通用的数据压缩。
-随后，自然语言处理领域的研究人员将其进行适配，并应用于文本分词。
 BPE 算法从一组基本符号（例如字母和边界字符）开始，迭代地寻找语料库中的两个相邻词元，并将它们替换为新的词元，这一过程被称为`合并`。
 合并的选择标准是计算两个连续词元的共现频率，也就是每次迭代中，最频繁出现的一对词元会被选择与合并。
 合并过程将一直持续达到预定义的词表大小。
 
+
+
+#### 3.3.2 B-BPE（Byte-level BPE）
 字节级别的 BPE（Byte-level BPE, B-BPE）是 BPE 算法的一种拓展。
 它将字节视为合并操作的基本符号，从而可以实现更细粒度的分割，且解决了未登录词问题。
 具体来说，如果将所有 Unicode 字符都视为基本字符，那么包含所有可能基本字符的基本词表会非常庞大（例如将中文的每个汉字当作一个基本字符）。
 而将字节作为基本词表可以设置基本词库的大小为 256，同时确保每个基本字符都包含在词汇中。 
 例如，GPT-2 的词表大小为 50,257 ，包括 256 个字节的基本词元、一个特殊的文末词元以及通过 50,000 次合并学习到的词元。
 
-#### WordPiece 分词
+### 3.2 WordPiece
 WordPiece 是谷歌内部非公开的分词算法，最初是由谷歌研究人员在开发语音搜索系统时提出的。
 随后，在 2016 年被用于机器翻译系统，并于 2018 年被 BERT 采用作为分词器。
 WordPiece 分词和 BPE 分词的想法非常相似，都是通过迭代合并连续的词元，但是合并的选择标准略有不同。
@@ -156,8 +204,8 @@ WordPiece 分词和 BPE 分词的想法非常相似，都是通过迭代合并�
 $$
 得分=\frac{词对出现的频率}{第一个词出现的频率\times 第二个词出现的频率} \\
 $$
-
-#### Unigram 分词
+### 3.3 SentencePiece
+### 3.4 Unigram
 与 BPE 分词和 WordPiece 分词不同，Unigram 分词方法从语料库的一组足够大的字符串或词元初始集合开始，迭代地删除其中的词元，直到达到预期的词表大小。
 它假设从当前词表中删除某个词元，并计算训练语料的似然增加情况，以此来作为选择标准。
 这个步骤是基于一个训练好的一元语言模型来进行的。
