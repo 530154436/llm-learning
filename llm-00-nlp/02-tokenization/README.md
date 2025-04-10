@@ -199,11 +199,11 @@ Post-tokenization主要包括：
 
 
 ## 参考引用
-1. [第三篇：ChatGPT背后强大而神秘的力量，用最简单的语言讲解Transformer架构之Tokenizer](https://zhuanlan.zhihu.com/p/686444517)<br>
-2. [【LLM基础知识】LLMs-Tokenizer知识总结笔记v2.0](https://www.53ai.com/news/LargeLanguageModel/2024080625837.html)<br>
-3. [全网最全的大模型分词器（Tokenizer）总结.md](https://github.com/luhengshiwo/LLMForEverybody/blob/main/01-第一章-预训练/全网最全的大模型分词器（Tokenizer）总结.md)<br>
-4. [transformers-tokenizer](https://huggingface.co/learn/nlp-course/zh-CN/chapter6/1?fw=pt)<br>
-5. [LLM中的Tokenizers-bilibili视频](https://www.bilibili.com/video/BV1q94y1a7NU)<br>
-6. [tiktokenizer-可视化](https://tiktokenizer.vercel.app/)<br>
-7. [千问-tokenizer](https://github.com/QwenLM/Qwen/blob/main/tokenization_note_zh.md)<br>
-8. [FastTokenizer：高性能文本处理库](https://github.com/GreatV/fast_tokenizer)<br>
+[1] [第三篇：ChatGPT背后强大而神秘的力量，用最简单的语言讲解Transformer架构之Tokenizer](https://zhuanlan.zhihu.com/p/686444517)<br>
+[2] [【LLM基础知识】LLMs-Tokenizer知识总结笔记v2.0](https://www.53ai.com/news/LargeLanguageModel/2024080625837.html)<br>
+[3] [全网最全的大模型分词器（Tokenizer）总结.md](https://github.com/luhengshiwo/LLMForEverybody/blob/main/01-第一章-预训练/全网最全的大模型分词器（Tokenizer）总结.md)<br>
+[4] [transformers-tokenizer](https://huggingface.co/learn/nlp-course/zh-CN/chapter6/1?fw=pt)<br>
+[5] [LLM中的Tokenizers-bilibili视频](https://www.bilibili.com/video/BV1q94y1a7NU)<br>
+[6] [tiktokenizer-可视化](https://tiktokenizer.vercel.app/)<br>
+[7] [千问-tokenizer](https://github.com/QwenLM/Qwen/blob/main/tokenization_note_zh.md)<br>
+[8] [FastTokenizer：高性能文本处理库](https://github.com/GreatV/fast_tokenizer)<br>
