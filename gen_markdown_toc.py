@@ -61,4 +61,5 @@ if __name__ == "__main__":
     # process_markdown_file("P1-CH01-引言.md")
     # process_markdown_file("P1-CH02-基础介绍.md")
     # process_markdown_file("P2-CH04-数据准备.md")
-    process_markdown_file("llm-00-nlp/02-tokenization/README.md")
+    # process_markdown_file("llm-00-nlp/02-tokenization/README.md")
+    process_markdown_file("llm-00-nlp/02-tokenization/子词分词（1）BPE.md")

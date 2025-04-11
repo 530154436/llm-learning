@@ -145,7 +145,7 @@ Post-tokenization主要包括：
 
 根据切分粒度的不同，分词策略可以分为以下几种：
 
-### 3.1 按单词划分（Word-based）
+### 3.1 基于词的分词（Word-based tokenization）
 按照词进行分词，根据空格或标点进行分割。例如："Today is sunday"→[today, is, sunday, .]<br>
 
 优点：
@@ -157,7 +157,7 @@ Post-tokenization主要包括：
 + `低频词训练不足`：受限于词汇表大小，一些出现频率较低的词可能被排除在外，导致这些词在模型训练中得不到充分学习。<br>
 + `形态学信息丢失`：对于英语等语言，不同形式的同一个词（如"look", "looks", "looking", "looked"）被视为不同的词，增加了词汇量，并且使得模型难以学习到这些词之间的关系，既增加了训练冗余，也加剧了大词汇量的问题。<br>
 
-### 3.2 按字符划分（Character-based）
+### 3.2 基于字符的分词（Character-based tokenization）
 按照单字符进行分词，将每个字符（包括标点符号）视为一个单独的单元。例如："Today is sunday"→[t， o， d，a，y，i, s, s，u，n，d，a，y，.]<br>
 
 优点：
@@ -170,7 +170,7 @@ Post-tokenization主要包括：
 + `在某些语言中字符的意义有限`：特别是在那些字符本身不携带完整意义的语言中（如英语等使用字母文字的语言），单个字符无法传达有效的信息，必须结合其他字符才能表达完整的意思。<br>
 
 
-### 3.3 按子词切分 (Subword tokenization)
+### 3.3 子词分词 (Subword tokenization)
 基于子词的分词方法旨在结合基于词和基于字符的分词法的优点，同时克服它们各自的缺点。这种方法通过将单词切分成更小但具有一定语义意义的子词来实现。
 + 高频词保持完整：如"dog"这样的高频词不会被分割。
 + 低频词被拆分为有意义的子词：例如"dogs"会被拆分为["dog", "##s"]。这种方法允许用一个有限的词汇表解决所有单词的分词问题，同时尽量减少词汇表的大小。
@@ -193,9 +193,9 @@ Post-tokenization主要包括：
 
 
 详细参考：
-+ [分词器（1）BPE.md](分词器（1）BPE.md)
-+ [分词器（2）WordPiece.md](分词器（2）WordPiece.md)
-+ [分词器（3）Unigram.md](分词器（3）Unigram.md)
++ [子词分词（1）BPE.md](子词分词（1）BPE.md)
++ [子词分词（2）WordPiece.md](子词分词（2）WordPiece.md)
++ [子词分词（3）Unigram.md](子词分词（3）Unigram.md)
 
 
 ## 参考引用
