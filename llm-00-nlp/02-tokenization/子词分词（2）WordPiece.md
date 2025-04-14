@@ -3,8 +3,7 @@
 WordPiece 是谷歌内部非公开的分词算法，最初是由谷歌研究人员在开发语音搜索系统时提出的。
 随后，在 2016 年被用于机器翻译系统，并于 2018 年被 BERT 采用作为分词器。
 
-
-WordPiece核心思想是将单词`拆分成多个前缀符号`（比如BERT中的##）最小单元，再通过子词合并规则将最小单元进行合并为子词级别。例如对于单词"word"，拆分如下：
+WordPiece核心思想是将单词拆分成`多个前缀符号`（比如BERT中的##，将前缀添加到单词内的每个字符，单词的首字符不添加前缀）最小单元，再通过子词合并规则将最小单元进行合并为子词级别。例如对于单词"word"，拆分如下：
 ```
 w ##o ##r ##d
 ```
@@ -18,7 +17,7 @@ $$
 该算法的训练步骤：
 1. **初始化词汇表 $V$**：
    - 语料库标准化、预分词后，统计所有单词的频率 -> word_freqs
-   - 所有单词通过添加前缀（如 BERT 中的 ## ）来识别子词，例如 "word"→["w","##o","##r","##d"]-> word_splits
+   - 将所有单词拆分成子词序列：通过添加前缀（如 BERT 中的 ## ）来识别子词，例如 "word"→["w","##o","##r","##d"]-> word_splits
    - 构建初始词表：特殊标记["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"]+英文中26个字母+各种符号以及常见中文字符-> $V$
 2. **统计单个子词、相邻子词对的频次和计算 Score**：
    - 对于每个单词的子词序列，统计单个子词、相邻子词对（两个连续的子词）的出现频次，并根据定义计算得分。
@@ -30,6 +29,28 @@ $$
 4. **重复步骤 2 到 4**：
    - 重复统计和合并过程，直到满足停止条件（例如，词汇表达到预定大小）。
 
+示例：
+```
+假设语料库预分词后得到的单词及其频次的集合：
+("hug", 10), ("pug", 5), ("pun", 12), ("bun", 4), ("hugs", 5) 
+
+一.初始化词汇表
+-将所有单词拆分成子词序列
+("h" "##u" "##g", 10), ("p" "##u" "##g", 5), ("p" "##u" "##n", 12), ("b" "##u" "##n", 4), ("h" "##u" "##g" "##s", 5)
+
+-构建初始词表
+["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]", "b", "h", "p", "##g", "##n", "##s", "##u"]
+
+二. 统计单个子词、相邻子词对的频次和计算 Score；合并得分最高的子词对并更新词汇表：
+计算出 pair("##g", "##s")的分数最高为(5)/(20*5) = 1/20，所以最先合并的pair是("##g", "##s")→("##gs")。
+此时词表和拆分后的的频率将变成以下：
+词汇表: ["b", "h", "p", "##g", "##n", "##s", "##u", "##gs"]
+语料库: ("h" "##u" "##g", 10), ("p" "##u" "##g", 5), ("p" "##u" "##n", 12), ("b" "##u" "##n", 4), ("h" "##u" "##gs", 5)
+
+重复上述操作
+```
+
+代码实现：
 ```python
 from collections import defaultdict
 from typing import Dict, Tuple, List, Iterable, Union
@@ -260,15 +281,8 @@ def main(vocab_size: int = 70):
          '##r', '##s', '##e', '.']
 ```
 
-### 3.3 SentencePiece
-
-
 ## 参考引用
-[1] [transformers-BPE tokenization 算法](https://huggingface.co/learn/llm-course/zh-CN/chapter6/5?fw=pt)<br>
-[2] [BPE分词原理](https://github.com/BrightXiaoHan/MachineTranslationTutorial/blob/master/tutorials/Chapter2/BPE.md)<br>
-[3] [理解 Tokenizer 的工作原理与子词分割方法](https://github.com/Hoper-J/AI-Guide-and-Demos-zh_CN/blob/master/Guide/)<br>
-[4] [Subword Tokenization 算法](https://www.huaxiaozhuan.com/%E5%B7%A5%E5%85%B7/huggingface_transformer/chapters/1_tokenizer.html)<br>
-[5] [论文分享 Neural machine Translation of Rare Words with Subword Units](https://blog.csdn.net/Mr_tyting/article/details/91352726)<br>
-[6] [subword-nmt](https://github.com/rsennrich/subword-nmt/blob/master/learn_bpe.py)<br>
-[7] [LLM大语言模型之Tokenization分词方法（WordPiece，Byte-Pair Encoding (BPE)，Byte-level BPE(BBPE)原理及其代码实现）](https://zhuanlan.zhihu.com/p/652520262)<br>
-[8] [通义千问 (Qwen)](https://qwen.readthedocs.io/zh-cn/latest/getting_started/concepts.html)<br>
+[1] [transformers-WordPiece tokenization 算法](https://huggingface.co/learn/llm-course/zh-CN/chapter6/6?fw=pt)<br>
+[2] [理解 Tokenizer 的工作原理与子词分割方法](https://github.com/Hoper-J/AI-Guide-and-Demos-zh_CN/blob/master/Guide/)<br>
+[3] [Subword Tokenization 算法](https://www.huaxiaozhuan.com/%E5%B7%A5%E5%85%B7/huggingface_transformer/chapters/1_tokenizer.html)<br>
+[4] [LLM大语言模型之Tokenization分词方法（WordPiece，Byte-Pair Encoding (BPE)，Byte-level BPE(BBPE)原理及其代码实现）](https://zhuanlan.zhihu.com/p/652520262)<br>

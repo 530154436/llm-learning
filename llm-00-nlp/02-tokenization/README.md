@@ -197,6 +197,8 @@ Post-tokenization主要包括：
 + [子词分词（2）WordPiece.md](子词分词（2）WordPiece.md)
 + [子词分词（3）Unigram.md](子词分词（3）Unigram.md)
 
+开源工具：
++ [SentencePiece](https://github.com/google/sentencepiece)Google推出的subword开源工具包，集成了BPE和Unigram；除此之外，SentencePiece还能支持字符和词级别的分词。
 
 ## 参考引用
 [1] [第三篇：ChatGPT背后强大而神秘的力量，用最简单的语言讲解Transformer架构之Tokenizer](https://zhuanlan.zhihu.com/p/686444517)<br>
