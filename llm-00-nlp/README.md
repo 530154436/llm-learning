@@ -1,7 +1,7 @@
 
 [transformer学习]
-https://github.com/datawhalechina/fun-transformer/tree/main
 https://github.com/Hoper-J/AI-Guide-and-Demos-zh_CN/tree/master/PaperNotes
+https://github.com/datawhalechina/fun-transformer/tree/main
 https://github.com/luhengshiwo/LLMForEverybody
 
 [transformer-nlp实践]
@@ -16,6 +16,9 @@ https://github.com/BrightXiaoHan/MachineTranslationTutorial/blob/master/tutorial
 视频：https://www.bilibili.com/video/BV1BJ4m1e7g8/
 参考代码：https://github.com/Hoper-J/AI-Guide-and-Demos-zh_CN
 
+[百度-深度学习百科及面试资源¶]
+https://paddlepedia.readthedocs.io/en/latest/index.html
+https://github.com/PaddlePaddle/awesome-DeepLearning
 
 数据处理框架
 https://github.com/modelscope/data-juicer/blob/main/README_ZH.md
