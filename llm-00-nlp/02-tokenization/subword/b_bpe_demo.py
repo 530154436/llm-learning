@@ -7,7 +7,7 @@ from collections import defaultdict
 from typing import Dict, Tuple
 from b_bpe_tokenizer import init_vocab, tokenize
 from bpe_tokenizer import compute_pair_freqs, find_max_freq_pair, merge_pair
-from bpe_demo import prepare_corpus
+from corpus import prepare_corpus
 
 
 def main(vocab_size: int = 280):

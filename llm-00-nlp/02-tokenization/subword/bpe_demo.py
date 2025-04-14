@@ -8,30 +8,8 @@
 # 根据学习的合并规则，按顺序合并拆分的字符
 from collections import defaultdict
 from typing import Dict, Tuple
-from data.download_model import DATA_DIR
-from transformers import AutoTokenizer, GPT2TokenizerFast
+from corpus import prepare_corpus
 from bpe_tokenizer import init_vocab, compute_pair_freqs, find_max_freq_pair, merge_pair, tokenize
-
-
-def prepare_corpus():
-    corpus = [
-        "This is the Hugging Face Course.",
-        "This chapter is about tokenization.",
-        "This section shows several tokenizer algorithms.",
-        "Hopefully, you will be able to understand how they are trained and generate tokens.",
-    ]
-    # 使用gpt2 标准化+预分词
-    filepath = DATA_DIR.joinpath("openai-community/gpt2")
-    tokenizer: GPT2TokenizerFast = AutoTokenizer.from_pretrained(filepath)
-
-    # 计算语料库中每个单词的频率
-    for text in corpus:
-        # [('This', (0, 4)), ('Ġis', (4, 7)), ('Ġthe', (7, 11))..]，Ġ是空空格
-        words_with_offsets = tokenizer.backend_tokenizer.pre_tokenizer.pre_tokenize_str(text)
-        sentence = []
-        for word, offset in words_with_offsets:
-            sentence.append(word)
-        yield sentence
 
 
 def main(vocab_size: int = 50):

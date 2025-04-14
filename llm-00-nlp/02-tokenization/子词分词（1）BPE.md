@@ -151,7 +151,7 @@ def tokenize(sentence: Iterable, merges: Dict[Tuple[str], str]) -> List[str]:
     return sum(splits, [])
 
 
-def prepare_corpus():
+def prepare_corpus(model: str = "openai-community/gpt2"):
     corpus = [
         "This is the Hugging Face Course.",
         "This chapter is about tokenization.",
@@ -159,7 +159,7 @@ def prepare_corpus():
         "Hopefully, you will be able to understand how they are trained and generate tokens.",
     ]
     # 使用gpt2 标准化+预分词
-    filepath = DATA_DIR.joinpath("openai-community/gpt2")
+    filepath = DATA_DIR.joinpath(model)
     tokenizer: GPT2TokenizerFast = AutoTokenizer.from_pretrained(filepath)
 
     # 计算语料库中每个单词的频率
