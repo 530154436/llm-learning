@@ -22,6 +22,12 @@ def prepare_corpus(model: str = "openai-community/gpt2"):
     ['This', 'chapter', 'is', 'about', 'tokenization', '.']
     ['This', 'section', 'shows', 'several', 'tokenizer', 'algorithms', '.']
     ['Hopefully', ',', 'you', 'will', 'be', 'able', 'to', 'understand', 'how', 'they', 'are', 'trained', 'and', 'generate', 'tokens', '.']
+
+    xlnet-base-cased:
+    ['▁This', '▁is', '▁the', '▁Hugging', '▁Face', '▁Course.']
+    ['▁This', '▁chapter', '▁is', '▁about', '▁tokenization.']
+    ['▁This', '▁section', '▁shows', '▁several', '▁tokenizer', '▁algorithms.']
+    ['▁Hopefully,', '▁you', '▁will', '▁be', '▁able', '▁to', '▁understand', '▁how', '▁they', '▁are', '▁trained', '▁and', '▁generate', '▁tokens.']
     """
     corpus = [
         "This is the Hugging Face Course.",
@@ -45,6 +51,7 @@ def prepare_corpus(model: str = "openai-community/gpt2"):
 
 if __name__ == "__main__":
     # _sentences = prepare_corpus("openai-community/gpt2")
-    _sentences = prepare_corpus("google-bert/bert-base-cased")
+    # _sentences = prepare_corpus("google-bert/bert-base-cased")
+    _sentences = prepare_corpus("xlnet-base-cased")
     for _sentence in _sentences:
         print(_sentence)

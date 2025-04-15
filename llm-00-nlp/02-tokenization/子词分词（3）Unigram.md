@@ -30,7 +30,7 @@ $$
 其中， $|D|$ 是语料库中语料数量。上述公式的一个直观理解是，将语料库中所有句子的所有分词组合形成的概率相加。
 但是，初始时，词表 $V$ 并不存在。因而，ULM算法采用不断迭代的方法来构造词表以及求解分词概率：
 
-1. 初始时，**建立一个足够大的词表**。<br>
+1. **初始化词汇表**<br>
    一般，可用语料中的所有字符加上常见的子字符串初始化词表，也可以通过BPE算法初始化。
 2. 针对当前词表，用**EM算法**求解每个子词在语料上的概率。
 3. 对于每个子词，计算当该子词被从词表中移除时，总的loss降低了多少，记为该子词的**loss**。
@@ -42,7 +42,7 @@ $$
 + 使用的训练算法可以利用所有可能的分词结果，这是通过data sampling算法实现的。
 + 提出一种基于语言模型的分词算法，这种语言模型可以给多种分词结果赋予概率，从而可以学到其中的噪声。
 
-示例1，单个词的切分：
+示例1 计算每个子词在语料上的概率、根据似然值对语料库中的每个单词进行分词：
 ```
 假设语料库预分词后得到的单词及其频次的集合：
 ("hug", 10), ("pug", 5), ("pun", 12), ("bun", 4), ("hugs", 5)
@@ -76,7 +76,7 @@ Character 3 (u): "un" "hu" (score 0.005442)
 Character 4 (g): "un" "hug" (score 0.005442)
 ```
 
-示例2，计算损失值：
+示例2 确定分词结果后，计算整个语料库的loss，以及计算移除每个子词(token)对损失值的影响：
 ```
 语料库中的每个词都有一个分数，损失（loss）值是这些分数的负对数似然——即所有词的语料库中所有词的 -log(P(word)) 总和
 每个单词的分词及其相应的得分如下：
@@ -100,4 +100,4 @@ Character 4 (g): "un" "hug" (score 0.005442)
 
 ## 参考引用
 [1] [预训练分词Subword](https://paddlepedia.readthedocs.io/en/latest/tutorials/pretrain_model/subword.html#unigram-language-model-ulm)<br>
-[2] [transformers-WordPiece tokenization 算法](https://huggingface.co/learn/llm-course/zh-CN/chapter6/6?fw=pt)<br>
+[2] [transformers-Unigram tokenization 算法](https://huggingface.co/learn/llm-course/zh-CN/chapter6/7?fw=pt)<br>

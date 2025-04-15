@@ -37,32 +37,49 @@ def init_vocab(corpus: Iterable) -> Tuple[Dict[str, int], Dict[str, list]]:
     return word_freqs, token_freqs
 
 
-def encode_word(word: str, vocab: list) -> str:
+def encode_word(word: str, model: Dict[str, float]) -> Tuple[list, int]:
     """
-    将一个单词编码为基于词汇表 vocab 的一系列子词（subword）标记。
-    如果词汇表中没有完全匹配的单词，则尝试找到最长的前缀进行匹配，并将剩余部分继续分割，直到整个单词被处理完毕。
-    如果没有找到任何匹配项（即找不到已知的前缀），则返回一个特殊的未知标记 "[UNK]"。
+    为词的每一个位置（从 0 开始，一直到词的总长度）都保存一个字典，字典里有两个键：最好的分割中最后一个词的起始位置，以及最好的分割的得分。
+    一个主循环用来遍历每个可能的开始位置，第二个循环则试着找出所有以这个开始位置开始的子串。
+
+    Character 0 (u): "u" (score 0.171429)
+    Character 1 (n): "un" (score 0.076191)
+    Character 2 (h): "un" "h" (score 0.005442)
+    Character 3 (u): "un" "hu" (score 0.005442)
+    Character 4 (g): "un" "hug" (score 0.005442)
     """
+    best_segmentations = \
+        [{"start": 0, "score": 1}] \
+        + [{"start": None, "score": None} for _ in range(len(word))]
+
+    for start_idx in range(len(word)):
+        # best_score_at_start应该由循环的前面的步骤计算和填充
+        best_score_at_start = best_segmentations[start_idx]["score"]
+        print(f"start_idx={start_idx}: ", end="")
+        for end_idx in range(start_idx + 1, len(word) + 1):
+            token = word[start_idx: end_idx]
+            if token in model and best_score_at_start is not None:
+                score = model[token] + best_score_at_start
+                # 如果我们发现以 end_idx 结尾的更好分段,我们会更新
+                if (
+                    best_segmentations[end_idx]["score"] is None
+                    or best_segmentations[end_idx]["score"] > score
+                ):
+                    best_segmentations[end_idx] = {"start": start_idx, "score": score}
+
+    segmentation = best_segmentations[-1]
+    if segmentation["score"] is None:
+        # 我们没有找到单词的 tokens  -> unknown
+        return ["<unk>"], None
+
+    score = segmentation["score"]
+    start = segmentation["start"]
+    end = len(word)
     tokens = []
-    while len(word) > 0:
-        i = len(word)
-        while i > 0 and word[:i] not in vocab:
-            i -= 1
-        if i == 0:
-            return ["[UNK]"]
-        tokens.append(word[:i])  # 找到的最长前缀
-        word = word[i:]  # 后半部分需要增加"##"前缀
-        if len(word) > 0:
-            word = f"##{word}"
-    return tokens
-
-
-def tokenize(sentence: Iterable, vocab: list) -> List[str]:
-    """
-    使用学到的所有合并规则进行分词
-    :param sentence:  句子
-    :param vocab:  子词表
-    :return:
-    """
-    encoded_words = [encode_word(word, vocab) for word in sentence]
-    return sum(encoded_words, [])
+    while start != 0:
+        tokens.insert(0, word[start:end])
+        next_start = best_segmentations[start]["start"]
+        end = start
+        start = next_start
+    tokens.insert(0, word[start:end])
+    return tokens, score

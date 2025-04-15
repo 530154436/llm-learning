@@ -3,16 +3,21 @@
 # @author: zhengchubin
 # @time: 2025/4/10 15:43
 # @function:
+from math import log
 from corpus import prepare_corpus
 from unigram_tokenizer import init_vocab, encode_word, tokenize
 
 
 def main(vocab_size: int = 70):
-    # 初始化
+    # 构建初始词汇表
     sentences = prepare_corpus("xlnet-base-cased")
     word_freqs, token_freqs = init_vocab(sentences)
 
-    # # 训练
+    # 为每个子词分配一个初始概率值的负对数
+    total_sum = sum([freq for token, freq in token_freqs.items()])
+    model = {token: -log(freq / total_sum) for token, freq in token_freqs.items()}
+
+    # 训练
     # iteration = 1
     # while len(vocab) < vocab_size:
     #     letter_freqs, pair_freqs, scores = compute_pair_score(word_splits, word_freqs)
