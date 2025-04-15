@@ -2,6 +2,7 @@
 [transformer学习]
 https://github.com/Hoper-J/AI-Guide-and-Demos-zh_CN/tree/master/PaperNotes
 https://github.com/datawhalechina/fun-transformer/tree/main
+https://github.com/zxuu/Self-Attention/tree/main
 https://github.com/luhengshiwo/LLMForEverybody
 
 [transformer-nlp实践]
