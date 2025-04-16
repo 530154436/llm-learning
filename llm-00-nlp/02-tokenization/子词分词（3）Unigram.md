@@ -1,3 +1,8 @@
+<nav>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unigram">Unigram</a><br/>
+<a href="#参考引用">参考引用</a><br/>
+</nav>
+
 ### Unigram
 Unigram Language Model (ULM)模型是Kudo提出的。当时主要是为了解决机器翻译中分词的问题。作者使用一种叫做marginalized likelihood的方法来建模翻译问题，考虑到不同分词结果对最终翻译结果的影响，引入了分词概率。
 
@@ -41,12 +46,12 @@ $$
    初始化子词概率：为每个子词分配一个初始概率值，通常基于训练数据中的频次统计或均匀分布。<br>
 2. **迭代直到收敛**<br>
    + 1）计算期望（E），即计算损失：<br>
-   基于当前词表、子词概率（模型参数），对每个句子用`维特比算法`计算出使loss最小的分词组合，从而得到整个语料库的loss。<br>
+   基于当前词表、子词概率（模型参数），对每个句子用`维特比算法`计算出使句子loss最小的分词组合，从而得到整个语料库的loss。<br>
    计算每个子词从词表中移除时语料库的loss减少量，记为该子词的**loss**。<br>
    + 2）最大化（M），即最小化loss：<br>
    将子词按照loss大小进行排序，**丢弃一定比例loss最小的子词**(比如20%)，保留下来的子词生成新的词表，同时更新子词概率。<br>
    这里需要注意的是，单字符不能被丢弃，这是为了避免OOV情况。
-   + 3）M 步上找到的参数估计值被用于下一个 E 步计算中，这个过程不断交替进行。
+   + 3）M 步上找到的词表、子词概率（参数估计值）用于下一个 E 步计算中，这个过程不断交替进行。
 
 示例1 维特比算法分词：
 ```
@@ -300,3 +305,5 @@ Process finished with exit code 0
 ## 参考引用
 [1] [预训练分词Subword](https://paddlepedia.readthedocs.io/en/latest/tutorials/pretrain_model/subword.html#unigram-language-model-ulm)<br>
 [2] [transformers-Unigram tokenization 算法](https://huggingface.co/learn/llm-course/zh-CN/chapter6/7?fw=pt)<br>
+[3] [搜狗百科-em算法](https://baike.sogou.com/v9130286.htm?ch=frombaikevr&fromTitle=em%E7%AE%97%E6%B3%95)<br>
+[4] [文本挖掘的分词原理](https://www.cnblogs.com/pinard/p/6677078.html)<br>
