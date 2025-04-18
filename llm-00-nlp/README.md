@@ -5,6 +5,9 @@ https://github.com/datawhalechina/fun-transformer/tree/main
 https://github.com/zxuu/Self-Attention/tree/main
 https://github.com/luhengshiwo/LLMForEverybody
 
+Transformer常见问题与回答总结
+https://zhuanlan.zhihu.com/p/496012402?utm_medium=social&utm_oi=629375409599549440
+
 [transformer-nlp实践]
 huggingface-transformer-nlp
 https://huggingface.co/learn/nlp-course/zh-CN/chapter1/1

@@ -1,9 +1,9 @@
 <nav>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unigram">Unigram</a><br/>
+<a href="#unigram">Unigram</a><br/>
 <a href="#参考引用">参考引用</a><br/>
 </nav>
 
-### Unigram
+## Unigram
 Unigram Language Model (ULM)模型是Kudo提出的。当时主要是为了解决机器翻译中分词的问题。作者使用一种叫做marginalized likelihood的方法来建模翻译问题，考虑到不同分词结果对最终翻译结果的影响，引入了分词概率。
 
 与WordPiece一样，Unigram Language Model(ULM)同样使用语言模型来挑选子词。不同之处在于，BPE和WordPiece算法的词表大小都是从小到大变化，属于增量法。而Unigram Language Model则是**减量法**,即先初始化一个大词表，根据评估准则不断丢弃词表，直到满足限定条件。ULM算法考虑了句子的不同分词可能，因而能够输出带概率的多个子词分段。
