@@ -6,7 +6,7 @@
 import dashscope
 from typing import List
 from dashscope import Tokenizer
-from tokenizers import BPETokenizer
+from tokenization import BPETokenizer
 
 
 class QwenTokenizer(BPETokenizer):

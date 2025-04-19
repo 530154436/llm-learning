@@ -6,7 +6,7 @@
 import tiktoken
 from typing import List
 from tiktoken import Encoding
-from tokenizers import BPETokenizer
+from tokenization import BPETokenizer
 
 
 class OpenaiTokenizer(BPETokenizer):
