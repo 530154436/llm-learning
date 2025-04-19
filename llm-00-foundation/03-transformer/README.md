@@ -5,6 +5,9 @@ https://github.com/datawhalechina/fun-transformer/tree/main
 https://github.com/zxuu/Self-Attention/tree/main
 https://github.com/luhengshiwo/LLMForEverybody
 
+比较清晰的各模块实现
+https://github.com/hyunwoongko/transformer/blob/master/models/blocks/decoder_layer.py
+
 Transformer常见问题与回答总结
 https://zhuanlan.zhihu.com/p/496012402?utm_medium=social&utm_oi=629375409599549440
 
@@ -14,7 +17,8 @@ https://huggingface.co/learn/nlp-course/zh-CN/chapter1/1
 基于transformers的自然语言处理(NLP)入门 
 https://github.com/datawhalechina/learn-nlp-with-transformers
 机器翻译教程
-https://github.com/BrightXiaoHan/MachineTranslationTutorial/blob/master/tutorials/Chapter2/Normalize.md
+https://github.com/hemingkx/ChineseNMT/blob/master/README.md
+（不全）https://github.com/BrightXiaoHan/MachineTranslationTutorial/blob/master/tutorials/Chapter2/Normalize.md
 
 [李宏毅《生成式人工智能导论》]
 视频：https://www.bilibili.com/video/BV1BJ4m1e7g8/
