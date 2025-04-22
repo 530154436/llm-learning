@@ -197,5 +197,10 @@ class MultiHeadAttention(nn.Module):
         # => (batch_size, seq_len_q, num_heads, head_dim)
         # => (batch_size, seq_len_q, embed_size)
         concat_out = scaled_attention.transpose(1, 2).contiguous().view(batch_size, seq_len_q, -1)
+
+        # 输出线性层作用
+        # 特征变换与适配：将多个子空间的输出通过线性变换映射到适合下游任务的新特征空间，使得特征表示更符合后续层的需求。
+        # 信息融合与统一：将分散在不同子空间的多头输出进行有效融合（不同头提取的特征可能具有不同的语义和侧重点），从而形成一个综合的特征向量，更好地捕捉输入序列中的复杂模式。
+        # 增加模型表达能力：通过学习权值矩阵自动调整以适应不同任务和数据分布，增强模型灵活性和性能，优于简单拼接多头输出的方法。
         output = self.fc_out(concat_out)
         return output
