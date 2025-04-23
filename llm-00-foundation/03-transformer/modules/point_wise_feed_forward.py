@@ -5,6 +5,7 @@
 # @function:
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 
 class PositionWiseFeedForward(nn.Module):
@@ -27,4 +28,4 @@ class PositionWiseFeedForward(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.w_2(self.dropout(self.w_1(x).relu()))
+        return self.w_2(self.dropout(F.relu(self.w_1(x))))

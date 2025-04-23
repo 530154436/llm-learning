@@ -14,9 +14,9 @@ def test_residual_connection():
     d_model = 512
     d_ff = 2048
     input_tensor = torch.randn(batch_size, sql_len, d_model)
-    module = PositionWiseFeedForward(d_model, d_ff)
+    sublayer_output = PositionWiseFeedForward(d_model, d_ff).forward(input_tensor)
 
-    out = ResidualConnection().forward(input_tensor, module)
+    out = ResidualConnection().forward(input_tensor, sublayer_output)
     # torch.Size([10, 10, 512])
     print(out.shape)
 
@@ -26,7 +26,7 @@ def test_layer_norm():
     sql_len = 10
     d_model = 512
     input_tensor = torch.randn(batch_size, sql_len, d_model)
-    out = LayerNorm(feature_size=d_model).forward(input_tensor)
+    out = LayerNorm(d_model=d_model).forward(input_tensor)
     # torch.Size([10, 10, 512])
     print(out.shape)
     # print(out)
@@ -38,15 +38,15 @@ def test_sublayer_connection():
     d_model = 512
     d_ff = 2048
     input_tensor = torch.randn(batch_size, sql_len, d_model)
-    module = PositionWiseFeedForward(d_model, d_ff)
+    sublayer_output = PositionWiseFeedForward(d_model, d_ff).forward(input_tensor)
 
-    out = SublayerConnection(feature_size=d_model).forward(input_tensor, module)
+    out = SublayerConnection(d_model=d_model).forward(input_tensor, sublayer_output)
     # torch.Size([10, 10, 512])
     print(out.shape)
     # print(out)
 
 
 if __name__ == '__main__':
-    # test_residual_connection()
-    # test_layer_norm()
+    test_residual_connection()
+    test_layer_norm()
     test_sublayer_connection()
