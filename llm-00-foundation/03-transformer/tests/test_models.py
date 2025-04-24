@@ -42,10 +42,18 @@ def test_Transformer():
     tgt_tensor = torch.randint(0, tgt_vocab_size, (batch_size, sequence_length + 1))
 
     model = Transformer(src_vocab_size, tgt_vocab_size, embed_size, num_heads=2, d_ff=4)
-    out = model.forward(src_tensor, tgt_tensor)
     print(f"源输入批次   {src_tensor.shape}: \n{src_tensor}")  # torch.Size([1, 2])
     print(f"目标输入批次 {tgt_tensor.shape}: \n{tgt_tensor}")  # torch.Size([1, 3])
-    print(f"解码器输出   {out.shape}: \n{out}")                # torch.Size([1, 3, 6])
+
+    # 打印各部分的输出形状
+    print("Encoder 来源嵌入:", model.encoder.embed(src_tensor).shape)  # torch.Size([1, 2, 4])
+    print("Encoder 输出:   ", model.encoder(src_tensor).shape)        # torch.Size([1, 2, 4])
+    print("Decoder 目标嵌入:", model.decoder.embed(tgt_tensor).shape)  # torch.Size([1, 3, 4])
+    print("Decoder 输出:   ",  model.decoder(tgt_tensor, model.encoder(src_tensor)).shape)  # torch.Size([1, 3, 4])
+    print("最终输出:        ", model.forward(src_tensor, tgt_tensor).shape)  # torch.Size([1, 3, 6])
+
+    # 打印模型结构
+    # print(model)
 
 
 if __name__ == '__main__':
