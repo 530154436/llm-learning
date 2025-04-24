@@ -32,16 +32,19 @@ class Encoder(nn.Module):
         )
         self.norm = LayerNorm(d_model)  # 最后层归一化
 
-    def forward(self, x, mask):
+    def forward(self, x: torch.LongTensor, mask=None):
         """
         前向传播函数。
 
-        :param x: 输入张量 (batch_size, seq_len, d_model)
+        :param x: 输入张量 (batch_size, seq_len)，一个批次的多个序列，序列元素是 token_id
         :param mask: 输入掩码
         :return: 编码器的输出 (batch_size, seq_len, d_model)
         """
+        # (batch_size, seq_len_tgt) => (batch_size, seq_len_tgt, d_model)
         x = self.embed(x)
         x = self.pe(x)
+
+        # (batch_size, seq_len, d_model) => (batch_size, seq_len, d_model)
         for layer in self.layers:
             x = layer(x, mask)
         return self.norm(x)  # 最后层归一化
@@ -67,17 +70,21 @@ class Decoder(nn.Module):
         )
         self.norm = LayerNorm(d_model)  # 最后层归一化
 
-    def forward(self, x, encoder_output, src_mask, tgt_mask) -> torch.Tensor:
+    def forward(self, x: torch.LongTensor, encoder_output, src_mask=None, tgt_mask=None) -> torch.Tensor:
         """
         前向传播函数。
 
-        :param x: 解码器输入 (batch_size, seq_len_tgt, d_model)
+        :param x: 解码器输入 (batch_size, seq_len_tgt)，一个批次的多个序列，序列元素是 token_id
         :param encoder_output: 编码器输出 (batch_size, seq_len_src, d_model)
         :param src_mask: 源序列掩码，用于交叉注意力
         :param tgt_mask: 目标序列掩码，用于自注意力
+        :return (batch_size, seq_len_tgt, d_model)
         """
+        # (batch_size, seq_len_tgt) => (batch_size, seq_len_tgt, d_model)
         x = self.embed(x)
         x = self.pe(x)
+
+        # (batch_size, seq_len_tgt, d_model)
         for layer in self.layers:
             x = layer(x, encoder_output, src_mask, tgt_mask)
         return self.norm(x)  # 最后层归一化
@@ -105,7 +112,7 @@ class Transformer(nn.Module):
         # 输出线性层
         self.fc_out = nn.Linear(d_model, tgt_vocab_size)
 
-    def forward(self, src, tgt, src_mask, tgt_mask):
+    def forward(self, src, tgt, src_mask=None, tgt_mask=None):
         """
         前向传播函数。
 
@@ -113,7 +120,7 @@ class Transformer(nn.Module):
         :param tgt: 目标序列输入 (batch_size, seq_len_tgt)
         :param src_mask: 源序列掩码，用于交叉注意力
         :param tgt_mask: 目标序列掩码，用于自注意力
-        :return Transformer 的输出（未经过 Softmax）
+        :return Transformer 的输出（未经过 Softmax） (batch_size, seq_len_tgt, tgt_vocab_size)
         """
         # 编码器
         enc_output = self.encoder(src, src_mask)

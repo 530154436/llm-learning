@@ -75,7 +75,7 @@ class DecoderLayer(nn.Module):
         self.sublayer_conn2 = SublayerConnection(d_model=d_model, dropout=dropout)
         self.sublayer_conn3 = SublayerConnection(d_model=d_model, dropout=dropout)
 
-    def forward(self, x, encoder_output, src_mask, tgt_mask) -> torch.Tensor:
+    def forward(self, x, encoder_output, src_mask=None, tgt_mask=None) -> torch.Tensor:
         """
         前向传播函数。
 
