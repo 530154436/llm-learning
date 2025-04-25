@@ -1,5 +1,11 @@
 
 [transformer学习]
+[李宏毅-自注意力机制 Self-attention（上）](https://www.bilibili.com/video/BV1Wv411h7kN?spm_id_from=333.788.videopod.episodes&vd_source=436107f586d66ab4fcf756c76eb96c35&p=38)
+[李宏毅-Transformer（上）](https://www.bilibili.com/video/BV1Wv411h7kN/?p=49&share_source=copy_web&vd_source=e46571d631061853c8f9eead71bdb390)
+[李沐-Transformer论文逐段精读【论文精读】](https://www.bilibili.com/video/BV1pu411o7BE/?share_source=copy_web&vd_source=e46571d631061853c8f9eead71bdb390)
+[3Blue1Brown-【官方双语】GPT是什么？直观解释Transformer | 【深度学习第5章】](https://www.bilibili.com/video/BV13z421U7cs/?share_source=copy_web&vd_source=e46571d631061853c8f9eead71bdb390)
+[3Blue1Brown-【官方双语】直观解释注意力机制，Transformer的核心 | 【深度学习第6章】](https://www.bilibili.com/video/BV1TZ421j7Ke/?share_source=copy_web)
+
 ⭐Transformer 论文精读
 https://github.com/Hoper-J/AI-Guide-and-Demos-zh_CN/tree/master/PaperNotes
 
@@ -19,21 +25,22 @@ https://github.com/zxuu/Self-Attention/blob/main/My_Transformer.py
 Transformer常见问题与回答总结
 https://zhuanlan.zhihu.com/p/496012402?utm_medium=social&utm_oi=629375409599549440
 
-datawhalechina
-https://github.com/datawhalechina/fun-transformer/tree/main
-
 比较清晰的各模块实现
 https://github.com/hyunwoongko/transformer/blob/master/models/blocks/decoder_layer.py
 
+datawhalechina
+https://github.com/datawhalechina/fun-transformer/tree/main
+
 
 [transformer实战-机器翻译]
+HUuggingface：https://huggingface.co/learn/llm-course/zh-CN/chapter7/4?fw=pt
+PyTorch官方实现：https://pytorch.ac.cn/tutorials/beginner/torchtext_translation.html
+PyTorch官方实现中文：https://github.com/apachecn/apachecn-dl-zh/blob/master/docs/pt-tut-17/32.md
+
 （不全）https://github.com/BrightXiaoHan/MachineTranslationTutorial/blob/master/tutorials/Chapter2/Normalize.md
 博客：https://zhuanlan.zhihu.com/p/347061440
 代码：https://github.com/hemingkx/ChineseNMT/tree/master
 研究生实验2：基于序列模型的英文到中文翻译机：https://www.zybuluo.com/wujiaju/note/1885072
-PyTorch官方实现：https://pytorch.ac.cn/tutorials/beginner/torchtext_translation.html
-PyTorch官方实现中文：https://github.com/apachecn/apachecn-dl-zh/blob/master/docs/pt-tut-17/32.md
-
 
 [Bert+深度自然语言处理实战]
 cs244n
