@@ -1,0 +1,6 @@
+# Python 3.10.12
+transformers==4.51.0
+spacy==3.8.5
+torch == 2.3.0
+torchtext==0.18.0
+numpy==1.26.0

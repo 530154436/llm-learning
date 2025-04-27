@@ -1,2 +1,4 @@
+# Python 3.10.12
 transformers==4.51.0
-spacy==3.8.5
+torch == 2.4.0
+sentencepiece

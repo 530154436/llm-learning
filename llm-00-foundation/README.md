@@ -33,14 +33,15 @@ https://github.com/datawhalechina/fun-transformer/tree/main
 
 
 [transformer实战-机器翻译]
+博客：https://zhuanlan.zhihu.com/p/347061440
+代码：https://github.com/hemingkx/ChineseNMT/tree/master
+研究生实验2：基于序列模型的英文到中文翻译机：https://www.zybuluo.com/wujiaju/note/1885072
+
 HUuggingface：https://huggingface.co/learn/llm-course/zh-CN/chapter7/4?fw=pt
 PyTorch官方实现：https://pytorch.ac.cn/tutorials/beginner/torchtext_translation.html
 PyTorch官方实现中文：https://github.com/apachecn/apachecn-dl-zh/blob/master/docs/pt-tut-17/32.md
 
 （不全）https://github.com/BrightXiaoHan/MachineTranslationTutorial/blob/master/tutorials/Chapter2/Normalize.md
-博客：https://zhuanlan.zhihu.com/p/347061440
-代码：https://github.com/hemingkx/ChineseNMT/tree/master
-研究生实验2：基于序列模型的英文到中文翻译机：https://www.zybuluo.com/wujiaju/note/1885072
 
 [Bert+深度自然语言处理实战]
 cs244n
