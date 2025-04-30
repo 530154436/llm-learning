@@ -117,6 +117,9 @@ https://blog.csdn.net/bcxbdzh/article/details/144276080
 合理性：交叉注意力中，键（K）来自编码器输出，需应用源序列的填充掩码。
 实现逻辑：掩码广播至 (batch_size, num_heads, seq_len_tgt, seq_len_src)，确保解码器每个查询仅关注有效源位置。
 
+https://www.cvmart.net/community/detail/5137
+https://avoid.overfit.cn/post/2371a9ec5eca46af81dbe23d3442a383
+https://ifwind.github.io/2021/08/17/Transformer%E7%9B%B8%E5%85%B3%E2%80%94%E2%80%94%EF%BC%887%EF%BC%89Mask%E6%9C%BA%E5%88%B6/#unilm%E4%B8%AD%E7%9A%84mask
 
 #### 问题
 

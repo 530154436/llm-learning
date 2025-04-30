@@ -29,6 +29,17 @@ def train():
                         d_model=config.d_model, num_heads=config.n_heads, d_ff=config.d_ff,
                         dropout=config.dropout, N=config.n_layers)
 
+    # https://github.com/intro-llm/intro-llm-code/blob/main/chs/ch2-foundations/Transformer/main.py
+
+    # https://zhuanlan.zhihu.com/p/347061440
+    # https://link.zhihu.com/?target=https%3A//github.com/hemingkx/ChineseNMT
+
+    # https://github.com/hyunwoongko/transformer/blob/master/train.py
+    # https://github.com/Hoper-J/AI-Guide-and-Demos-zh_CN/blob/master/PaperNotes/Transformer%20%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BB.md#q2-%E4%BB%80%E4%B9%88%E6%98%AF%E8%87%AA%E5%9B%9E%E5%BD%92%E4%B8%8E%E9%9D%9E%E8%87%AA%E5%9B%9E%E5%BD%92
+
+    # https://nlp.seas.harvard.edu/annotated-transformer/#part-1-model-architecture
+    # https://github.com/mcxiaoxiao/annotated-transformer-Chinese/tree/main
+
 
 if __name__ == '__main__':
     train()
