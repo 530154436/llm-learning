@@ -5,14 +5,15 @@
 # @function:
 import json
 import random
+
 random.seed(1024)
 
 
 def merge_and_split_files(
-    src_file: str,
-    tgt_file: str,
-    train_ratio: float = 0.7,
-    dev_ratio: float = 0.1
+        src_file: str,
+        tgt_file: str,
+        train_ratio: float = 0.7,
+        dev_ratio: float = 0.1
 ):
     # 读取源语言和目标语言的文件内容
     with open(src_file, 'r', encoding='utf-8') as src, open(tgt_file, 'r', encoding='utf-8') as tgt:
@@ -41,8 +42,8 @@ def merge_and_split_files(
     # 写入文件
     for dataset, name, suffix in zip([train_data, dev_data, test_data],
                                      ["train", "dev", "test"],
-                                     ['.jsonl', '.jsonl', '.jsonl']):
-        with open(f"{name}.{suffix}", 'w', encoding='utf-8') as outfile:
+                                     ['jsonl', 'jsonl', 'jsonl']):
+        with open(f"./dataset/{name}.{suffix}", 'w', encoding='utf-8') as outfile:
             for zh, en in dataset:
                 _dict = {"zh": zh, "en": en}
                 outfile.write(json.dumps(_dict, ensure_ascii=False))

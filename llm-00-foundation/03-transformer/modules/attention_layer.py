@@ -181,7 +181,7 @@ class MultiHeadAttention(nn.Module):
         batch_size = q.size(0)
         seq_len_q, seq_len_k = q.size(1), k.size(1)
 
-        # 1、拆分：将线性变换后的矩阵拆分为独立的多头，调整维度为 (batch_size, h, seq_len, head_dim)
+        # 1、拆分：将线性变换后的矩阵拆分为独立的多头，调整维度为 (batch_size, num_heads, seq_len, head_dim)
         # (batch_size, seq_len_q, embed_size) => (batch_size, seq_len_q, num_heads, head_dim) => (batch_size, num_heads, seq_len_q, head_dim)
         # (batch_size, seq_len_k, embed_size) => (batch_size, seq_len_k, num_heads, head_dim) => (batch_size, num_heads, seq_len_k, head_dim)
         Q = self.w_q(q).view(batch_size, seq_len_q, self.num_heads, self.head_dim).transpose(1, 2)

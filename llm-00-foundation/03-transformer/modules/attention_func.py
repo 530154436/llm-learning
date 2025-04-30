@@ -31,7 +31,7 @@ def scaled_dot_product_attention(Q: torch.Tensor,
     Q: 查询矩阵 (batch_size, num_heads, seq_len_q, head_dim)
     K: 键矩阵 (batch_size, num_heads, seq_len_k, head_dim)
     V: 值矩阵 (batch_size, num_heads, seq_len_v, head_dim)
-    mask: 掩码矩阵 (batch_size, num_heads, seq_len_q, seq_len_k)
+    mask: 掩码矩阵 (batch_size, 1, 1, seq_len)
 
     :return
         output: 注意力加权后的输出矩阵 (batch_size, seq_len_q, embed_size)

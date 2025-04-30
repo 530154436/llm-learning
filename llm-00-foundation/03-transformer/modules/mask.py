@@ -3,13 +3,16 @@
 # @author: zhengchubin
 # @time: 2025/4/23 16:00
 # @function:
+#
+# 注意力机制中三种掩码技术详解和Pytorch实现
+# https://avoid.overfit.cn/post/2371a9ec5eca46af81dbe23d3442a383
 import torch
 
 
 def create_padding_mask(seq: torch.Tensor, pad_token_id: int = 0) -> torch.Tensor:
     """
     填充掩码（Padding Mask）
-    填充掩码用于在注意力计算时屏蔽填充 <PAD> 位置，防止模型计算注意力权重的时候考虑这些无意义的位置，在编码器的自注意力中使用。
+    用来指示哪些数据是真实的，哪些是填充的（<PAD>）。在模型处理这些数据时，掩码会用来避免在计算损失或者梯度时考虑填充的部分，确保模型的学习只关注于有效的数据。
 
     :param seq: 分词（tokenize）然后映射为 Token ID 序列, (batch_size, seq_len)
     :param pad_token_id: 填充对应的token_id，如<PAD>对应0
@@ -21,10 +24,11 @@ def create_padding_mask(seq: torch.Tensor, pad_token_id: int = 0) -> torch.Tenso
     return mask  # 在注意力计算时，填充值为 0 的位置会被屏蔽
 
 
-def create_look_ahead_mask(size):
+def create_casual_mask(size):
     """
-    未来信息掩码（Look-ahead Mask）
-    未来信息掩码用于在解码器中屏蔽未来的位置，防止模型在预测下一个词时“偷看”答案（训练时），在解码器中使用。
+    因果掩码（Causal Mask）
+    也称为前瞻掩码或未来掩码（Look-ahead Mask）
+    屏蔽未来时间步的信息（即设置为一个非常小的负值，如负无穷大），这确保了在计算每个元素的输出时，模型只能使用到当前和之前的信息，而不能使用后面的信息。
 
     :param size: 序列长度
     :return: (seq_len, seq_len)
@@ -33,9 +37,9 @@ def create_look_ahead_mask(size):
     return mask
 
 
-def create_decoder_mask(seq: torch.Tensor, pad_token_id: int = 0) -> torch.Tensor:
+def create_sequence_mask(seq: torch.Tensor, pad_token_id: int = 0) -> torch.Tensor:
     """
-    生成每个序列的 填充掩码+未来信息掩码
+    生成每个序列的掩码：填充掩码+未来信息掩码
     :param seq: (batch_size, seq_len)
     :param pad_token_id: 填充对应的token_id，如<PAD>对应0
     :return: mask处理后的序列 (batch_size, 1, seq_len, seq_len)
@@ -44,7 +48,7 @@ def create_decoder_mask(seq: torch.Tensor, pad_token_id: int = 0) -> torch.Tenso
     padding_mask = create_padding_mask(seq, pad_token_id)
 
     # (seq_len, seq_len)
-    look_ahead_mask = create_look_ahead_mask(seq.size(1)).to(seq.device)
+    look_ahead_mask = create_casual_mask(seq.size(1)).to(seq.device)
 
     # look_ahead_mask: (seq_len, seq_len) => (1, seq_len, seq_len)
     # (batch_size, 1, seq_len, seq_len): (1, seq_len, seq_len) & (batch_size, 1, 1, seq_len)

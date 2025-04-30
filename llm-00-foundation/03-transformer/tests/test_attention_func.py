@@ -66,7 +66,7 @@ def test_multi_head():
     #          [[1.0000, 0.0000, 0.0000],
     #           [0.0269, 0.9731, 0.0000],
     #           [0.2973, 0.1114, 0.5913]]]])
-    print(_output.shape, _attention_weights.shape)
+    print(mask.shape, _output.shape, _attention_weights.shape)
     print(mask)
     print(_attention_weights)
 
