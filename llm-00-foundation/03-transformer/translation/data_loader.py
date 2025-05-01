@@ -16,15 +16,16 @@ from modules.mask import create_padding_mask, create_sequence_mask
 
 class MTBatch(object):
     def __init__(self, src_text: List[str], src_input: torch.Tensor, src_mask: torch.Tensor,
-                 tgt_text: List[str], tgt_input: torch.Tensor, tgt_output: torch.Tensor, tgt_mask: torch.Tensor):
+                 tgt_text: List[str], tgt_input: torch.Tensor, tgt_mask: torch.Tensor,
+                 tgt_output: torch.Tensor, device: str = "cpu"):
         self.src_text = src_text
-        self.src_input = src_input
-        self.src_mask = src_mask
+        self.src_input = src_input.to(device)
+        self.src_mask = src_mask.to(device)
 
         self.tgt_text = tgt_text
-        self.tgt_input = tgt_input
-        self.tgt_mask = tgt_mask
-        self.tgt_output = tgt_output
+        self.tgt_input = tgt_input.to(device)
+        self.tgt_mask = tgt_mask.to(device)
+        self.tgt_output = tgt_output.to(device)
 
 
 class MTDataset(Dataset):
@@ -72,7 +73,7 @@ class MTDataset(Dataset):
     def __len__(self):
         return len(self.src_sentences)
 
-    def collate_fn(self, batch: List[Tuple[str]]):
+    def collate_fn(self, batch: List[Tuple[str]], device: str = "cpu"):
         """
         预处理流程：
         1、把原始语料中的中英文句对按照英文句子的长度排序，使得每个batch中的句子长度相近。
@@ -109,7 +110,8 @@ class MTDataset(Dataset):
         tgt_output = tgt_tensor[:, 1:]  # 去除每个序列的第一个token
 
         return MTBatch(src_text=src_text, src_input=src_input, src_mask=src_mask,
-                       tgt_text=tgt_text, tgt_input=tgt_input, tgt_mask=tgt_mask, tgt_output=tgt_output)
+                       tgt_text=tgt_text, tgt_input=tgt_input, tgt_mask=tgt_mask,
+                       tgt_output=tgt_output, device=device)
 
 
 if __name__ == '__main__':
