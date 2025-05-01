@@ -39,6 +39,7 @@ batch_size = 32
 epoch_num = 40
 early_stop = 5
 lr = 3e-4
+warmup = 100
 
 # 解码配置
 max_len = 60

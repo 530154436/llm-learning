@@ -4,6 +4,7 @@
 # @time: 2025/4/27 20:25
 # @function:
 import json
+import os.path
 import random
 
 random.seed(1024)
@@ -43,6 +44,8 @@ def merge_and_split_files(
     for dataset, name, suffix in zip([train_data, dev_data, test_data],
                                      ["train", "dev", "test"],
                                      ['jsonl', 'jsonl', 'jsonl']):
+        if not os.path.exists("./dataset"):
+            os.mkdir("./dataset")
         with open(f"./dataset/{name}.{suffix}", 'w', encoding='utf-8') as outfile:
             for zh, en in dataset:
                 _dict = {"zh": zh, "en": en}

@@ -36,15 +36,18 @@ class Encoder(nn.Module):
         """
         前向传播函数。
 
-        :param x: 输入张量 (batch_size, seq_len)，一个批次的多个序列，序列元素是 token_id
-        :param mask: 输入掩码
-        :return: 编码器的输出 (batch_size, seq_len, d_model)
+        :param x: 输入张量 (batch_size, seq_len_src)，一个批次的多个序列，序列元素是 token_id
+        :param mask: 输入掩码 (batch_size, 1, 1, seq_len_src)
+        :return: 编码器的输出 (batch_size, seq_len_src, d_model)
         """
-        # (batch_size, seq_len_tgt) => (batch_size, seq_len_tgt, d_model)
+        # 输入序列：(batch_size, seq_len_src)
+        # 标记嵌入：(batch_size, seq_len_src, d_model)
+        # 位置嵌入：(batch_size, seq_len_src, d_model)
         x = self.embed(x)
         x = self.pe(x)
 
-        # (batch_size, seq_len, d_model) => (batch_size, seq_len, d_model)
+        # 掩码：(batch_size, 1, 1, seq_len_src)
+        # 输出：(batch_size, seq_len_src, d_model)
         for layer in self.layers:
             x = layer(x, mask)
         return self.norm(x)  # 最后层归一化
@@ -75,16 +78,20 @@ class Decoder(nn.Module):
         前向传播函数。
 
         :param x: 解码器输入 (batch_size, seq_len_tgt)，一个批次的多个序列，序列元素是 token_id
-        :param encoder_output: 编码器输出 (batch_size, seq_len_src, d_model)
-        :param src_mask: 源序列掩码，用于交叉注意力
-        :param tgt_mask: 目标序列掩码，用于自注意力
+        :param encoder_output: 编码器输出 (batch_size, seq_len_tgt, d_model)
+        :param src_mask: 源序列掩码,用于编码器的自注意力、解码器的交叉注意力
+                         即填充掩码  (batch_size, 1, 1, seq_len_src)
+        :param tgt_mask: 目标序列掩码，用于解码器输入部分的自注意力
+                         填充掩码 & 因果掩码  (batch_size, 1, seq_len_tgt, seq_len_tgt)
         :return (batch_size, seq_len_tgt, d_model)
         """
-        # (batch_size, seq_len_tgt) => (batch_size, seq_len_tgt, d_model)
+        # 输入序列：(batch_size, seq_len_tgt)
+        # 标记嵌入：(batch_size, seq_len_tgt, d_model)
+        # 位置嵌入：(batch_size, seq_len_tgt, d_model)
         x = self.embed(x)
         x = self.pe(x)
 
-        # (batch_size, seq_len_tgt, d_model)
+        # 输出：(batch_size, seq_len_tgt, d_model)
         for layer in self.layers:
             x = layer(x, encoder_output, src_mask, tgt_mask)
         return self.norm(x)  # 最后层归一化
@@ -118,17 +125,19 @@ class Transformer(nn.Module):
 
         :param src: 源序列输入 (batch_size, seq_len_src)
         :param tgt: 目标序列输入 (batch_size, seq_len_tgt)
-        :param src_mask: 源序列掩码，用于交叉注意力
-        :param tgt_mask: 目标序列掩码，用于自注意力
+        :param src_mask: 源序列掩码,用于编码器的自注意力、解码器的交叉注意力
+                         即填充掩码 (batch_size, 1, 1, seq_len_src)
+        :param tgt_mask: 目标序列掩码，用于解码器输入部分的自注意力
+                         填充掩码 & 因果掩码 (batch_size, 1, seq_len_tgt, seq_len_tgt)
         :return Transformer 的输出（未经过 Softmax） (batch_size, seq_len_tgt, tgt_vocab_size)
         """
-        # 编码器
+        # 编码器 (batch_size, seq_len_src, d_model)
         enc_output = self.encoder(src, src_mask)
 
-        # 解码器
+        # 解码器 (batch_size, seq_len_tgt, d_model)
         dec_output = self.decoder(tgt, enc_output, src_mask, tgt_mask)
 
-        # 输出层
+        # 全连接层 (batch_size, seq_len_tgt, tgt_vocab_size)
         output = self.fc_out(dec_output)
 
         return output

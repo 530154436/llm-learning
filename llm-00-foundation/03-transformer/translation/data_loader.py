@@ -4,6 +4,7 @@
 # @time: 2025/4/27 19:18
 # @function:
 import json
+from typing import List, Tuple
 
 import numpy as np
 import torch
@@ -14,11 +15,13 @@ from modules.mask import create_padding_mask, create_sequence_mask
 
 
 class MTBatch(object):
-    def __init__(self, src_input: torch.Tensor, src_mask: torch.Tensor,
-                 tgt_input: torch.Tensor, tgt_output: torch.Tensor, tgt_mask: torch.Tensor):
+    def __init__(self, src_text: List[str], src_input: torch.Tensor, src_mask: torch.Tensor,
+                 tgt_text: List[str], tgt_input: torch.Tensor, tgt_output: torch.Tensor, tgt_mask: torch.Tensor):
+        self.src_text = src_text
         self.src_input = src_input
         self.src_mask = src_mask
 
+        self.tgt_text = tgt_text
         self.tgt_input = tgt_input
         self.tgt_mask = tgt_mask
         self.tgt_output = tgt_output
@@ -45,6 +48,7 @@ class MTDataset(Dataset):
         src_sent = []
         tgt_sent = []
         for idx, line in enumerate(open(path, 'r', encoding='utf-8')):
+            line = line.strip()
             if not line:
                 continue
             json_data: dict = json.loads(line)
@@ -68,7 +72,7 @@ class MTDataset(Dataset):
     def __len__(self):
         return len(self.src_sentences)
 
-    def collate_fn(self, batch):
+    def collate_fn(self, batch: List[Tuple[str]]):
         """
         预处理流程：
         1、把原始语料中的中英文句对按照英文句子的长度排序，使得每个batch中的句子长度相近。
@@ -76,35 +80,36 @@ class MTDataset(Dataset):
         3、在每个 id sequence 的首尾加上起始符和终止符，并将其转换为Tensor。
         4、分别生成编码器、解码器的掩码；右移（shifted right）操作，对目标序列划分成输入、输出两部分。
         """
-        print(type(batch))
-
         # 1、分别对中英文句子进行分词、转换为token id， 并在每个 id sequence 的首尾加上起始符和终止符
-        src_token_ids, tgt_token_ids = [], []
+        src_text, src_token_ids, tgt_text, tgt_token_ids = [], [], [], []
         for src_sentence, tgt_sentence in batch:
+            src_text.append(src_sentence)
             src_token_ids.append(
                 [self.src_tokenizer.bos_id()] + self.src_tokenizer.encode_as_id(src_sentence) + [self.src_tokenizer.eos_id()]
             )
+            tgt_text.append(tgt_sentence)
             tgt_token_ids.append(
                 [self.tgt_tokenizer.bos_id()] + self.tgt_tokenizer.encode_as_id(tgt_sentence) + [self.tgt_tokenizer.eos_id()]
             )
 
         # 2、Token id 序列转换为 Tensor，并将该批次不同长度的 Tensor 填充到等长 => (batch_size, seq_len)
-        src_input = pad_sequence([torch.LongTensor(np.array(l_)) for l_ in src_token_ids],
+        src_tensor = pad_sequence([torch.LongTensor(np.array(l_)) for l_ in src_token_ids],
                                  batch_first=True, padding_value=self.src_tokenizer.pad_id())
-        tgt_input = pad_sequence([torch.LongTensor(np.array(l_)) for l_ in tgt_token_ids],
+        tgt_tensor = pad_sequence([torch.LongTensor(np.array(l_)) for l_ in tgt_token_ids],
                                  batch_first=True, padding_value=self.tgt_tokenizer.pad_id())
 
         # 3、生成掩码
         # Encoder训练时的输入部分
+        src_input = src_tensor
         src_mask = create_padding_mask(src_input, pad_token_id=self.src_tokenizer.pad_id())
         # Decoder训练时的输入部分
-        tgt_input = tgt_input[:, :-1]  # 去除每个序列的最后一个token
+        tgt_input = tgt_tensor[:, :-1]  # 去除每个序列的最后一个token
         tgt_mask = create_sequence_mask(tgt_input, pad_token_id=self.tgt_tokenizer.pad_id())
         # Decoder训练时的输出部分
-        tgt_output = tgt_input[:, 1:]  # 去除每个序列的第一个token
+        tgt_output = tgt_tensor[:, 1:]  # 去除每个序列的第一个token
 
-        return MTBatch(src_input=src_input, src_mask=src_mask,
-                       tgt_input=tgt_input, tgt_mask=tgt_mask, tgt_output=tgt_output)
+        return MTBatch(src_text=src_text, src_input=src_input, src_mask=src_mask,
+                       tgt_text=tgt_text, tgt_input=tgt_input, tgt_mask=tgt_mask, tgt_output=tgt_output)
 
 
 if __name__ == '__main__':
