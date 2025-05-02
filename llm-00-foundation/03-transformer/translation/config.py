@@ -17,7 +17,8 @@ train_data_path = f'{data_dir}/dataset/train.jsonl'
 dev_data_path = f'{data_dir}/dataset/dev.jsonl'
 test_data_path = f'{data_dir}/dataset/test.jsonl'
 
-model_path = f'{data_dir}/experiment/model.pth'
+# model_path = f'{data_dir}/experiment/model.pth'
+model_path = f'{data_dir}/experiment/model-0502.pth'
 
 for sub_dir in ["dataset", "experiment", "log"]:
     _dir = f'{data_dir}/{sub_dir}'
