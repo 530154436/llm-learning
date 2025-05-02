@@ -102,7 +102,7 @@ def test():
 
     print(sp.encode_as_token(text))
     print(sp.encode_as_id(text))
-    a = [12908, 277, 7420, 7319, 18385, 28724]
+    a = [2, 12908, 277, 7420, 7319, 18385, 28724, 3]
     print(sp.decode_ids(a))
     print(sp.vocab_size())
 

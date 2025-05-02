@@ -5,7 +5,6 @@
 # @function:
 import time
 from functools import partial
-
 import torch
 import tqdm
 from typing import Callable
@@ -35,11 +34,12 @@ def count_trainable_parameters(model: nn.Module):
 
 def run_epoch(data: DataLoader[MTBatch],
               model: Transformer,
-              optimizer: Optimizer,
-              criterion: Callable):
-    model.train()
+              criterion: Callable,
+              optimizer: Optimizer = None) -> float:
+    model.train() if optimizer is not None else model.eval()
+    desc = "train" if optimizer is not None else "eval"
     epoch_loss = 0.0
-    tk0 = tqdm.tqdm(data, desc="train", smoothing=0, mininterval=1.0)
+    tk0 = tqdm.tqdm(data, desc=desc, smoothing=0, mininterval=1.0)
     for i, item in enumerate(tk0, start=1):
         # 模型预测
         batch: MTBatch = item
@@ -48,10 +48,14 @@ def run_epoch(data: DataLoader[MTBatch],
         y_true = batch.tgt_output.contiguous().view(-1)
 
         # 计算损失
-        optimizer.zero_grad()
-        loss = criterion(y_pred, y_true)
-        loss.backward()
-        optimizer.step()
+        if optimizer is not None:
+            optimizer.zero_grad()
+            loss = criterion(y_pred, y_true)
+            loss.backward()
+            optimizer.step()
+        else:
+            with torch.no_grad():
+                loss = criterion(y_pred, y_true)
 
         epoch_loss += loss.item()
         tk0.set_postfix(loss=round(epoch_loss / i, 5))
@@ -59,26 +63,11 @@ def run_epoch(data: DataLoader[MTBatch],
 
 
 @torch.no_grad()
-def evaluate(data: DataLoader[MTBatch],
-             model: Transformer,
-             criterion: Callable):
+def evaluate(data, model, use_beam=True):
     """ 在data上用训练好的模型进行预测，打印模型翻译结果
     """
-    model.eval()
-    epoch_loss = 0
-    tk0 = tqdm.tqdm(data, desc="eval", smoothing=0, mininterval=1.0)
-    for i, item in enumerate(tk0, start=1):
-        # 计算loss
-        batch: MTBatch = item
-        y_pred = model(batch.src_input, batch.tgt_input, batch.src_mask, batch.tgt_mask)
-        y_pred = y_pred.contiguous().view(-1, y_pred.size(-1))
-        y_true = batch.tgt_output.contiguous().view(-1)
-        loss = criterion(y_pred, y_true)
-        # 计算blue分值
+    pass
 
-        epoch_loss += loss.item()
-        tk0.set_postfix(loss=round(epoch_loss / i, 5))
-    return epoch_loss / len(data)
 
 def train(model: nn.Module,
           train_dataloader: DataLoader,
@@ -96,15 +85,18 @@ def train(model: nn.Module,
     model.to(config.device)
     for epoch in range(1, config.epoch_num + 1):
         # 模型训练
-        train_loss = run_epoch(train_dataloader, model, optimizer, criterion)
+        train_loss = run_epoch(train_dataloader, model, criterion, optimizer)
         # 验证集
-        valid_loss = evaluate(dev_dataloader, model, criterion)
+        valid_loss = run_epoch(train_dataloader, model, criterion)
+        # blue_score = evaluate(dev_dataloader, model, criterion)
 
         current_lr = optimizer.state_dict()['param_groups'][0]['lr']
         LOGGER.info("Epoch: {}, train_loss: {}, valid_loss: {}, lr: {}"
                     .format(epoch, round(train_loss, 6), round(valid_loss, 6), round(current_lr, 6)))
         scheduler.step()
 
+    # 保存模型
+    torch.save(model.state_dict(), config.model_path)
 
 
 def main():
