@@ -35,11 +35,12 @@ def count_trainable_parameters(model: nn.Module):
 def run_epoch(data: DataLoader[MTBatch],
               model: Transformer,
               criterion: Callable,
-              optimizer: Optimizer = None) -> float:
+              optimizer: Optimizer = None,
+              epoch: int = 1) -> float:
     model.train() if optimizer is not None else model.eval()
     desc = "train" if optimizer is not None else "eval"
     epoch_loss = 0.0
-    tk0 = tqdm.tqdm(data, desc=desc, smoothing=0, mininterval=1.0)
+    tk0 = tqdm.tqdm(data, desc=f"{desc} {epoch}/{config.epoch_num}", smoothing=0, mininterval=1.0)
     for i, item in enumerate(tk0, start=1):
         # 模型预测
         batch: MTBatch = item
@@ -85,10 +86,10 @@ def train(model: nn.Module,
     model.to(config.device)
     for epoch in range(1, config.epoch_num + 1):
         # 模型训练
-        train_loss = run_epoch(train_dataloader, model, criterion, optimizer)
+        train_loss = run_epoch(train_dataloader, model, criterion, optimizer, epoch=epoch)
         # 验证集
-        valid_loss = run_epoch(train_dataloader, model, criterion)
-        # blue_score = evaluate(dev_dataloader, model, criterion)
+        valid_loss = run_epoch(dev_dataloader, model, criterion, epoch=epoch)
+        # blue_score = evaluate(dev_dataloader, model, criterion, epoch=epoch)
 
         current_lr = optimizer.state_dict()['param_groups'][0]['lr']
         LOGGER.info("Epoch: {}, train_loss: {}, valid_loss: {}, lr: {}"

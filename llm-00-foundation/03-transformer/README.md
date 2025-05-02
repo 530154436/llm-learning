@@ -19,7 +19,19 @@
 
 ```
 
-
+[HAMI-core Msg(813:140699094931264:libvgpu.c:836)]: Initializing.....
+Fri May  2 07:22:52 2025
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 470.57.02    Driver Version: 470.57.02    CUDA Version: 12.2     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA A100-PCI...  Off  | 00000000:65:00.0 Off |                    0 |
+| N/A   44C    P0    74W / 250W |  26940MiB / 40536MiB |     40%      Default |
+|                               |                      |             Disabled |
++-------------------------------+----------------------+----------------------+
 
 
 [1] [动手深度学习v2-机器翻译与数据集](https://zh.d2l.ai/chapter_recurrent-modern/machine-translation-and-dataset.html)<br>

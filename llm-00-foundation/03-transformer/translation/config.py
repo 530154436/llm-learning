@@ -40,7 +40,7 @@ bos_idx = 2
 eos_idx = 3
 
 batch_size = 32
-epoch_num = 40
+epoch_num = 20
 early_stop = 5
 lr = 3e-4
 warmup_steps = 50
