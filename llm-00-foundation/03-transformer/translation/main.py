@@ -16,21 +16,7 @@ from modules.models import Transformer
 from translation import config
 from translation.config import LOGGER
 from translation.data_loader import MTDataset, MTBatch
-
-
-def initialize_weights(model: nn.Module):
-    """ 初始化模型权重
-    """
-    for p in model.parameters():
-        if p.dim() > 1:
-            nn.init.xavier_uniform_(p)
-            # nn.init.kaiming_uniform_(p)
-
-
-def count_trainable_parameters(model: nn.Module):
-    """ 计算模型参数
-    """
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+from util.torch_util import initialize_weights, count_trainable_parameters
 
 
 def run_epoch(data: DataLoader[MTBatch],

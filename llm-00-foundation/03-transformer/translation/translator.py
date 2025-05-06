@@ -75,7 +75,6 @@ def translate(sentences: List[str],
     ]
 
 
-
 if __name__=='__main__':
     _sentences = [
         "Which Way is West for Turkey?",

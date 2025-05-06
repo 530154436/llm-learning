@@ -25,6 +25,10 @@ else:
 # snapshot_download("google-bert/bert-base-cased",
 #                   revision='master',
 #                   cache_dir=DATA_DIR)
+snapshot_download("google-bert/bert-base-chinese",
+                  revision='master',
+                  cache_dir=DATA_DIR)
+
 # snapshot_download("openai-community/gpt2",
 #                   revision='master',
 #                   cache_dir=DATA_DIR)

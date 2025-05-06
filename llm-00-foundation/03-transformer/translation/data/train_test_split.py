@@ -14,12 +14,13 @@ def merge_and_split_files(
         src_file: str,
         tgt_file: str,
         train_ratio: float = 0.7,
-        dev_ratio: float = 0.1
+        dev_ratio: float = 0.1,
+        limit: int = None,
 ):
     # 读取源语言和目标语言的文件内容
     with open(src_file, 'r', encoding='utf-8') as src, open(tgt_file, 'r', encoding='utf-8') as tgt:
-        src_lines = src.readlines()
-        tgt_lines = tgt.readlines()
+        src_lines = src.readlines() if limit is None else src.readlines()[:limit]
+        tgt_lines = tgt.readlines() if limit is None else tgt.readlines()[:limit]
 
     # 确保两个文件的行数相同
     assert len(src_lines) == len(tgt_lines), "源文件和目标文件的行数不匹配"

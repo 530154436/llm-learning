@@ -95,9 +95,9 @@ class MTDataset(Dataset):
 
         # 2、Token id 序列转换为 Tensor，并将该批次不同长度的 Tensor 填充到等长 => (batch_size, seq_len)
         src_tensor = pad_sequence([torch.LongTensor(np.array(l_)) for l_ in src_token_ids],
-                                 batch_first=True, padding_value=self.src_tokenizer.pad_id())
+                                  batch_first=True, padding_value=self.src_tokenizer.pad_id())
         tgt_tensor = pad_sequence([torch.LongTensor(np.array(l_)) for l_ in tgt_token_ids],
-                                 batch_first=True, padding_value=self.tgt_tokenizer.pad_id())
+                                  batch_first=True, padding_value=self.tgt_tokenizer.pad_id())
 
         # 3、生成掩码
         # Encoder训练时的输入部分
