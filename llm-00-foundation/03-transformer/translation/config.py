@@ -4,10 +4,11 @@
 # @time: 2025/4/27 19:30
 # @function:
 import os
+from pathlib import Path
 import torch
 from util import logger
 
-data_dir = 'data'
+data_dir = Path(__file__).parent.joinpath('data')
 
 # 设置日志格式
 LOGGER = logger.get_logger(path=f'{data_dir}/log')
