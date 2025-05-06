@@ -26,6 +26,7 @@ def initialize_weights(model: nn.Module):
             nn.init.xavier_uniform_(p)
             # nn.init.kaiming_uniform_(p)
 
+
 def count_trainable_parameters(model: nn.Module):
     """ 计算模型参数
     """

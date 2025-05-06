@@ -12,6 +12,7 @@ bert-base-uncased 和 bert-base-cased 是 BERT（Bidirectional Encoder Represent
 https://www.yiyibooks.cn/nlp/bert/main.html
 
 Chinese NER Project
+https://github.com/intro-llm/intro-llm-code/blob/main/chs/ch2-foundations/PreTrain/main.py
 https://github.com/hemingkx/CLUENER2020
 
 datawhalechina的nlp学习
