@@ -13,6 +13,7 @@ def create_padding_mask(seq: torch.Tensor, pad_token_id: int = 0) -> torch.Tenso
     """
     填充掩码（Padding Mask）
     用来指示哪些数据是真实的，哪些是填充的（<PAD>）。在模型处理这些数据时，掩码会用来避免在计算损失或者梯度时考虑填充的部分，确保模型的学习只关注于有效的数据。
+    True表示对应位置是非填充元素，而False表示填充元素。
 
     :param seq: 分词（tokenize）然后映射为 Token ID 序列, (batch_size, seq_len)
     :param pad_token_id: 填充对应的token_id，如<PAD>对应0
