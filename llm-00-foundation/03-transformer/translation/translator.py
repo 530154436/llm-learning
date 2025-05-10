@@ -23,6 +23,7 @@ MODEL.load_state_dict(torch.load(config.model_path,
                                  map_location=torch.device(config.device)))
 MODEL.eval()
 
+
 @torch.no_grad()
 def translate(sentences: List[str],
               model: Transformer,

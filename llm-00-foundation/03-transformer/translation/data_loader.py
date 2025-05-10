@@ -30,7 +30,7 @@ class MTBatch(object):
 
 class MTDataset(Dataset):
     """
-    翻译数据集 <news-commentary-v13>
+    翻译数据集Loader, <src, tgt>
     """
     def __init__(self, path: str, src_lang: str = "en", tgt_lang: str = "zh"):
         self.src_lang = src_lang

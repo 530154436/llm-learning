@@ -40,6 +40,7 @@ https://github.com/datawhalechina/fun-transformer/tree/main
 HUuggingface：https://huggingface.co/learn/llm-course/zh-CN/chapter7/4?fw=pt
 PyTorch官方实现：https://pytorch.ac.cn/tutorials/beginner/torchtext_translation.html
 PyTorch官方实现中文：https://github.com/apachecn/apachecn-dl-zh/blob/master/docs/pt-tut-17/32.md
+PyTorch官方示例：https://github.com/pytorch/examples/blob/main/language_translation/src/model.py
 
 （不全）https://github.com/BrightXiaoHan/MachineTranslationTutorial/blob/master/tutorials/Chapter2/Normalize.md
 
