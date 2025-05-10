@@ -25,7 +25,8 @@ https://github.com/langgenius/dify
 https://github.com/infiniflow/ragflow/tree/main
 https://github.com/labring/FastGPT/blob/main/README.md
 
-
+嵌入向量
+SentenceTransformer
 
 [大模型RAG的迭代路径](https://mp.weixin.qq.com/s/kTZc1UpAzpSNanRx82ZRtg)
 [面向大语言模型的检索增强生成技术：综述 [译]](https://baoyu.io/translations/ai-paper/2312.10997-retrieval-augmented-generation-for-large-language-models-a-survey)

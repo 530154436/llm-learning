@@ -12,10 +12,11 @@ from torch import nn
 from torch.optim import AdamW, lr_scheduler, Optimizer
 from torch.utils.data import DataLoader
 from transformers import get_linear_schedule_with_warmup
-from torch.nn import Transformer
-from translation import config
-from translation.config import LOGGER
-from translation.data_loader import MTDataset, MTBatch
+# from torch.nn import Transformer
+from modules.models import Transformer
+import config
+from config import LOGGER
+from data_loader import MTDataset, MTBatch
 from util.torch_util import initialize_weights, count_trainable_parameters
 
 

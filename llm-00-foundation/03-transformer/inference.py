@@ -8,8 +8,8 @@ from typing import List
 from torch.nn.utils.rnn import pad_sequence
 from modules.mask import create_padding_mask, create_sequence_mask
 from modules.models import Transformer
-from translation import config
-from translation.sentencepiece_tokenizer import SentencePieceTokenizerWithLang
+import config
+from util.sentencepiece_tokenizer import SentencePieceTokenizerWithLang
 
 
 SRC_TOKENIZER = SentencePieceTokenizerWithLang(lang="en")

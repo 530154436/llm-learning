@@ -10,7 +10,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pad_sequence
-from sentencepiece_tokenizer import SentencePieceTokenizerWithLang
+from util.sentencepiece_tokenizer import SentencePieceTokenizerWithLang
 from modules.mask import create_padding_mask, create_sequence_mask
 
 

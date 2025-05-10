@@ -5,6 +5,7 @@
 # @function:
 import json
 import os
+import sys
 from pathlib import Path
 from util import logger
 
@@ -24,8 +25,12 @@ label2id = json.load(open(label_data_path, 'r'))
 id2label = {_id: _label for _label, _id in list(label2id.items())}
 
 # 模型
-bert_model = f'{data_dir}/pretrained/bert-base-chinese/'
-roberta_model = f'{data_dir}/pretrained/chinese_roberta_wwm_large_ext/'
+if sys.platform == 'win32':
+    pretrained_model_dir = Path('E:/data/models')
+else:
+    pretrained_model_dir = Path('/data/models')
+bert_base_chinese = pretrained_model_dir.joinpath('bert-base-chinese')
+# chinese_roberta_wwm_large_ext = pretrained_mode_dir.joinpath('chinese_roberta_wwm_large_ext')
 model_path = f'{data_dir}/experiment/ner.pth'
 
 for sub_dir in ["dataset", "experiment", "log", "pretrained"]:

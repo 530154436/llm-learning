@@ -1,3 +1,48 @@
+[transformer学习]
+[李宏毅-自注意力机制 Self-attention（上）](https://www.bilibili.com/video/BV1Wv411h7kN?spm_id_from=333.788.videopod.episodes&vd_source=436107f586d66ab4fcf756c76eb96c35&p=38)
+[李宏毅-Transformer（上）](https://www.bilibili.com/video/BV1Wv411h7kN/?p=49&share_source=copy_web&vd_source=e46571d631061853c8f9eead71bdb390)
+[李沐-Transformer论文逐段精读【论文精读】](https://www.bilibili.com/video/BV1pu411o7BE/?share_source=copy_web&vd_source=e46571d631061853c8f9eead71bdb390)
+[3Blue1Brown-【官方双语】GPT是什么？直观解释Transformer | 【深度学习第5章】](https://www.bilibili.com/video/BV13z421U7cs/?share_source=copy_web&vd_source=e46571d631061853c8f9eead71bdb390)
+[3Blue1Brown-【官方双语】直观解释注意力机制，Transformer的核心 | 【深度学习第6章】](https://www.bilibili.com/video/BV1TZ421j7Ke/?share_source=copy_web)
+
+⭐Transformer 论文精读
+https://github.com/Hoper-J/AI-Guide-and-Demos-zh_CN/tree/master/PaperNotes
+
+⭐《大语言模型：从理论到实践v2.2025.张奇》transformer组件实现+机器翻译实战
+https://github.com/intro-llm/intro-llm-code/blob/main/chs/ch2-foundations/Transformer
+
+哈佛NLP实现：
+博客：https://nlp.seas.harvard.edu/annotated-transformer/#training
+代码：https://github.com/mcxiaoxiao/annotated-transformer-Chinese/blob/main/AnnotatedTransformer%20%E4%B8%AD%E6%96%87.ipynb
+
+PPT可以
+【Transformer 的 Pytorch 代码实现讲解-哔哩哔哩】 https://b23.tv/pPamgsI
+源码是github上现成的哦～链接🔗 https://github.com/wmathor/nlp-tutorial/blob/master/5-1.Transformer/Transformer_Torch.py#L122
+视频中用到的 ppt 链接在这里啦：链接🔗 https://pan.quark.cn/s/6e55ac9f40d9
+https://github.com/zxuu/Self-Attention/blob/main/My_Transformer.py
+
+Transformer常见问题与回答总结
+https://zhuanlan.zhihu.com/p/496012402?utm_medium=social&utm_oi=629375409599549440
+
+比较清晰的各模块实现
+https://github.com/hyunwoongko/transformer/blob/master/models/blocks/decoder_layer.py
+
+datawhalechina
+https://github.com/datawhalechina/fun-transformer/tree/main
+
+
+[transformer实战-机器翻译]
+博客：https://zhuanlan.zhihu.com/p/347061440
+代码：https://github.com/hemingkx/ChineseNMT/tree/master
+研究生实验2：基于序列模型的英文到中文翻译机：https://www.zybuluo.com/wujiaju/note/1885072
+
+HUuggingface：https://huggingface.co/learn/llm-course/zh-CN/chapter7/4?fw=pt
+PyTorch官方实现：https://pytorch.ac.cn/tutorials/beginner/torchtext_translation.html
+PyTorch官方实现中文：https://github.com/apachecn/apachecn-dl-zh/blob/master/docs/pt-tut-17/32.md
+PyTorch官方示例：https://github.com/pytorch/examples/blob/main/language_translation/src/model.py
+
+（不全）https://github.com/BrightXiaoHan/MachineTranslationTutorial/blob/master/tutorials/Chapter2/Normalize.md
+
 
 机器翻译（machine translation）指的是 将序列从一种语言自动翻译成另一种语言。 事实上，这个研究领域可以追溯到数字计算机发明后不久的20世纪40年代， 特别是在第二次世界大战中使用计算机破解语言编码。 几十年来，在使用神经网络进行端到端学习的兴起之前， 统计学方法在这一领域一直占据主导地位 (Brown et al., 1990, Brown et al., 1988)。 因为统计机器翻译（statistical machine translation）涉及了 翻译模型和语言模型等组成部分的统计分析， 因此基于神经网络的方法通常被称为 `神经机器翻译`（neural machine translation）， 用于将两种翻译模型区分开来。
 
