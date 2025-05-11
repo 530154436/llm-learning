@@ -6,36 +6,8 @@
 import json
 import os.path
 import random
-from typing import Tuple
-
+from data_process import process_line
 random.seed(1024)
-
-
-def process_line(line: str) -> Tuple[str, str]:
-    """ 处理每一行，转为 BISO 格式
-    """
-    # loads()：用于处理内存中的json对象，strip去除可能存在的空格
-    json_line: dict = json.loads(line.strip())
-    word_list, label_list = [], []
-
-    text = json_line['text']
-    words = list(text)
-    # 如果没有label，则返回None
-    label_entities: dict = json_line.get('label', None)
-    if label_entities is None:
-        return None
-    labels = ['O'] * len(words)
-    for key, value in label_entities.items():
-        for sub_name, sub_index in value.items():
-            for start_index, end_index in sub_index:
-                assert ''.join(words[start_index:end_index + 1]) == sub_name
-                if start_index == end_index:
-                    labels[start_index] = 'S-' + key
-                else:
-                    labels[start_index] = 'B-' + key
-                    labels[start_index + 1:end_index + 1] = ['I-' + key] * (len(sub_name) - 1)
-    assert len(words) == len(labels)
-    return words, labels
 
 
 def pipeline(
@@ -48,6 +20,10 @@ def pipeline(
     2、文本格式转换为命名实体识别BIOS格式
     3、记录所有实体标签
     """
+    if not os.path.exists("./dataset"):
+        os.mkdir("./dataset")
+    if not os.path.exists("./dataset/clue"):
+        os.mkdir("./dataset/clue")
     # 标签全集
     all_labels = []
 
@@ -67,9 +43,7 @@ def pipeline(
         for dataset, name, suffix in zip([train_data, dev_data],
                                          ["train", "dev"],
                                          ['jsonl', 'jsonl']):
-            if not os.path.exists("./dataset"):
-                os.mkdir("./dataset")
-            with open(f"./dataset/{name}.{suffix}", 'w', encoding='utf-8') as writer:
+            with open(f"./dataset/clue/{name}.{suffix}", 'w', encoding='utf-8') as writer:
                 for line in dataset:
                     words, labels = process_line(line)
                     for label in labels:
@@ -78,7 +52,7 @@ def pipeline(
                     writer.write("\n".join(f"{w} {l}" for w, l in zip(words, labels)))
                     writer.write("\n\n")
                     writer.flush()
-        with open(f"./dataset/label.json", 'w', encoding='utf-8') as writer:
+        with open(f"./dataset/clue/label.json", 'w', encoding='utf-8') as writer:
             _dict = dict()
             for i, label in enumerate(all_labels):
                 _dict[label] = i
@@ -87,7 +61,7 @@ def pipeline(
     # 原始验证集作为测试集
     with open(dev_file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
-        with open("./dataset/test.jsonl", 'w', encoding='utf-8') as writer:
+        with open("./dataset/clue/test.jsonl", 'w', encoding='utf-8') as writer:
             for line in lines:
                 words, labels = process_line(line)
                 writer.write("\n".join(f"{w} {l}" for w, l in zip(words, labels)))

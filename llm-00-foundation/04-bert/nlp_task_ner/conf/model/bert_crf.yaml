@@ -1,0 +1,3 @@
+name: bert_crf
+pretrain_model_path: "${data_dir}/pretrain/bert-base-chinese"
+save_path: "${data_dir}/experiment/bert_crf.pth"

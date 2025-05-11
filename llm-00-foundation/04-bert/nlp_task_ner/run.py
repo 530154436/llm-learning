@@ -5,13 +5,16 @@
 # @function:
 import hydra
 import logging
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
+from hydra.core.hydra_config import HydraConfig
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config.yaml")
 def main(config: DictConfig):
-    logging.info(f"开始训练模型:{config.model.name}, 数据集: {config.dataset.name}")
-    # TODO
+    # print(OmegaConf.to_yaml(HydraConfig.get()))
+    logging.info("Running BERT CRF")
+    logging.info("\n" + OmegaConf.to_yaml(config))
+
 
 if __name__ == '__main__':
     main()

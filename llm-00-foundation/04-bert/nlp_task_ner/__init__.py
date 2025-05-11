@@ -5,11 +5,7 @@
 # @function:
 from omegaconf import OmegaConf, DictConfig
 from pathlib import Path
-from util import logger
 
-
-# 设置日志格式
-LOGGER = logger.get_logger(path=f'{data_dir}/log')
 BASE_DIR = Path(__file__).parent.joinpath('data')
 
 
