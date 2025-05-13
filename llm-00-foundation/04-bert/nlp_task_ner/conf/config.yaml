@@ -1,4 +1,5 @@
 data_dir: "./data"   # 数据目录
+device: "cuda:0"
 
 defaults:
   - dataset: clue

@@ -9,6 +9,10 @@ bert-base-uncased 和 bert-base-cased 是 BERT（Bidirectional Encoder Represent
 | **bert-base-cased**   | 需要区分大小写的任务，例如命名实体识别(NER)或语法分析 | 保持了文本中的大小写信息，有助于捕捉更多文本结构细节 |
 
 
+问题：
+1、进入crf层时为什么要去除[CLS]标签，直接给成 O 标签不可以吗
+
+
 ModernBERT
 
 一文看懂如何使用 Hydra 框架高效地跑各种超参数配置的深度学习实验
