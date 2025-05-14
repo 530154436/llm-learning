@@ -3,8 +3,7 @@
 # @author: zhengchubin
 # @time: 2025/5/10 14:35
 # @function:
-import torch
-import numpy as np
+from typing import List, Tuple
 from transformers import BertTokenizer
 from torch.utils.data import Dataset
 
@@ -21,35 +20,44 @@ class NERDataset(Dataset):
         self.tokenizer = tokenizer
 
         self.dataset = self.load_raw()
-        self.word_pad_idx = word_pad_idx
-        self.label_pad_idx = label_pad_idx
-        self.device = config.device
+        # self.word_pad_idx = word_pad_idx
+        # self.label_pad_idx = label_pad_idx
+        # self.device = config.device
 
-    def load_raw(self):
+    def load_raw(self) -> List[Tuple[List[str], List[str]]]:
         """
         加载原始数据: bio格式
-        :return Tuple[词元列表, 标签列表]
+        :return
+        [
+           (['藏', '家', '1', '2', '条', '收', '藏', '秘', '籍'],
+            ['B-position', 'I-position', 'O', 'O', 'O', 'O', 'O', 'O', 'O'])
+        ]
         """
         with open(self.data_path, 'r', encoding='utf-8') as f:
             samples = []
-            sample = []
+            words, labels = [], []
             for line in f:
                 line = line.strip()
-                if line != "":
-                    sample.append(line)
-
+                if line == "":
+                    samples.append((words, labels))
+                    words, labels = [], []
+                else:
+                    word, label = line.split(' ')
+                    words.append(word)
+                    labels.append(label)
+        return samples
 
     def __getitem__(self, idx):
         """sample data to get batch"""
-        word = self.dataset[idx][0]
-        label = self.dataset[idx][1]
-        return [word, label]
+        words = self.dataset[idx][0]
+        labels = self.dataset[idx][1]
+        return [words, labels]
 
     def __len__(self):
         """get dataset size"""
         return len(self.dataset)
 
-    def collate_fn(self, batch):
+    def collate_fn(self, batch: List[Tuple[list]]):
         pass
 
 

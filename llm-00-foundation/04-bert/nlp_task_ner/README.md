@@ -1,7 +1,16 @@
 
 
+用BERT做NER？教你用PyTorch轻松入门Roberta！
+https://zhuanlan.zhihu.com/p/346828049
+https://github.com/hemingkx/CLUENER2020
+
+CLUE官方baseline
+https://github.com/CLUEbenchmark/CLUENER2020/tree/master
+
 CLUENER2020官方的排行榜：[传送门](https://www.cluebenchmarks.com/ner.html)。
 [CLUENER2020任务详情](https://github.com/CLUEbenchmark/CLUENER2020)
+
+https://github.com/lemonhu/NER-BERT-pytorch
 
 本数据是在清华大学开源的文本分类数据集THUCTC基础上，选出部分数据进行细粒度命名实体标注，原数据来源于Sina News RSS.
 任务详情：CLUENER2020

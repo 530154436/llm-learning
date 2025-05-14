@@ -15,6 +15,16 @@ https://github.com/intro-llm/intro-llm-code/blob/main/chs/ch2-foundations/Transf
 博客：https://nlp.seas.harvard.edu/annotated-transformer/#training
 代码：https://github.com/mcxiaoxiao/annotated-transformer-Chinese/blob/main/AnnotatedTransformer%20%E4%B8%AD%E6%96%87.ipynb
 
+PyTorch官方实现：https://pytorch.ac.cn/tutorials/beginner/torchtext_translation.html
+PyTorch官方实现中文：https://github.com/apachecn/apachecn-dl-zh/blob/master/docs/pt-tut-17/32.md
+PyTorch官方示例：https://github.com/pytorch/examples/blob/main/language_translation/src/model.py
+nn.Transformer中，
+Attention Mask （causal mask）-inf表示遮掩，而0表示不遮掩。
+Padding Mask 使用布尔值 True 和 False 来分别标记需要遮掩的填充部分和有效的非填充部分。True表示遮掩，而False表示不遮掩。
+The masked positions are filled with float(‘-inf’). Unmasked positions are filled with float(0.0).
+https://docs.pytorch.org/docs/stable/generated/torch.nn.Transformer.html
+
+
 PPT可以
 【Transformer 的 Pytorch 代码实现讲解-哔哩哔哩】 https://b23.tv/pPamgsI
 源码是github上现成的哦～链接🔗 https://github.com/wmathor/nlp-tutorial/blob/master/5-1.Transformer/Transformer_Torch.py#L122
@@ -37,10 +47,6 @@ https://github.com/datawhalechina/fun-transformer/tree/main
 研究生实验2：基于序列模型的英文到中文翻译机：https://www.zybuluo.com/wujiaju/note/1885072
 
 HUuggingface：https://huggingface.co/learn/llm-course/zh-CN/chapter7/4?fw=pt
-PyTorch官方实现：https://pytorch.ac.cn/tutorials/beginner/torchtext_translation.html
-PyTorch官方实现中文：https://github.com/apachecn/apachecn-dl-zh/blob/master/docs/pt-tut-17/32.md
-PyTorch官方示例：https://github.com/pytorch/examples/blob/main/language_translation/src/model.py
-
 （不全）https://github.com/BrightXiaoHan/MachineTranslationTutorial/blob/master/tutorials/Chapter2/Normalize.md
 
 
