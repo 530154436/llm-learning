@@ -6,10 +6,10 @@
 from omegaconf import OmegaConf, DictConfig
 from pathlib import Path
 
-BASE_DIR = Path(__file__).parent.joinpath('data')
+BASE_DIR = Path(__file__).parent
 
 
-# 加载 YAML 配置
-config: DictConfig = OmegaConf.load("config/bert_crf.yaml")
-print(config)
-print(config.data_dir)
+# # 加载 YAML 配置
+# config: DictConfig = OmegaConf.load("data/conf/config.yaml")
+# print(config)
+# print(config.data_dir)

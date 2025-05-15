@@ -2,14 +2,9 @@
 # -*- coding:utf-8 -*--
 import copy
 import json
-import logging
-import torch
+from loguru import logger
 from typing import List, Tuple, Iterable, Dict
 from transformers import PreTrainedTokenizer, AutoTokenizer
-
-# 配置 logging
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(levelname)s - %(filename)s[:%(lineno)d] %(message)s')
 
 
 class InputFeatures(object):
@@ -36,9 +31,13 @@ class InputFeatures(object):
 
 
 def convert_text_to_features(sentences: List[Tuple[str, List[str]]],
-                             tokenizer: PreTrainedTokenizer,
-                             max_seq_length: int = 512) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    pass
+                             label2id: Dict[str, int],
+                             tokenizer: PreTrainedTokenizer) -> InputFeatures:
+    """
+    将输入文本转换为 BERT 的输入格式
+    """
+    examples = [(list(sent), ["O"] * len(sent)) for sent in sentences]
+    return convert_examples_to_feature(examples, label2id, tokenizer)
 
 
 def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
@@ -47,7 +46,7 @@ def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
                                 max_seq_length: int = 512,
                                 pad_token_id: int = 0,
                                 cls_token: str = "[CLS]",
-                                sep_token: str = "[SEP]") -> Tuple[torch.Tensor]:
+                                sep_token: str = "[SEP]") -> InputFeatures:
     """
     将训练数据转换为 BERT 的输入格式：
     (a) 对于句子对（sequence pairs）：
@@ -81,23 +80,22 @@ def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
     # 找到满足所有文本的最小最大长度
     special_tokens_count = 2  # [CLS]、[SEP]
     min_max_seq_length = min(max(map(lambda x: len(x[0]), examples)) + special_tokens_count, max_seq_length)
-    print(min_max_seq_length)
     idx = 0
     for idx, (tokens, labels) in enumerate(examples, start=1):
-        print(tokens)
-        # 1、
+
+        # 1、截断：如果输入长度超过限制，则截断至允许的最大长度（减去特殊标记长度）
         if len(tokens) > min_max_seq_length - special_tokens_count:
             tokens = tokens[:min_max_seq_length - special_tokens_count]
             labels = labels[:min_max_seq_length - special_tokens_count]
 
-        # 2、
+        # 2、将 token 转换为 id，并加上特殊标记 [CLS] 和 [SEP]
         input_ids = tokenizer.convert_tokens_to_ids([cls_token] + tokens + [sep_token])
         label_ids = [label2id['O']] + [label2id[label] for label in labels] + [label2id['O']]
         input_mask = [1] * len(input_ids)
-        segment_ids = [0] * len(tokens)
+        segment_ids = [0] * len(input_ids)
         input_len = len(input_ids)
 
-        # 3、
+        # 3、padding：填充到固定长度 min_max_seq_length
         pad_length = min_max_seq_length - len(input_ids)
         input_ids += [pad_token_id] * pad_length
         label_ids += [pad_token_id] * pad_length
@@ -108,23 +106,22 @@ def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
         assert len(input_mask) == min_max_seq_length
         assert len(segment_ids) == min_max_seq_length
         assert len(label_ids) == min_max_seq_length
-
         if idx <= 3:
-            logging.info("*** Example ***")
-            logging.info("tokens: %s" % " ".join([str(x) for x in tokens]))
-            logging.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
-            logging.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
-            logging.info("segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
-            logging.info("label_ids: %s" % " ".join([str(x) for x in label_ids]))
+            logger.info("*** Example ***")
+            logger.info("tokens: %s" % " ".join([str(x) for x in tokens]))
+            logger.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
+            logger.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
+            logger.info("segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
+            logger.info("label_ids: %s" % " ".join([str(x) for x in label_ids]))
         if idx % 1000 == 0:
-            logging.info("processing example: no.%s", idx)
+            logger.info("processing example: no.%s", idx)
 
         yield InputFeatures(input_ids=input_ids,
                             input_mask=input_mask,
                             segment_ids=segment_ids,
                             label_ids=label_ids,
                             input_len=input_len)
-    logging.info("processing done, total = %s", idx)
+    logger.info("processing done, total = %s", idx)
 
 
 if __name__ == '__main__':
@@ -132,7 +129,11 @@ if __name__ == '__main__':
         (["北", "京", "城"], ["B-NT", "I-NT", "I-NT"]),
         (['藏', '家', '1', '2', '条', '收', '藏', '秘', '籍'], ['B-p', 'I-p', 'O', 'O', 'O', 'O', 'O', 'O', 'O'])
     ]
-    _label2id = {"O": 0, "B-NT": 1, "I-NT": 2}
+    _label2id = {"O": 0, "B-NT": 1, "I-NT": 2, "B-p": 3, "I-p": 4}
     _tokenizer = AutoTokenizer.from_pretrained("data/pretrain/bert-base-chinese")
     for item in convert_examples_to_feature(_examples, _label2id, _tokenizer, max_seq_length=10):
-        print(item)
+        print(item.to_dict())
+
+    _sentences = ["北京城", "藏家12条收藏秘籍"]
+    for item in convert_text_to_features(_sentences, _label2id, _tokenizer):
+        print(item.to_dict())

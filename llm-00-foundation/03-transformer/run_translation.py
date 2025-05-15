@@ -51,13 +51,6 @@ def run_epoch(data: DataLoader[MTBatch],
     return epoch_loss / len(data)
 
 
-@torch.no_grad()
-def evaluate(data, model, use_beam=True):
-    """ 在data上用训练好的模型进行预测，打印模型翻译结果
-    """
-    pass
-
-
 def train(model: nn.Module,
           train_dataloader: DataLoader,
           dev_dataloader: DataLoader):
