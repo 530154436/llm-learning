@@ -1,3 +1,8 @@
+
+天池-基于LLM智能问答系统学习赛
+https://tianchi.aliyun.com/competition/entrance/532172/information
+https://github.com/Tongyi-EconML/FinQwen?spm=a2c22.12281976.0.0.3ff94ea4Wg1dNy
+
 [Coggle 30 Days of ML（24年1/2月）：动手学RAG](http://discussion.coggle.club/t/topic/30/1)
 [RAG比赛-基于运营商文本数据的知识库检索](https://www.datafountain.cn/competitions/1045/datasets)
 
