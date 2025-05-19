@@ -17,7 +17,7 @@ from modules.models import Transformer
 import config
 from config import LOGGER
 from data_loader import MTDataset, MTBatch
-from util.torch_util import initialize_weights, count_trainable_parameters
+from util.modeling_util import initialize_weights, count_trainable_parameters
 
 
 def run_epoch(data: DataLoader[MTBatch],
@@ -61,7 +61,7 @@ def train(model: nn.Module,
     scheduler = get_linear_schedule_with_warmup(optimizer=optimizer,
                                                 num_warmup_steps=config.warmup_steps,
                                                 num_training_steps=len(train_dataloader) * config.epoch_num)
-    criterion = nn.CrossEntropyLoss(ignore_index=config.padding_idx)
+    criterion = nn.CrossEntropyLoss(ignore_index=config.padding_idx)  # => nn.LogSoftmax()+nn.NLLLoss()
 
     start = time.time()
     model.to(config.device)

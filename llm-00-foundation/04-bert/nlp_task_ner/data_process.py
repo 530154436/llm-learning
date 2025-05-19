@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*--
 import copy
 import json
-from loguru import logger
+import logging as logger
 from typing import List, Tuple, Iterable, Dict
 from transformers import PreTrainedTokenizer, AutoTokenizer
 
@@ -12,12 +12,13 @@ class InputFeatures(object):
     Bert输入特征
     """
 
-    def __init__(self, input_ids, input_mask, input_len, segment_ids, label_ids):
+    def __init__(self, input_ids: List[int], input_mask: List[int], token_type_ids: List[int],
+                 input_len: int, label_ids: List[int]):
         self.input_ids = input_ids
         self.input_mask = input_mask
-        self.segment_ids = segment_ids
-        self.label_ids = label_ids
+        self.token_type_ids = token_type_ids
         self.input_len = input_len
+        self.label_ids = label_ids
 
     def __repr__(self):
         return str(self.to_json())
@@ -51,14 +52,14 @@ def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
     将训练数据转换为 BERT 的输入格式：
     (a) 对于句子对（sequence pairs）：
         tokens:       [CLS] 是 这 jack ##son ##ville ? [SEP] 不 是 的 . [SEP]
-        segment_ids:    0   0  0   0    0     0     0    0   1  1  1  1  1
+        token_type_ids:    0   0  0   0    0     0     0    0   1  1  1  1  1
     (b) 对于单个句子（single sequences）：
         tokens:       [CLS] 这只 狗 很 茸毛 . [SEP]
-        segment_ids :   0   0   0  0   0  0   0
+        token_type_ids :   0   0   0  0   0  0   0
 
     + [CLS]：每个序列开头都会加入这个特殊 token，用于表示整个句子的聚合信息，常用于分类任务。
     + [SEP]：用于分隔两个句子或标记一个句子的结束。
-    + segment_ids （token_type_ids）：用于区分句子对中的不同句子。第1个句子的所有 token 标记为 0；第2个句子的所有 token 标记为 1；单独使用时全部为 0。
+    + token_type_ids （segment_ids）：用于区分句子对中的不同句子。第1个句子的所有 token 标记为 0；第2个句子的所有 token 标记为 1；单独使用时全部为 0。
 
     输入示例
     输入：[
@@ -68,7 +69,7 @@ def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
         tokens: 		[CLS] 北   京   城  [SEP]
         input_ids: 		101 1266 776 1814  102  0  0  0  0  0
         input_mask: 	1    1    1    1    1   0  0  0  0  0
-        segment_ids: 	0    0    0    0    0   0  0  0  0  0
+        token_type_ids: 	0    0    0    0    0   0  0  0  0  0
         label_ids: 		0    1    2    2    0   0  0  0  0  0
     示例：
         _examples = [("北京城", ["B-NT", "I-NT", "I-NT"])]
@@ -92,7 +93,7 @@ def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
         input_ids = tokenizer.convert_tokens_to_ids([cls_token] + tokens + [sep_token])
         label_ids = [label2id['O']] + [label2id[label] for label in labels] + [label2id['O']]
         input_mask = [1] * len(input_ids)
-        segment_ids = [0] * len(input_ids)
+        token_type_ids = [0] * len(input_ids)
         input_len = len(input_ids)
 
         # 3、padding：填充到固定长度 min_max_seq_length
@@ -100,25 +101,25 @@ def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
         input_ids += [pad_token_id] * pad_length
         label_ids += [pad_token_id] * pad_length
         input_mask += [pad_token_id] * pad_length
-        segment_ids += [pad_token_id] * pad_length
+        token_type_ids += [pad_token_id] * pad_length
 
         assert len(input_ids) == min_max_seq_length
         assert len(input_mask) == min_max_seq_length
-        assert len(segment_ids) == min_max_seq_length
+        assert len(token_type_ids) == min_max_seq_length
         assert len(label_ids) == min_max_seq_length
-        if idx <= 3:
+        if idx <= 2:
             logger.info("*** Example ***")
             logger.info("tokens: %s" % " ".join([str(x) for x in tokens]))
             logger.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
             logger.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
-            logger.info("segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
+            logger.info("token_type_ids: %s" % " ".join([str(x) for x in token_type_ids]))
             logger.info("label_ids: %s" % " ".join([str(x) for x in label_ids]))
         if idx % 1000 == 0:
             logger.info("processing example: no.%s", idx)
 
         yield InputFeatures(input_ids=input_ids,
                             input_mask=input_mask,
-                            segment_ids=segment_ids,
+                            token_type_ids=token_type_ids,
                             label_ids=label_ids,
                             input_len=input_len)
     logger.info("processing done, total = %s", idx)

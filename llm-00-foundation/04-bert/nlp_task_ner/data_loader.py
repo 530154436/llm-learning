@@ -4,8 +4,9 @@
 # @time: 2025/5/10 14:35
 # @function:
 import json
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 import torch
+from functorch.dim import Tensor
 from transformers import BertTokenizer
 from torch.utils.data import Dataset, TensorDataset
 from nlp_task_ner.data_process import convert_examples_to_feature
@@ -53,18 +54,27 @@ class NERDataset(Dataset):
         """get dataset size"""
         return len(self.dataset)
 
-    def collate_fn(self, batch: List[Tuple[list]]):
-        all_input_ids, all_input_mask, all_segment_ids, all_label_ids = [], [], [], []
+    def collate_fn(self, batch: List[Tuple[list]]) -> Dict[str, Tensor]:
+        """
+        将训练数据转化为 Bert 的输入格式
+        :param batch: [batch_size, sql_len]
+        :return:  dict([batch_size, sql_len],
+                       [batch_size, sql_len],
+                       [batch_size, sql_len],
+                       [batch_size, sql_len])
+        """
+        all_input_ids, all_input_mask, all_token_type_ids, all_label_ids = [], [], [], []
         for feature in convert_examples_to_feature(batch, label2id=self.label2id, tokenizer=self.tokenizer):
             all_input_ids.append(feature.input_ids)
             all_input_mask.append(feature.input_mask)
-            all_segment_ids.append(feature.segment_ids)
+            all_token_type_ids.append(feature.token_type_ids)
             all_label_ids.append(feature.label_ids)
-        dataset = TensorDataset(torch.LongTensor(all_input_ids),
-                                torch.LongTensor(all_input_mask),
-                                torch.LongTensor(all_segment_ids),
-                                torch.LongTensor(all_label_ids))
-        return dataset
+        return {
+            "input_ids": torch.LongTensor(all_input_ids),
+            "input_mask": torch.LongTensor(all_input_mask),
+            "token_type_ids": torch.LongTensor(all_token_type_ids),
+            "label_ids": torch.LongTensor(all_label_ids),
+        }
 
 
 if __name__ == '__main__':
@@ -75,6 +85,9 @@ if __name__ == '__main__':
     _dataset = NERDataset("data/dataset/clue/train.jsonl",
                           "data/dataset/clue/label.json",
                           tokenizer=_tokenizer)
-    for i in range(len(_dataset)):
-        print(i, _dataset[i])
+    _input_batch = _dataset.collate_fn([_dataset[i] for i in range(32)])
+    print(_input_batch.get("input_ids").shape)
+    print(_input_batch.get("input_mask").shape)
+    print(_input_batch.get("token_type_ids").shape)
+    print(_input_batch.get("label_ids").shape)
 

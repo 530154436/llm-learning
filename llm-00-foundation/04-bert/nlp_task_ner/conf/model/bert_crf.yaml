@@ -1,4 +1,7 @@
 name: "bert_crf"
 pretrain_path: "${data_dir}/pretrain/bert-base-chinese"
 model_path: "${data_dir}/experiment/bert_crf.pth"
-batch_size: 64
+batch_size: 32
+dropout: 0.3
+epoch_num: 10
+lr: 10
