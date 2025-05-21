@@ -1,5 +1,6 @@
 # Python 3.10.12
 transformers==4.51.0
+accelerate==1.7.0
 torch==2.4.0
 sentencepiece==0.2.0
 tqdm==4.66.5

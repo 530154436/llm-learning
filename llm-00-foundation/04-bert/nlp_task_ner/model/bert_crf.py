@@ -6,25 +6,23 @@
 from typing import List
 import torch
 from torch import nn
-from transformers import BertModel, BertPreTrainedModel, BertConfig
+from transformers import BertModel, BertConfig
 from torchcrf import CRF
+from nlp_task_ner.model import BaseNerModel
 
 
-class BertCrf(BertPreTrainedModel):
+class BertCrf(BaseNerModel):
 
     def __init__(self,
                  pretrain_path: str,
                  num_labels: int,
                  dropout: float = 0.3):
+        super(BertCrf, self).__init__()
         self.bert_config = BertConfig.from_pretrained(pretrain_path)
-        super().__init__(self.bert_config)
         self.bert = BertModel.from_pretrained(pretrain_path)
-
         self.dropout = nn.Dropout(dropout)
-        self.classifier = nn.Linear(self.bert_config.hidden_size, num_labels)
+        self.linear = nn.Linear(self.bert_config.hidden_size, num_labels)
         self.crf = CRF(num_tags=num_labels, batch_first=True)
-
-        self.init_weights()
 
     def predict_proba(self,
                       input_ids: torch.Tensor,
@@ -68,6 +66,16 @@ class BertCrf(BertPreTrainedModel):
         output = self.dropout(output)
 
         # [batch_size, seq_len, num_labels]
-        logits = self.classifier(output)
+        logits = self.linear(output)
 
         return logits
+
+
+if __name__ == "__main__":
+    _pretrain_path = "../data/pretrain/bert-base-chinese"
+    _model = BertCrf(_pretrain_path, num_labels=31)
+    # for name, param in list(_model.named_parameters()):
+    #     print(name)
+    print(_model)
+    for name, module in _model.named_modules():
+        print(name, type(module))

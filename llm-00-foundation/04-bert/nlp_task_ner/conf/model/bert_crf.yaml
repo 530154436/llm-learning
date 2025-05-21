@@ -4,4 +4,4 @@ model_path: "${data_dir}/experiment/bert_crf.pth"
 batch_size: 32
 dropout: 0.3
 epoch_num: 10
-lr: 10
+learning_rate: 10

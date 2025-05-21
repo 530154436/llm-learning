@@ -4,18 +4,20 @@
 # @time: 2025/5/10 14:38
 # @function:
 import logging
+import time
 import hydra
 import torch
 import tqdm
 from omegaconf import DictConfig, OmegaConf
 from torch import nn
-from torch.optim import AdamW, Optimizer
+from torch.optim import Optimizer
 from torch.utils.data import DataLoader
-from transformers import BertTokenizer
+from transformers import BertTokenizer, get_linear_schedule_with_warmup
 from typing import Dict, Callable
 from nlp_task_ner.data_loader import NERDataset
+from nlp_task_ner.model import BaseNerModel
 from nlp_task_ner.model.bert_crf import BertCrf
-from nlp_task_ner.util.modeling_util import count_trainable_parameters
+from nlp_task_ner.util.modeling_util import count_trainable_parameters, build_optimizer
 
 
 def train_epoch(data: DataLoader[Dict[str, torch.Tensor]],
@@ -45,19 +47,15 @@ def train_epoch(data: DataLoader[Dict[str, torch.Tensor]],
     return epoch_loss / len(data)
 
 
-def train(model: nn.Module,
+def train(model: BaseNerModel,
           train_dataloader: DataLoader,
           dev_dataloader: DataLoader,
-          learning_rate: float,
-          ):
-    # 初始化模型权重，定义优化器、学习率调整器、损失函数
-    optimizer = AdamW(model.parameters(), lr=learning_rate)
-    # scheduler = lr_scheduler.ReduceLROnPlateau(optimizer=optimizer)
-    scheduler = get_linear_schedule_with_warmup(optimizer=optimizer,
-                                                num_warmup_steps=config.warmup_steps,
-                                                num_training_steps=len(train_dataloader) * config.epoch_num)
-    criterion = nn.CrossEntropyLoss(ignore_index=config.padding_idx)  # => nn.LogSoftmax()+nn.NLLLoss()
+          optimizer: Optimizer,
+          scheduler: Optimizer,
+          criterion: Callable,
+          epoch_num: int = 30,
 
+          ):
     start = time.time()
     model.to(config.device)
     for epoch in range(1, config.epoch_num + 1):
@@ -88,6 +86,7 @@ def main(config: DictConfig):
     train_dataset = NERDataset(config.dataset.train_data_path, config.dataset.label_data_path, tokenizer=_tokenizer)
     dev_dataset = NERDataset(config.dataset.dev_data_path, config.dataset.label_data_path, tokenizer=_tokenizer)
     test_dataset = NERDataset(config.dataset.test_data_path, config.dataset.label_data_path, tokenizer=_tokenizer)
+    train_size = len(train_dataset)
 
     logging.info("加载DataLoader")
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=config.model.batch_size,
@@ -96,14 +95,24 @@ def main(config: DictConfig):
                                 collate_fn=dev_dataset.collate_fn)
     test_dataloader = DataLoader(test_dataset, shuffle=False, batch_size=config.model.batch_size,
                                  collate_fn=test_dataset.collate_fn)
-    # logging.info("初始化模型")
+
+    logging.info("配置优化器、学习率调整器、损失函数")
+    optimizer = build_optimizer(model, config.learning_rate)
+    train_steps_per_epoch = train_size // config.batch_size
+    scheduler = get_linear_schedule_with_warmup(optimizer=optimizer,
+                                                num_warmup_steps=(config.epoch_num // 10) * train_steps_per_epoch,
+                                                num_training_steps=config.epoch_num * train_steps_per_epoch)
+    criterion = model.loss_fn
+
+    logging.info("初始化模型")
     model = BertCrf(pretrain_path=config.model.pretrain_path,
                     num_labels=config.dataset.label_data_path,
                     dropout=config.model.dropout)
     print(model)
+
     logging.info(f'模型训练参数: {count_trainable_parameters(model)}')
     logging.info("训练模型...")
-    train(model, train_dataloader, dev_dataloader, learning_rate=config.model.lr)
+    train(model, train_dataloader, dev_dataloader)
 
 
 if __name__ == '__main__':

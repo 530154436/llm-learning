@@ -21,63 +21,32 @@ def count_trainable_parameters(model: nn.Module):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-# model.named_parameters(): [bert, bilstm, classifier, crf]
-bert_optimizer = list(model.bert.named_parameters())
-lstm_optimizer = list(model.bilstm.named_parameters())
-classifier_optimizer = list(model.classifier.named_parameters())
-no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
-optimizer_grouped_parameters = [
-    {'params': [p for n, p in bert_optimizer if not any(nd in n for nd in no_decay)],
-     'weight_decay': weight_decay},
-    {'params': [p for n, p in bert_optimizer if any(nd in n for nd in no_decay)],
-     'weight_decay': 0.0},
-    {'params': [p for n, p in lstm_optimizer if not any(nd in n for nd in no_decay)],
-     'lr': learning_rate * 5, 'weight_decay': weight_decay},
-    {'params': [p for n, p in lstm_optimizer if any(nd in n for nd in no_decay)],
-     'lr': learning_rate * 5, 'weight_decay': 0.0},
-    {'params': [p for n, p in classifier_optimizer if not any(nd in n for nd in no_decay)],
-     'lr': learning_rate * 5, 'weight_decay': weight_decay},
-    {'params': [p for n, p in classifier_optimizer if any(nd in n for nd in no_decay)],
-     'lr': learning_rate * 5, 'weight_decay': 0.0},
-    {'params': model.crf.parameters(), 'lr': learning_rate * 5}
-]
-
-optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
-return optimizer
-
-def build_optimizer(self,
-                    model: nn.Module,
+def build_optimizer(model: nn.Module,
                     learning_rate: float = 3e-5,
                     weight_decay: float = 0.01):
     """
-
+    L2 正则化（也称为权重衰减）
+    权重衰减 是一种正则化技术（等价于L2正则化），通过惩罚大权重值防止模型过拟合。 然而，某些参数（如偏置项、归一化层的参数）通常不需要应用权重衰减，因为它们对模型的正则化效果贡献较小，甚至可能损害训练稳定性。
+    1、精细控制不同模块的学习率
+    2、避免对特定参数（如 bias、LayerNorm）进行正则化
+    • 偏置项（bias）： 偏置参数通常用于调整神经元的激活阈值，其数值大小对模型的表达能力影响较小，正则化反而可能抑制灵活性。
+    • 归一化层参数（LayerNorm）： 层归一化的 weight（缩放参数）和 bias（偏移参数）本质上是学习数据分布的均值和方差，对其进行正则化会破坏归一化的统计特性，可能导致训练不稳定。
+    3、提升模型训练效率与性能
+    :param model: 模型对象
+    :param learning_rate: 基础学习率（用于BERT）
+    :param weight_decay: 权重衰减系数
+    :return optimizer: 配置好的 AdamW 优化器
     """
-    no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
-    optimizer_grouped_parameters = []
+    params = list(model.named_parameters())
+    no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight', 'BatchNorm.bias', 'BatchNorm.weight']
 
-    def param_groups_from_module(module: nn.Module):
-        params = list(module.named_parameters())
-        decay_params = [p for n, p in params if not any(nd in n for nd in no_decay)]
-        no_decay_params = [p for n, p in params if any(nd in n for nd in no_decay)]
-        return [
-            {'params': decay_params, 'weight_decay': weight_decay, 'lr': learning_rate * lr_multiplier},
-            {'params': no_decay_params, 'weight_decay': 0.0, 'lr': learning_rate * lr_multiplier}
-        ]
-
-    # 遍历所有子模块并根据类型添加参数分组
-    for name, module in model.named_modules():
-        if isinstance(module, (nn.modules.transformer.TransformerEncoderLayer, nn.Module)) and 'Bert' in name:
-            optimizer_grouped_parameters.extend(param_groups_from_module(module))
-        elif isinstance(module, nn.LSTM):
-            optimizer_grouped_parameters.extend(param_groups_from_module(module, lr_multiplier=5))
-        elif isinstance(module, nn.Linear):
-            optimizer_grouped_parameters.extend(param_groups_from_module(module, lr_multiplier=5))
-        elif hasattr(module, '__class__') and 'CRF' in module.__class__.__name__:
-            optimizer_grouped_parameters.append({'params': module.parameters(), 'lr': learning_rate * 5})
-
-    # 如果没有匹配到任何模块，直接使用默认的AdamW设置整个模型参数
-    if not optimizer_grouped_parameters:
-        optimizer_grouped_parameters = [{'params': model.parameters(), 'lr': learning_rate}]
-
-    optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate, correct_bias=False)
+    # 需要权重衰减的参数（排除 no_decay 列表中的参数），比如: bert.embeddings.word_embeddings.weight
+    decay_params = [p for n, p in params if not any(nd in n for nd in no_decay)]
+    # 不需要权重衰减的参数（no_decay 列表中的参数），比如 bert.embeddings.LayerNorm.weight
+    no_decay_params = [p for n, p in params if any(nd in n for nd in no_decay)]
+    params = [
+        {'params': decay_params, 'weight_decay': weight_decay},
+        {'params': no_decay_params, 'weight_decay': 0.0}
+    ]
+    optimizer = AdamW(params, lr=learning_rate)
     return optimizer
