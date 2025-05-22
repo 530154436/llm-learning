@@ -17,7 +17,7 @@ from nlp_task_ner.util.modeling_util import count_trainable_parameters, build_op
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="bert-crf.yaml")
-def main(config: DictConfig):
+def train(config: DictConfig):
     logging.info(f"开始训练模型")
     logging.info("配置信息:\n{}".format(OmegaConf.to_yaml(config, resolve=True)))
     logging.info("加载Dataset和Tokenizer.")
@@ -27,7 +27,6 @@ def main(config: DictConfig):
     )
     train_dataset = NERDataset(config.train_data_path, config.label_data_path, tokenizer=_tokenizer)
     dev_dataset = NERDataset(config.dev_data_path, config.label_data_path, tokenizer=_tokenizer)
-    test_dataset = NERDataset(config.test_data_path, config.label_data_path, tokenizer=_tokenizer)
     train_size = len(train_dataset)
     num_labels = len(train_dataset.label2id)
 
@@ -36,9 +35,6 @@ def main(config: DictConfig):
                                   collate_fn=train_dataset.collate_fn)
     dev_dataloader = DataLoader(dev_dataset, shuffle=False, batch_size=config.batch_size,
                                 collate_fn=dev_dataset.collate_fn)
-    test_dataloader = DataLoader(test_dataset, shuffle=False, batch_size=config.batch_size,
-                                 collate_fn=test_dataset.collate_fn)
-
     logging.info("初始化模型")
     model: BertCrf = BertCrf(pretrain_path=config.pretrain_path, num_labels=num_labels, dropout=config.dropout)
     logging.info(f'模型训练参数: {count_trainable_parameters(model)}')
@@ -59,5 +55,21 @@ def main(config: DictConfig):
     trainer.fit(train_dataloader, dev_dataloader)
 
 
+@hydra.main(version_base=None, config_path="conf", config_name="bert-crf.yaml")
+def evaluation(config: DictConfig):
+    logging.info("配置信息:\n{}".format(OmegaConf.to_yaml(config, resolve=True)))
+    logging.info("加载Dataset和Tokenizer.")
+    _tokenizer = BertTokenizer.from_pretrained(
+        pretrained_model_name_or_path=config.pretrain_path,
+        do_lower_case=True
+    )
+    test_dataset = NERDataset(config.test_data_path, config.label_data_path, tokenizer=_tokenizer)
+    test_dataloader = DataLoader(test_dataset, shuffle=False, batch_size=config.batch_size,
+                                 collate_fn=test_dataset.collate_fn)
+    model: BertCrf = BertCrf(pretrain_path=config.pretrain_path, num_labels=config.num_labels, dropout=config.dropout)
+    model.load_state_dict(torch.load(config.model_path,
+                                     weights_only=False,
+                                     map_location=torch.device("cpu")))
+
 if __name__ == '__main__':
-    main()
+    train()
