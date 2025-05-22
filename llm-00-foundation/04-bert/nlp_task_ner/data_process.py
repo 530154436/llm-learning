@@ -47,7 +47,8 @@ def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
                                 max_seq_length: int = 512,
                                 pad_token_id: int = 0,
                                 cls_token: str = "[CLS]",
-                                sep_token: str = "[SEP]") -> InputFeatures:
+                                sep_token: str = "[SEP]",
+                                verbose: bool = False) -> InputFeatures:
     """
     将训练数据转换为 BERT 的输入格式：
     (a) 对于句子对（sequence pairs）：
@@ -107,14 +108,14 @@ def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
         assert len(input_mask) == min_max_seq_length
         assert len(token_type_ids) == min_max_seq_length
         assert len(label_ids) == min_max_seq_length
-        if idx <= 2:
+        if verbose and idx <= 2:
             logger.info("*** Example ***")
             logger.info("tokens: %s" % " ".join([str(x) for x in tokens]))
             logger.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
             logger.info("input_mask: %s" % " ".join([str(x) for x in input_mask]))
             logger.info("token_type_ids: %s" % " ".join([str(x) for x in token_type_ids]))
             logger.info("label_ids: %s" % " ".join([str(x) for x in label_ids]))
-        if idx % 1000 == 0:
+        if verbose and idx % 1000 == 0:
             logger.info("processing example: no.%s", idx)
 
         yield InputFeatures(input_ids=input_ids,
@@ -122,7 +123,8 @@ def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
                             token_type_ids=token_type_ids,
                             label_ids=label_ids,
                             input_len=input_len)
-    logger.info("processing done, total = %s", idx)
+    if verbose:
+        logger.info("processing done, total = %s", idx)
 
 
 if __name__ == '__main__':

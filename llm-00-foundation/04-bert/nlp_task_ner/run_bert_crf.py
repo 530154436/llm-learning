@@ -4,74 +4,15 @@
 # @time: 2025/5/10 14:38
 # @function:
 import logging
-import time
 import hydra
-import torch
-import tqdm
 from omegaconf import DictConfig, OmegaConf
-from torch import nn
-from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from transformers import BertTokenizer, get_linear_schedule_with_warmup
-from typing import Dict, Callable
 from nlp_task_ner.data_loader import NERDataset
-from nlp_task_ner.model import BaseNerModel
 from nlp_task_ner.model.bert_crf import BertCrf
+from nlp_task_ner.model.my_loss_func import CRFLoss
+from nlp_task_ner.model.my_trainer import MyTrainer
 from nlp_task_ner.util.modeling_util import count_trainable_parameters, build_optimizer
-
-
-def train_epoch(data: DataLoader[Dict[str, torch.Tensor]],
-                model: nn.Module,
-                criterion: Callable,
-                optimizer: Optimizer = None,
-                epoch: int = 1,
-                epoch_num: int = None) -> float:
-    model.train()
-    desc = "train" if optimizer is not None else "eval"
-    epoch_loss = 0.0
-    tk0 = tqdm.tqdm(data, desc=f"{desc} {epoch}/{epoch_num}", smoothing=0, mininterval=1.0)
-    for i, item in enumerate(tk0, start=1):
-        # 模型预测
-
-        logits = y_pred.contiguous().view(-1, y_pred.size(-1))
-        y_true = batch.tgt_output.contiguous().view(-1)
-
-        # 计算损失
-        optimizer.zero_grad()
-        loss = criterion(logits, y_true)
-        loss.backward()
-        optimizer.step()
-
-        epoch_loss += loss.item()
-        tk0.set_postfix(loss=round(epoch_loss / i, 5))
-    return epoch_loss / len(data)
-
-
-def train(model: BaseNerModel,
-          train_dataloader: DataLoader,
-          dev_dataloader: DataLoader,
-          optimizer: Optimizer,
-          scheduler: Optimizer,
-          criterion: Callable,
-          epoch_num: int = 30,
-
-          ):
-    start = time.time()
-    model.to(config.device)
-    for epoch in range(1, config.epoch_num + 1):
-        # 模型训练
-        train_loss = run_epoch(train_dataloader, model, criterion, optimizer, epoch=epoch)
-        # 验证集
-        valid_loss = run_epoch(dev_dataloader, model, criterion, epoch=epoch)
-        # blue_score = evaluate(dev_dataloader, model, criterion, epoch=epoch)
-
-        current_lr = optimizer.state_dict()['param_groups'][0]['lr']
-        LOGGER.info("Epoch: {}, train_loss: {}, valid_loss: {}, lr: {}"
-                    .format(epoch, round(train_loss, 6), round(valid_loss, 6), round(current_lr, 6)))
-        scheduler.step()
-
-    # 保存模型
-    torch.save(model.state_dict(), config.model_path)
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config.yaml")
@@ -87,6 +28,7 @@ def main(config: DictConfig):
     dev_dataset = NERDataset(config.dataset.dev_data_path, config.dataset.label_data_path, tokenizer=_tokenizer)
     test_dataset = NERDataset(config.dataset.test_data_path, config.dataset.label_data_path, tokenizer=_tokenizer)
     train_size = len(train_dataset)
+    num_labels = len(train_dataset.label2id)
 
     logging.info("加载DataLoader")
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=config.model.batch_size,
@@ -96,23 +38,26 @@ def main(config: DictConfig):
     test_dataloader = DataLoader(test_dataset, shuffle=False, batch_size=config.model.batch_size,
                                  collate_fn=test_dataset.collate_fn)
 
-    logging.info("配置优化器、学习率调整器、损失函数")
-    optimizer = build_optimizer(model, config.learning_rate)
-    train_steps_per_epoch = train_size // config.batch_size
-    scheduler = get_linear_schedule_with_warmup(optimizer=optimizer,
-                                                num_warmup_steps=(config.epoch_num // 10) * train_steps_per_epoch,
-                                                num_training_steps=config.epoch_num * train_steps_per_epoch)
-    criterion = model.loss_fn
-
     logging.info("初始化模型")
-    model = BertCrf(pretrain_path=config.model.pretrain_path,
-                    num_labels=config.dataset.label_data_path,
-                    dropout=config.model.dropout)
+    model: BertCrf = BertCrf(pretrain_path=config.model.pretrain_path,
+                             num_labels=num_labels,
+                             dropout=config.model.dropout)
+    logging.info(f'模型训练参数: {count_trainable_parameters(model)}')
     print(model)
 
-    logging.info(f'模型训练参数: {count_trainable_parameters(model)}')
+    logging.info("配置优化器、学习率调整器、损失函数")
+    optimizer = build_optimizer(model, learning_rate=config.model.learning_rate)
+    train_steps_per_epoch = train_size // config.model.batch_size
+    scheduler = get_linear_schedule_with_warmup(optimizer=optimizer,
+                                                num_warmup_steps=(config.model.epoch_num // 10) * train_steps_per_epoch,
+                                                num_training_steps=config.model.epoch_num * train_steps_per_epoch)
+    loss_fn = CRFLoss(model.crf, pad_token_id=train_dataset.pad_token_id)
+
     logging.info("训练模型...")
-    train(model, train_dataloader, dev_dataloader)
+    trainer = MyTrainer(model=model, loss_fn=loss_fn, optimizer=optimizer, scheduler=scheduler,
+                        n_epoch=config.model.epoch_num, device=config.model.device,
+                        model_path=config.model.model_path)
+    trainer.fit(train_dataloader, dev_dataloader)
 
 
 if __name__ == '__main__':

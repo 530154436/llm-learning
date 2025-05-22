@@ -8,10 +8,10 @@ import torch
 from torch import nn
 from transformers import BertModel, BertConfig
 from torchcrf import CRF
-from nlp_task_ner.model import BaseNerModel
+from nlp_task_ner.model import BaseModel
 
 
-class BertCrf(BaseNerModel):
+class BertCrf(BaseModel):
 
     def __init__(self,
                  pretrain_path: str,
@@ -23,31 +23,6 @@ class BertCrf(BaseNerModel):
         self.dropout = nn.Dropout(dropout)
         self.linear = nn.Linear(self.bert_config.hidden_size, num_labels)
         self.crf = CRF(num_tags=num_labels, batch_first=True)
-
-    def predict_proba(self,
-                      input_ids: torch.Tensor,
-                      attention_mask: torch.Tensor,
-                      token_type_ids: torch.Tensor) -> torch.Tensor:
-        logits = self.forward(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        # 预测解码
-        predicts: List[list] = self.crf.decode(logits, mask=attention_mask.bool())
-        return predicts
-
-    def loss_fn(self,
-                logits: torch.Tensor,
-                labels: torch.Tensor,
-                attention_mask: torch.Tensor = None) -> torch.FloatTensor:
-        """
-        损失函数: CRF负对数似然损失
-        :param logits: [batch_size, seq_len, num_labels]
-        :param labels: [batch_size, seq_len]
-        :param attention_mask: [batch_size, seq_len]
-        """
-        if attention_mask is not None:
-            loss = -self.crf(logits, labels, attention_mask.bool(), reduction="mean")
-        else:
-            loss = -self.crf(logits, labels, reduction="mean")
-        return loss
 
     def forward(self,
                 input_ids: torch.Tensor,
@@ -69,6 +44,16 @@ class BertCrf(BaseNerModel):
         logits = self.linear(output)
 
         return logits
+
+    def predict(self,
+                input_ids: torch.Tensor,
+                attention_mask: torch.Tensor,
+                token_type_ids: torch.Tensor) -> torch.Tensor:
+        # [batch_size, seq_len, num_labels]
+        logits = self.forward(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        # [batch_size, seq_len]
+        predicts: List[list] = self.crf.decode(logits, mask=attention_mask.bool())
+        return predicts
 
 
 if __name__ == "__main__":

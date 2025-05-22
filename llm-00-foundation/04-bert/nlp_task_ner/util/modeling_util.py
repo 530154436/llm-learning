@@ -4,7 +4,9 @@
 # @time: 2025/5/6 17:39
 # @function:
 from torch import nn
-from torch.optim import AdamW
+from torch.optim import AdamW, Optimizer
+from torch.optim.lr_scheduler import LambdaLR
+from transformers import get_linear_schedule_with_warmup
 
 
 def initialize_weights(model: nn.Module):
@@ -23,7 +25,7 @@ def count_trainable_parameters(model: nn.Module):
 
 def build_optimizer(model: nn.Module,
                     learning_rate: float = 3e-5,
-                    weight_decay: float = 0.01):
+                    weight_decay: float = 0.01) -> Optimizer:
     """
     L2 正则化（也称为权重衰减）
     权重衰减 是一种正则化技术（等价于L2正则化），通过惩罚大权重值防止模型过拟合。 然而，某些参数（如偏置项、归一化层的参数）通常不需要应用权重衰减，因为它们对模型的正则化效果贡献较小，甚至可能损害训练稳定性。

@@ -7,22 +7,10 @@ import torch
 from torch import nn
 
 
-class BaseNerModel(nn.Module):
+class BaseModel(nn.Module):
 
-    def predict_proba(self,
-                      input_ids: torch.Tensor,
-                      attention_mask: torch.Tensor,
-                      token_type_ids: torch.Tensor) -> torch.Tensor:
+    def forward(self, *inputs: torch.Tensor) -> torch.FloatTensor:
         raise NotImplementedError
 
-    def loss_fn(self,
-                logits: torch.Tensor,
-                labels: torch.Tensor,
-                attention_mask: torch.Tensor = None) -> torch.FloatTensor:
-        raise NotImplementedError
-
-    def forward(self,
-                input_ids: torch.Tensor,
-                attention_mask: torch.Tensor,
-                token_type_ids: torch.Tensor) -> torch.FloatTensor:
+    def predict(self, *inputs: torch.Tensor) -> torch.Tensor:
         raise NotImplementedError

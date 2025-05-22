@@ -32,19 +32,23 @@ def run_epoch(data: DataLoader[MTBatch],
     for i, item in enumerate(tk0, start=1):
         # 模型预测
         batch: MTBatch = item
-        y_pred = model(batch.src_input, batch.tgt_input, batch.src_mask, batch.tgt_mask)
-        y_pred = y_pred.contiguous().view(-1, y_pred.size(-1))
+        logits = model(batch.src_input, batch.tgt_input, batch.src_mask, batch.tgt_mask)
+
+        # 转换为 nn.CrossEntropyLoss 的输入格式
+        # [batch_size, tgt_seq_len, tgt_vocab_size] => [batch_size * tgt_seq_len, tgt_vocab_size]
+        logits = logits.contiguous().view(-1, logits.size(-1))
+        # [batch_size, tgt_seq_len] => [batch_size * tgt_seq_len]
         y_true = batch.tgt_output.contiguous().view(-1)
 
         # 计算损失
         if optimizer is not None:
             optimizer.zero_grad()
-            loss = criterion(y_pred, y_true)
+            loss = criterion(logits, y_true)
             loss.backward()
             optimizer.step()
         else:
             with torch.no_grad():
-                loss = criterion(y_pred, y_true)
+                loss = criterion(logits, y_true)
 
         epoch_loss += loss.item()
         tk0.set_postfix(loss=round(epoch_loss / i, 5))
