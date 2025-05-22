@@ -1,9 +1,0 @@
-data_dir: "./data"   # 数据目录
-device: "cuda:0"
-
-defaults:
-  - dataset: clue
-  - model: bert_crf
-  # 修改hydra默认值
-  - _self_
-  - override hydra/job_logging: custom
