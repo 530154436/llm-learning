@@ -86,7 +86,7 @@ class MyTrainer(object):
             total_loss += loss.item()
             if isinstance(log_interval, int) and (step + 1) % log_interval == 0:
                 tk0.set_postfix(loss=round(total_loss/step, 5))
-        return total_loss/step
+        return round(total_loss / step, 5)
 
     @torch.no_grad()
     def evaluate(self, data_loader: DataLoader):
@@ -122,5 +122,5 @@ class MyTrainer(object):
             #     self.model.load_state_dict(self.early_stopper.best_weights)
             #     logging.info('Current loss: %.6f, Best Value: %.6f\n' % (val_loss, self.early_stopper.best_value))
             #     break
-        # torch.save(self.model.state_dict(), self.model_path)  # save best auc model
+        torch.save(self.model.state_dict(), self.model_path)
         # logging.info('Saved model\'s loss: %.6f' % self.early_stopper.best_value)
