@@ -113,10 +113,10 @@ class MyTrainer(object):
             val_dataloader: DataLoader,
             test_dataloader: DataLoader = None) -> float:
         for epoch in range(1, self.n_epoch + 1):
-            lr = self.scheduler.get_lr()  # 获取当前的学习率
-            train_loss = self.train_one_epoch(train_dataloader)
+            lr = self.scheduler.get_lr()[0]  # 获取当前的学习率
+            train_loss = self.train_one_epoch(train_dataloader, epoch=epoch)
             val_loss = self.evaluate(val_dataloader)
-            logging.info(f'epoch: {epoch}, Current lr : {lr}, train_loss: {train_loss}, val_loss: {val_loss}')
+            logging.info(f'epoch: {epoch}, Current lr : {round(lr, 6)}, train_loss: {train_loss}, val_loss: {val_loss}')
 
             # if self.early_stopper.stop_training(val_loss, self.model.state_dict(), mode='min'):
             #     self.model.load_state_dict(self.early_stopper.best_weights)

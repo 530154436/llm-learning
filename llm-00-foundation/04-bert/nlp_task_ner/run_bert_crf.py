@@ -5,6 +5,7 @@
 # @function:
 import logging
 import hydra
+import torch
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 from transformers import BertTokenizer, get_linear_schedule_with_warmup
@@ -54,9 +55,9 @@ def main(config: DictConfig):
     loss_fn = CRFLoss(model.crf, pad_token_id=train_dataset.pad_token_id)
 
     logging.info("训练模型...")
+    device = torch.device("cuda:0") if torch.cuda.is_available() else "cpu"
     trainer = MyTrainer(model=model, loss_fn=loss_fn, optimizer=optimizer, scheduler=scheduler,
-                        n_epoch=config.model.epoch_num, device=config.model.device,
-                        model_path=config.model.model_path)
+                        n_epoch=config.model.epoch_num, device=device, model_path=config.model.model_path)
     trainer.fit(train_dataloader, dev_dataloader)
 
 

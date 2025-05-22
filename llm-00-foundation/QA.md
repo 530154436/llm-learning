@@ -29,5 +29,10 @@ Transformer在计算注意力分数时引入Query（Q）、Key（K）、Value（
 | 可解释性  | 难以可视化                        | 可以通过分析注意力热图来理解模型的决策过程   | 支持模型诊断，增强了模型的可解释性      |
  
 
+### 1.2 loss出现 NAN
+```
+epoch: 2, Current lr : [9.992641648270787, 9.992641648270787], train_loss: nan, val_loss: nan
+```
+原因：学习率太高。
 
 >参考：[从人脑到Transformer：轻松理解注意力机制中的QKV](https://zhuanlan.zhihu.com/p/688660519)
