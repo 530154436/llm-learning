@@ -89,18 +89,22 @@ class MyTrainer(object):
         return total_loss/step
 
     @torch.no_grad()
-    def evaluate(self, model, data_loader: DataLoader):
-        model.eval()
+    def evaluate(self, data_loader: DataLoader):
+        self.model.eval()
         step, total_loss = 1, 0
         for step, xy in enumerate(data_loader, start=1):
             xy_tuple = tuple(x.to(self.device) for x in xy)
             logits: torch.Tensor = self.model(*xy_tuple[:-1])  # 不传label
             y_true: torch.Tensor = xy_tuple[-1]
 
-            logits = logits.contiguous().view(-1, logits.size(-1))
-            y_true = y_true.contiguous().view(-1)
+            # 计算 loss
+            if isinstance(self.loss_fn, CRFLoss):
+                loss = self.loss_fn(logits=logits, labels=y_true, input_ids=xy_tuple[0])
+            else:
+                logits = logits.contiguous().view(-1, logits.size(-1))
+                y_true = y_true.contiguous().view(-1)
+                loss = self.loss_fn(logits, y_true)
 
-            loss = self.loss_fn(logits, y_true)
             total_loss += loss.item()
         return round(total_loss / step, 5)
 
