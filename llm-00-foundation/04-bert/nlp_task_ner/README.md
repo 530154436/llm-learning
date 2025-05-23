@@ -1,4 +1,6 @@
 
+NLP（二十三）序列标注算法评估模块seqeval的使用
+https://www.cnblogs.com/jclian91/p/12913042.html
 
 用BERT做NER？教你用PyTorch轻松入门Roberta！
 https://zhuanlan.zhihu.com/p/346828049
