@@ -2,8 +2,9 @@
 # -*- coding:utf-8 -*--
 import copy
 import json
+import torch
 import logging as logger
-from typing import List, Tuple, Iterable, Dict
+from typing import List, Tuple, Iterable, Dict, Union
 from transformers import PreTrainedTokenizer, AutoTokenizer
 
 
@@ -31,14 +32,22 @@ class InputFeatures(object):
         return json.dumps(self.to_dict(), indent=2, sort_keys=True)
 
 
-def convert_text_to_features(sentences: List[Tuple[str, List[str]]],
+def convert_text_to_features(sentences: List[Union[str, List[str]]],
                              label2id: Dict[str, int],
-                             tokenizer: PreTrainedTokenizer) -> InputFeatures:
+                             tokenizer: PreTrainedTokenizer) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     将输入文本转换为 BERT 的输入格式
+    :return:  ([batch_size, sql_len],
+               [batch_size, sql_len],
+               [batch_size, sql_len])
     """
     examples = [(list(sent), ["O"] * len(sent)) for sent in sentences]
-    return convert_examples_to_feature(examples, label2id, tokenizer)
+    input_ids, input_mask, token_type_ids = [], [], []
+    for feature in convert_examples_to_feature(examples, label2id, tokenizer):
+        input_ids.append(feature.input_ids)
+        input_mask.append(feature.input_mask)
+        token_type_ids.append(feature.token_type_ids)
+    return torch.tensor(input_ids), torch.tensor(input_mask), torch.tensor(token_type_ids)
 
 
 def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
@@ -138,5 +147,5 @@ if __name__ == '__main__':
         print(item.to_dict())
 
     _sentences = ["北京城", "藏家12条收藏秘籍"]
-    for item in convert_text_to_features(_sentences, _label2id, _tokenizer):
-        print(item.to_dict())
+    _input = convert_text_to_features(_sentences, _label2id, _tokenizer)
+    print(_input)

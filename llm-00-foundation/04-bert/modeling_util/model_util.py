@@ -5,8 +5,6 @@
 # @function:
 from torch import nn
 from torch.optim import AdamW, Optimizer
-from torch.optim.lr_scheduler import LambdaLR
-from transformers import get_linear_schedule_with_warmup
 
 
 def initialize_weights(model: nn.Module):

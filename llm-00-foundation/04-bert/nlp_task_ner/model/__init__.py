@@ -4,13 +4,12 @@
 # @time: 2025/5/19 9:46
 # @function:
 import torch
-from torch import nn
+from modeling_util import BaseModel
 
 
-class BaseModel(nn.Module):
+class BaseNerModel(BaseModel):
 
-    def forward(self, *inputs: torch.Tensor) -> torch.FloatTensor:
-        raise NotImplementedError
-
-    def predict(self, *inputs: torch.Tensor) -> torch.Tensor:
-        raise NotImplementedError
+    def __init__(self, pretrain_path: str, num_labels: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.pretrain_path = pretrain_path
+        self.num_labels = num_labels

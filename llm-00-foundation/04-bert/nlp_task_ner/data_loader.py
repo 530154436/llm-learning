@@ -4,11 +4,11 @@
 # @time: 2025/5/10 14:35
 # @function:
 import json
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 import torch
 from functorch.dim import Tensor
 from transformers import BertTokenizer
-from torch.utils.data import Dataset, TensorDataset
+from torch.utils.data import Dataset
 from nlp_task_ner.data_process import convert_examples_to_feature
 
 
@@ -60,10 +60,10 @@ class NERDataset(Dataset):
         """
         将训练数据转化为 Bert 的输入格式
         :param batch: [batch_size, sql_len]
-        :return:  dict([batch_size, sql_len],
-                       [batch_size, sql_len],
-                       [batch_size, sql_len],
-                       [batch_size, sql_len])
+        :return:  ([batch_size, sql_len],
+                   [batch_size, sql_len],
+                   [batch_size, sql_len],
+                   [batch_size, sql_len])
         """
         all_input_ids, all_input_mask, all_token_type_ids, all_label_ids = [], [], [], []
         for feature in convert_examples_to_feature(batch, label2id=self.label2id,

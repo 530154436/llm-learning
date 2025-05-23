@@ -8,16 +8,14 @@ import torch
 from torch import nn
 from transformers import BertModel, BertConfig
 from torchcrf import CRF
-from nlp_task_ner.model import BaseModel
+from nlp_task_ner.model import BaseNerModel
 
 
-class BertCrf(BaseModel):
+class BertCrf(BaseNerModel):
 
-    def __init__(self,
-                 pretrain_path: str,
-                 num_labels: int,
-                 dropout: float = 0.3):
-        super(BertCrf, self).__init__()
+    def __init__(self, pretrain_path: str, num_labels: int, dropout: float = 0.3):
+
+        super().__init__(pretrain_path, num_labels)
         self.bert_config = BertConfig.from_pretrained(pretrain_path)
         self.bert = BertModel.from_pretrained(pretrain_path)
         self.dropout = nn.Dropout(dropout)

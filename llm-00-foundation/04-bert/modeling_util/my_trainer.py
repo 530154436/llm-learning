@@ -10,21 +10,27 @@ from torch import nn
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader
-from nlp_task_ner.model import BaseModel
-from nlp_task_ner.model.my_loss_func import CRFLoss
+from modeling_util import BaseModel
+from modeling_util.loss_func import CRFLoss
 
 
 class MyTrainer(object):
-    """A general trainer for single task learning.
+    """
+    一个用于单任务学习的通用训练器。
 
-    Args:
-        model (nn.Module): any multi task learning model.
-        optimizer (torch.optim): optimizer function of pytorch (default = `torch.optim.Adam`).
-        scheduler (torch.optim.lr_scheduler) : torch scheduling class, eg. `torch.optim.lr_scheduler.StepLR`.
-        n_epoch (int): epoch number of training.
-        early_stop_patience (int): how long to wait after last time validation auc improved (default=10).
-        device (str): `"cpu"` or `"cuda:0"`
-        model_path (str): the path you want to save the model (default="./"). Note only save the best weight in the validation data.
+    参数说明：
+    model (nn.Module)：任意单任务学习模型。
+    optimizer (torch.optim)：PyTorch 的优化器函数（默认为 torch.optim.Adam）。
+    scheduler (torch.optim.lr_scheduler)：PyTorch 的学习率调度器类，例如 torch.optim.lr_scheduler.StepLR。
+    n_epoch (int)：训练的轮数（epoch 数）。
+    early_stop_patience (int)：在验证集 AUC 最后一次提升之后，等待多久（多少个 epoch）停止训练（默认值为 10）。
+    device (str)：设备类型，可以是 "cpu" 或 "cuda:0"。
+    model_path (str)：模型保存路径（默认为 "./"）。注意：只会保存在验证集上表现最好的权重。
+
+    注意：
+    1、data_loader每个批次的数据类型是一个张量tuple(x1,..,xn, y)，最后一个张量为标签。
+    2、model.forward(x1,..,xn) 输出是logits，即模型最后一层未经任何激活函数变换的输出。
+    3、model需实现 predict(x1,..,xn) 方法
     """
 
     def __init__(
