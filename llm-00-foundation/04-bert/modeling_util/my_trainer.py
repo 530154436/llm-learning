@@ -118,6 +118,7 @@ class MyTrainer(object):
             # 评估
             if self.metrics:
                 y_pred = self.model.predict(*xy_tuple[:-1]).contiguous().view(-1)
+                y_true = y_true.contiguous().view(-1)
                 assert y_pred.shape == y_true.shape
                 self.metrics.update(y_pred, y_true)
 

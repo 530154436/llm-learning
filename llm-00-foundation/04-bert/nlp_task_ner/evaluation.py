@@ -39,7 +39,7 @@ def evaluate(config_path: str):
         print(y_true.shape, y_pred.shape)
         assert y_pred.shape == y_true.shape
         # 转为实体标签
-        for y_pred_i, y_true_i in zip(y_pred, y_true):
+        for y_pred_i, y_true_i in zip(y_pred.tolist(), y_true.tolist()):
             y_preds.append([id2label.get(j) for j in y_pred_i])
             y_trues.append([id2label.get(j) for j in y_true_i])
     print(classification_report(y_trues, y_preds))
