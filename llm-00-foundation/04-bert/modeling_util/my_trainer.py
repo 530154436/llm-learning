@@ -10,6 +10,7 @@ from torch import nn
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader
+from torchmetrics import MetricCollection
 from modeling_util import BaseModel
 from modeling_util.loss_func import CRFLoss
 
@@ -40,10 +41,10 @@ class MyTrainer(object):
         optimizer: Optimizer,
         scheduler: LRScheduler,
         n_epoch: int = 10,
-        early_stop_patience=10,
         device: str = "cpu",
         model_path: str = "model.pth",
-        metrics=None
+        metrics: MetricCollection = None,
+        early_stop_patience=10
     ):
         self.model: BaseModel = model.to(device)
         self.device = torch.device(device)
@@ -54,6 +55,9 @@ class MyTrainer(object):
         self.loss_fn = loss_fn
         self.optimizer: Optimizer = optimizer
         self.scheduler: LRScheduler = scheduler
+
+        # 设置评估指标
+        self.metrics = metrics
 
     def train_one_epoch(self, data_loader, log_interval: int = None, epoch: int = 1) -> float:
         self.model.train()
@@ -75,11 +79,11 @@ class MyTrainer(object):
             else:
                 # 非CRF情况：展平成 CrossEntropyLoss 要求的格式
                 # 序列标注任务:
-                # [batch_size, seq_len, num_classes] => [batch_size * seq_len, num_classes]
-                # [batch_size, seq_len] => [batch_size * seq_len]
+                # logits: [batch_size, seq_len, num_classes] => [batch_size * seq_len, num_classes]
+                # y_true: [batch_size, seq_len] => [batch_size * seq_len]
                 # 分类任务：
-                # [batch_size, num_classes]
-                # [batch_size]
+                # logits: [batch_size, num_classes]
+                # y_true: [batch_size]
                 logits = logits.contiguous().view(-1, logits.size(-1))
                 y_true = y_true.contiguous().view(-1)
                 loss = self.loss_fn(logits, y_true)
@@ -95,7 +99,7 @@ class MyTrainer(object):
         return round(total_loss / step, 5)
 
     @torch.no_grad()
-    def evaluate(self, data_loader: DataLoader):
+    def evaluate(self, data_loader: DataLoader) -> dict:
         self.model.eval()
         step, total_loss = 1, 0
         for step, xy in enumerate(data_loader, start=1):
@@ -111,8 +115,19 @@ class MyTrainer(object):
                 y_true = y_true.contiguous().view(-1)
                 loss = self.loss_fn(logits, y_true)
 
+            # 评估
+            if self.metrics:
+                y_pred = self.model.predict(*xy_tuple[:-1]).contiguous().view(-1)
+                assert y_pred.shape == y_true.shape
+                self.metrics.update(y_pred, y_true)
+
             total_loss += loss.item()
-        return round(total_loss / step, 5)
+
+        result = {"val_loss": round(total_loss / step, 5)}
+        if self.metrics:
+            val_metrics = self.metrics.compute()
+            result.update({f"val_{k}": round(float(v), 5) for k, v in val_metrics.items()})
+        return result
 
     def fit(self,
             train_dataloader: DataLoader,
@@ -121,8 +136,9 @@ class MyTrainer(object):
         for epoch in range(1, self.n_epoch + 1):
             lr = self.scheduler.get_lr()[0]  # 获取当前的学习率
             train_loss = self.train_one_epoch(train_dataloader, epoch=epoch)
-            val_loss = self.evaluate(val_dataloader)
-            logging.info(f'epoch: {epoch}, Current lr : {round(lr, 6)}, train_loss: {train_loss}, val_loss: {val_loss}')
+            val_result = self.evaluate(val_dataloader)
+            val_metric_info = ", ".join(map(lambda x: f"{x[0]}: {x[1]}", val_result.items()))
+            logging.info(f'epoch: {epoch}, Current lr : {round(lr, 6)}, train_loss: {train_loss}, {val_metric_info}')
 
             # if self.early_stopper.stop_training(val_loss, self.model.state_dict(), mode='min'):
             #     self.model.load_state_dict(self.early_stopper.best_weights)

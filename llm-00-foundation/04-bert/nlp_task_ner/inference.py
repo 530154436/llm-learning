@@ -3,7 +3,6 @@
 # @author: zhengchubin
 # @time: 2025/5/23 13:40
 # @function:
-import gc
 import json
 import torch
 from typing import List, Dict
@@ -11,7 +10,6 @@ from loguru import logger
 from omegaconf import DictConfig, OmegaConf
 from transformers import BertTokenizer
 from seqeval.metrics.sequence_labeling import get_entities
-from nlp_task_ner.data_loader import NERDataset
 from nlp_task_ner.data_process import convert_text_to_features
 from nlp_task_ner.model import BaseNerModel
 from nlp_task_ner.model.bert_crf import BertCrf
@@ -61,7 +59,7 @@ class Predictor(object):
         input_ids = input_ids.to(self.device)
         input_mask = input_mask.to(self.device)
         segment_ids = segment_ids.to(self.device)
-        preds = self.model.predict(input_ids, input_mask, segment_ids)
+        preds = self.model.predict(input_ids, input_mask, segment_ids).tolist()
 
         del input_ids, input_mask, segment_ids
 
@@ -83,8 +81,7 @@ class Predictor(object):
         return result
 
 
-def test_bert_crf():
-    # 推理
+if __name__ == "__main__":
     _sentences = [
         "北京城",
         "价格高昂的大钻和翡翠消费为何如此火？通灵珠宝总裁沈东军认为，这与原料稀缺有直接关系。"
@@ -92,11 +89,3 @@ def test_bert_crf():
     predictor = Predictor("conf/BertCrf.yaml")
     for item in predictor.predict(_sentences):
         print(item)
-
-    # 评估
-    config = predictor.config
-    # test_dataset = NERDataset(config.dev_data_path, config.label_data_path, tokenizer=predictor.tokenizer)
-
-
-if __name__ == "__main__":
-    test_bert_crf()

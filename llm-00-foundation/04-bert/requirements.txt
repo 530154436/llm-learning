@@ -2,7 +2,7 @@
 transformers==4.51.0
 accelerate==1.7.0
 torch==2.4.0
-sentencepiece==0.2.0
+torchmetrics==1.7.1
 tqdm==4.66.5
 loguru==0.7.3
 sklearn==1.6.0

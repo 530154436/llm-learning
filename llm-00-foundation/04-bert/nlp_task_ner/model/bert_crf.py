@@ -9,6 +9,8 @@ from torch import nn
 from transformers import BertModel, BertConfig
 from torchcrf import CRF
 from nlp_task_ner.model import BaseNerModel
+import warnings
+warnings.filterwarnings("ignore", message="where received a uint8 condition tensor")
 
 
 class BertCrf(BaseNerModel):
@@ -47,11 +49,18 @@ class BertCrf(BaseNerModel):
                 input_ids: torch.Tensor,
                 attention_mask: torch.Tensor,
                 token_type_ids: torch.Tensor) -> torch.Tensor:
+        """
+        :param input_ids: [batch_size, seq_len, num_labels]
+        :param attention_mask: [batch_size, seq_len, num_labels]
+        :param token_type_ids: [batch_size, seq_len, num_labels]
+        :return: torch.Tensor
+        """
         # [batch_size, seq_len, num_labels]
         logits = self.forward(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         # [batch_size, seq_len]
-        predicts: List[list] = self.crf.decode(logits, mask=attention_mask.bool())
-        return predicts
+        # predicts: List[list] = self.crf.decode(logits, mask=attention_mask.bool())
+        predicts: List[list] = self.crf.decode(logits)
+        return torch.tensor(predicts, dtype=torch.int32)
 
 
 if __name__ == "__main__":

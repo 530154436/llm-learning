@@ -8,6 +8,7 @@ import hydra
 import torch
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
+from torchmetrics import F1Score, MetricCollection, Accuracy
 from transformers import BertTokenizer, get_linear_schedule_with_warmup
 from nlp_task_ner.data_loader import NERDataset
 from nlp_task_ner.model.bert_crf import BertCrf
@@ -56,18 +57,23 @@ def train(config: DictConfig):
     logging.info(f'模型训练参数: {count_trainable_parameters(model)}')
     print(model)
 
-    logging.info("配置优化器、学习率调整器、损失函数")
+    logging.info("配置优化器、学习率调整器、损失函数、评估指标")
     optimizer = build_optimizer(model, learning_rate=config.learning_rate)
     train_steps_per_epoch = train_size // config.batch_size
     scheduler = get_linear_schedule_with_warmup(optimizer=optimizer,
                                                 num_warmup_steps=(config.epoch_num // 10) * train_steps_per_epoch,
                                                 num_training_steps=config.epoch_num * train_steps_per_epoch)
     loss_fn = CRFLoss(model.crf, pad_token_id=train_dataset.pad_token_id)
+    metrics = MetricCollection({
+        'acc': Accuracy(task="multiclass"),
+        'f1': F1Score(task="multiclass", num_classes=num_labels)
+    })
 
     logging.info("训练模型...")
     device = torch.device("cuda:0") if torch.cuda.is_available() else "cpu"
     trainer = MyTrainer(model=model, loss_fn=loss_fn, optimizer=optimizer, scheduler=scheduler,
-                        n_epoch=config.epoch_num, device=device, model_path=config.model_path)
+                        n_epoch=config.epoch_num, device=device, model_path=config.model_path,
+                        metrics=metrics)
     trainer.fit(train_dataloader, dev_dataloader)
 
 
