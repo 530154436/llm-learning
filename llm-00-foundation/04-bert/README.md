@@ -1,4 +1,6 @@
 
+评估指标工具库
+https://blog.csdn.net/mzpmzk/article/details/134424122
 
 bert-base-uncased 和 bert-base-cased 是 BERT（Bidirectional Encoder Representations from Transformers）模型的两个不同版本，它们主要在处理输入文本时对大小写的处理方式上有所不同：
 

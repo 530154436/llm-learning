@@ -57,7 +57,7 @@ class MyTrainer(object):
         self.scheduler: LRScheduler = scheduler
 
         # 设置评估指标
-        self.metrics = metrics
+        self.metrics = metrics.to(device) if metrics is not None else None
 
     def train_one_epoch(self, data_loader, log_interval: int = None, epoch: int = 1) -> float:
         self.model.train()
@@ -117,7 +117,8 @@ class MyTrainer(object):
 
             # 评估
             if self.metrics:
-                y_pred = self.model.predict(*xy_tuple[:-1]).to(self.device).contiguous().view(-1)
+                y_pred = self.model.predict(*xy_tuple[:-1]).contiguous().view(-1)
+                print(y_true.device, y_true.device)
                 y_true = y_true.contiguous().view(-1)
                 assert y_pred.shape == y_true.shape
                 self.metrics.update(y_pred, y_true)
@@ -128,6 +129,7 @@ class MyTrainer(object):
         if self.metrics:
             val_metrics = self.metrics.compute()
             result.update({f"val_{k}": round(float(v), 5) for k, v in val_metrics.items()})
+            self.metrics.reset()
         return result
 
     def fit(self,
