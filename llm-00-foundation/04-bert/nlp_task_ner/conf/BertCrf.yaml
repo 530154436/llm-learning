@@ -13,7 +13,7 @@ device: "cuda:0"
 pretrain_path: "${data_dir}/pretrain/bert-base-chinese"
 batch_size: 64
 dropout: 0.3
-epoch_num: 10
+epoch_num: 50
 learning_rate: 3e-5
 
 defaults:
