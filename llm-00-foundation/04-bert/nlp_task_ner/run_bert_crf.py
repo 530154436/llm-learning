@@ -38,6 +38,7 @@ def train(config: DictConfig):
     logging.info(f"开始训练模型")
     logging.info("配置信息:\n{}".format(OmegaConf.to_yaml(config, resolve=True)))
     logging.info("加载Dataset和Tokenizer.")
+    device = torch.device("cuda:0") if torch.cuda.is_available() else "cpu"
     tokenizer = BertTokenizer.from_pretrained(
         pretrained_model_name_or_path=config.pretrain_path,
         do_lower_case=True
@@ -65,12 +66,11 @@ def train(config: DictConfig):
                                                 num_training_steps=config.epoch_num * train_steps_per_epoch)
     loss_fn = CRFLoss(model.crf, pad_token_id=train_dataset.pad_token_id)
     metrics = MetricCollection({
-        'acc': Accuracy(task="multiclass", num_classes=num_labels).to(device=config.device),
-        'f1': F1Score(task="multiclass", num_classes=num_labels).to(device=config.device)
+        'acc': Accuracy(task="multiclass", num_classes=num_labels),
+        'f1': F1Score(task="multiclass", num_classes=num_labels)
     })
 
     logging.info("训练模型...")
-    device = torch.device("cuda:0") if torch.cuda.is_available() else "cpu"
     trainer = MyTrainer(model=model, loss_fn=loss_fn, optimizer=optimizer, scheduler=scheduler,
                         n_epoch=config.epoch_num, device=device, model_path=config.model_path,
                         metrics=metrics)
