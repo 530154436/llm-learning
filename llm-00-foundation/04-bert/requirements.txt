@@ -5,7 +5,7 @@ torch==2.4.0
 torchmetrics==1.7.1
 tqdm==4.66.5
 loguru==0.7.3
-sklearn==1.6.0
+scikit-learn==1.6.0
 seqeval==1.2.2
 pytorch-crf==0.7.2
 # 配置文件管理
