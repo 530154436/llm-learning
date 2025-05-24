@@ -118,9 +118,9 @@ class MyTrainer(object):
             # 评估
             if self.metrics:
                 y_pred = self.model.predict(*xy_tuple[:-1]).contiguous().view(-1)
-                print(y_true.device, y_true.device)
                 y_true = y_true.contiguous().view(-1)
                 assert y_pred.shape == y_true.shape
+                print(y_true.device, y_true.device, self.metrics)
                 self.metrics.update(y_pred, y_true)
 
             total_loss += loss.item()
