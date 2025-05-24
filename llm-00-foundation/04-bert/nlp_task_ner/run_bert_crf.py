@@ -65,8 +65,8 @@ def train(config: DictConfig):
                                                 num_training_steps=config.epoch_num * train_steps_per_epoch)
     loss_fn = CRFLoss(model.crf, pad_token_id=train_dataset.pad_token_id)
     metrics = MetricCollection({
-        'acc': Accuracy(task="multiclass", num_classes=num_labels),
-        'f1': F1Score(task="multiclass", num_classes=num_labels)
+        'acc': Accuracy(task="multiclass", num_classes=num_labels).to(device=config.device),
+        'f1': F1Score(task="multiclass", num_classes=num_labels).to(device=config.device)
     })
 
     logging.info("训练模型...")

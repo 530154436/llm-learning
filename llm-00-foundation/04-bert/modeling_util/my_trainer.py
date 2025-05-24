@@ -114,16 +114,15 @@ class MyTrainer(object):
                 logits = logits.contiguous().view(-1, logits.size(-1))
                 y_true = y_true.contiguous().view(-1)
                 loss = self.loss_fn(logits, y_true)
+            total_loss += loss.item()
 
-            # 评估
+            # 评估指标
             if self.metrics:
                 y_pred = self.model.predict(*xy_tuple[:-1]).contiguous().view(-1)
                 y_true = y_true.contiguous().view(-1)
                 assert y_pred.shape == y_true.shape
                 print(y_true.device, y_true.device, self.metrics)
                 self.metrics.update(y_pred, y_true)
-
-            total_loss += loss.item()
 
         result = {"val_loss": round(total_loss / step, 5)}
         if self.metrics:
