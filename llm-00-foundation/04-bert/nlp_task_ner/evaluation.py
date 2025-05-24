@@ -36,10 +36,12 @@ def evaluate(config_path: str):
         xy_tuple: tuple = tuple(x.to(config.device) for x in xy)
         y_pred: torch.Tensor = model.predict(*xy_tuple[:-1])  # 不传label
         y_true: torch.Tensor = xy_tuple[-1]
+        print(y_true.shape, y_pred.shape)
         assert y_pred.shape == y_true.shape
-
-        y_preds.append(y_pred.tolist())
-        y_trues.append(y_true.tolist())
+        # 转为实体标签
+        for y_pred_i, y_true_i in zip(y_pred, y_true):
+            y_preds.append([id2label.get(j) for j in y_pred_i])
+            y_trues.append([id2label.get(j) for j in y_true_i])
     print(classification_report(y_trues, y_preds))
 
 
