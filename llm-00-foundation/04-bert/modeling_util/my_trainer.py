@@ -121,7 +121,7 @@ class MyTrainer(object):
                 y_pred = self.model.predict(*xy_tuple[:-1]).to(self.device).contiguous().view(-1)
                 y_true = y_true.contiguous().view(-1)
                 assert y_pred.shape == y_true.shape
-                print(y_true.device, y_pred.device, ", ".join(str(v.device) for v in self.metrics.values()))
+                # print(y_true.device, y_pred.device, ", ".join(str(v.device) for v in self.metrics.values()))
                 self.metrics.update(y_pred, y_true)
 
         result = {"val_loss": round(total_loss / step, 5)}
