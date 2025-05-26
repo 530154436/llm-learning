@@ -53,7 +53,7 @@ class BertCrf(BaseNerModel):
         :param input_ids: [batch_size, seq_len, num_labels]
         :param attention_mask: [batch_size, seq_len, num_labels]
         :param token_type_ids: [batch_size, seq_len, num_labels]
-        :return: torch.Tensor
+        :return: torch.Tensor [batch_size, seq_len]
         """
         # [batch_size, seq_len, num_labels]
         logits = self.forward(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)

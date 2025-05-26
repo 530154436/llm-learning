@@ -25,7 +25,11 @@ else:
 # snapshot_download("google-bert/bert-base-cased",
 #                   revision='master',
 #                   cache_dir=DATA_DIR)
-snapshot_download("google-bert/bert-base-chinese",
+# snapshot_download("google-bert/bert-base-chinese",
+#                   revision='master',
+#                   cache_dir=DATA_DIR)
+
+snapshot_download("dienstag/chinese-roberta-wwm-ext",
                   revision='master',
                   cache_dir=DATA_DIR)
 

@@ -6,21 +6,21 @@
 from typing import List
 import torch
 from torch import nn
-from transformers import BertModel, BertConfig
+from transformers import RobertaConfig, RobertaModel
 from torchcrf import CRF
 from nlp_task_ner.model import BaseNerModel
 import warnings
 warnings.filterwarnings("ignore", message="where received a uint8 condition tensor")
 
 
-class BertBiLstmCrf(BaseNerModel):
+class RoBertaBiLstmCrf(BaseNerModel):
 
     def __init__(self, pretrain_path: str, num_labels: int, dropout: float = 0.3,
                  lstm_num_layers: int = 2, lstm_hidden_size: int = 256):
 
         super().__init__(pretrain_path, num_labels)
-        self.bert_config = BertConfig.from_pretrained(pretrain_path)
-        self.bert = BertModel.from_pretrained(pretrain_path)
+        self.bert_config = RobertaConfig.from_pretrained(pretrain_path)
+        self.bert = RobertaModel.from_pretrained(pretrain_path)
         self.bilstm = nn.LSTM(input_size=self.bert_config.hidden_size,
                               bidirectional=True,
                               num_layers=lstm_num_layers,
@@ -43,7 +43,7 @@ class BertBiLstmCrf(BaseNerModel):
         :return: [batch_size, seq_len, num_labels]
         """
         # [batch_size, seq_len] => [batch_size, seq_len, embedding_size]
-        output = self.bert(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)[0]
+        output = self.bert(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids, return_dict=False)[0]
 
         # [batch_size, seq_len, lstm_hidden_size]
         lstm_out, _ = self.bilstm(output)
@@ -73,10 +73,10 @@ class BertBiLstmCrf(BaseNerModel):
 
 
 if __name__ == "__main__":
-    _pretrain_path = "../data/pretrain/bert-base-chinese"
-    _model = BertBiLstmCrf(_pretrain_path, num_labels=31)
+    _pretrain_path = "../data/pretrain/chinese-roberta-wwm-ext"
+    _model = RoBertaBiLstmCrf(_pretrain_path, num_labels=31)
     # for name, param in list(_model.named_parameters()):
     #     print(name)
     print(_model)
-    for name, module in _model.named_modules():
-        print(name, type(module))
+    # for name, module in _model.named_modules():
+    #     print(name, type(module))
