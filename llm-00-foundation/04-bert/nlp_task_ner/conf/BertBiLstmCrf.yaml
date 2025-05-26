@@ -7,10 +7,12 @@ label_data_path: "${data_dir}/dataset/clue/label.json"
 num_labels: 31
 
 # 模型设置
-model_name: "BertCrf"
+model_name: "BertBiLstmCrf"
 model_path: "${data_dir}/experiment/${model_name}.pth"
 device: "cuda:0"
 pretrain_path: "${data_dir}/pretrain/bert-base-chinese"
+lstm_num_layers: 1
+lstm_hidden_size: 128
 batch_size: 64
 dropout: 0.3
 epoch_num: 50
