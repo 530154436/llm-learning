@@ -13,18 +13,18 @@ from seqeval.metrics.sequence_labeling import get_entities
 from nlp_task_ner.data_process import convert_text_to_features
 from nlp_task_ner.model import BaseNerModel
 from nlp_task_ner.model.bert_crf import BertCrf
-
-
-__ALL_MODEL__: Dict[str, BaseNerModel] = {
-    "BertCrf": BertCrf
-}
+from nlp_task_ner.model.bert_bilstm_crf import BertBiLstmCrf
 
 
 def load_model_by_name(config: DictConfig,
                        device: str = "cpu") -> BaseNerModel:
-    clazz: BaseNerModel = __ALL_MODEL__.get(config.model_name)
-    # model = BertCrf(pretrain_path=config.pretrain_path, num_labels=num_labels)
-    model = clazz(pretrain_path=config.pretrain_path, num_labels=config.num_labels)
+    if config.model_name == "BertCrf":
+        model = BertCrf(pretrain_path=config.pretrain_path, num_labels=config.num_labels)
+    elif config.model_name == "BertBiLstmCrf":
+        model = BertBiLstmCrf(pretrain_path=config.pretrain_path, num_labels=config.num_labels,
+                              lstm_num_layers=config.lstm_num_layers, lstm_hidden_size=config.lstm_hidden_size)
+    else:
+        raise ValueError(f"Unknown model name: {config.model_name}")
     model.load_state_dict(torch.load(config.model_path,
                                      weights_only=False,
                                      map_location=torch.device(device)))
@@ -86,6 +86,7 @@ if __name__ == "__main__":
         "北京城",
         "价格高昂的大钻和翡翠消费为何如此火？通灵珠宝总裁沈东军认为，这与原料稀缺有直接关系。"
     ]
-    predictor = Predictor("conf/BertCrf.yaml")
+    # predictor = Predictor("conf/BertCrf.yaml")
+    predictor = Predictor("conf/BertBiLstmCrf.yaml")
     for item in predictor.predict(_sentences):
         print(item)

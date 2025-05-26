@@ -19,7 +19,23 @@ from modeling_util.model_util import count_trainable_parameters, build_optimizer
 
 @hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf.yaml")
 def train(config: DictConfig):
-    """ 模型训练流程=
+    """ 模型训练
+    data_dir: ./data
+    train_data_path: ./data/dataset/clue/train.jsonl
+    dev_data_path: ./data/dataset/clue/dev.jsonl
+    test_data_path: ./data/dataset/clue/test.jsonl
+    label_data_path: ./data/dataset/clue/label.json
+    num_labels: 31
+    model_name: BertBiLstmCrf
+    model_path: ./data/experiment/BertBiLstmCrf.pth
+    device: cuda:0
+    pretrain_path: ./data/pretrain/bert-base-chinese
+    lstm_num_layers: 1
+    lstm_hidden_size: 128
+    batch_size: 64
+    dropout: 0.3
+    epoch_num: 50
+    learning_rate: 3.0e-05
     """
     logging.info(f"开始训练模型")
     logging.info("配置信息:\n{}".format(OmegaConf.to_yaml(config, resolve=True)))
