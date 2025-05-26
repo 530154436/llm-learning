@@ -73,7 +73,9 @@ class BertBiLstmCrf(BaseNerModel):
 
 
 if __name__ == "__main__":
-    _pretrain_path = "../data/pretrain/bert-base-chinese"
+    # _pretrain_path = "../data/pretrain/bert-base-chinese"
+    # _pretrain_path = "../data/pretrain/chinese-bert-wwm-ext"
+    _pretrain_path = "../data/pretrain/chinese-roberta-wwm-ext"
     _model = BertBiLstmCrf(_pretrain_path, num_labels=31)
     # for name, param in list(_model.named_parameters()):
     #     print(name)

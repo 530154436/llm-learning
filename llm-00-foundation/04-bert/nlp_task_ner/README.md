@@ -1,3 +1,6 @@
+RoBERTa中文预训练模型：RoBERTa for Chinese
+https://mp.weixin.qq.com/s/K2zLEbWzDGtyOj7yceRdFQ
+https://github.com/ymcui/Chinese-BERT-wwm
 
 NLP（二十三）序列标注算法评估模块seqeval的使用
 https://www.cnblogs.com/jclian91/p/12913042.html
@@ -92,7 +95,11 @@ https://github.com/lemonhu/NER-BERT-pytorch
 
 + 汇总
 
-| 模型名称                | address | book | company | game | government | movie | name | organization | position | scene |
-|---------------------|:-------:|:----:|:-------:|:----:|:----------:|:-----:|:----:|:------------:|:--------:|:-----:|
-| Bert + Crf          |  0.59   | 0.75 |  0.77   | 0.75 |    0.79    | 0.77  | 0.75 |     0.71     |   0.75   | 0.64  |
-| Bert + BiLstm + Crf |  0.61   | 0.77 |  0.78   | 0.81 |    0.80    | 0.81  | 0.85 |     0.77     |   0.79   | 0.70  |
+| 模型名称                    | address | book | company | game | government | movie | name | organization | position | scene |
+|-------------------------|:-------:|:----:|:-------:|:----:|:----------:|:-----:|:----:|:------------:|:--------:|:-----:|
+| Bert + Crf              |  0.59   | 0.75 |  0.77   | 0.75 |    0.79    | 0.77  | 0.75 |     0.71     |   0.75   | 0.64  |
+| Bert + BiLstm + Crf     |  0.61   | 0.77 |  0.78   | 0.81 |    0.80    | 0.81  | 0.85 |     0.77     |   0.79   | 0.70  |
+| Bert-wwm + BiLstm + Crf |  0.61   | 0.77 |  0.78   | 0.81 |    0.80    | 0.81  | 0.85 |     0.77     |   0.79   | 0.70  |
+
+Bert-wwm：chinese-bert-wwm-ext
+Bert：bert-base-chinese

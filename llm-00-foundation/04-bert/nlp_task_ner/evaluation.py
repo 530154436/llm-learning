@@ -48,4 +48,5 @@ def evaluate(config_path: str):
 if __name__ == '__main__':
     # evaluate("conf/BertCrf.yaml")
     evaluate("conf/BertBiLstmCrf.yaml")
+    evaluate("conf/BertWwmBiLstmCrf.yaml")
 
