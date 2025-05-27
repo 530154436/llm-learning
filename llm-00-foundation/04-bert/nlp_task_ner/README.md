@@ -93,13 +93,45 @@ https://github.com/lemonhu/NER-BERT-pytorch
 | position       | 0.78      | 0.80   | 0.79     | 433     |
 | scene          | 0.69      | 0.71   | 0.70     | 209     |
 
-+ 汇总
++ Bert-wwm-ext+BiLstm+Crf
 
-| 模型名称                    | address | book | company | game | government | movie | name | organization | position | scene |
-|-------------------------|:-------:|:----:|:-------:|:----:|:----------:|:-----:|:----:|:------------:|:--------:|:-----:|
-| Bert + Crf              |  0.59   | 0.75 |  0.77   | 0.75 |    0.79    | 0.77  | 0.75 |     0.71     |   0.75   | 0.64  |
-| Bert + BiLstm + Crf     |  0.61   | 0.77 |  0.78   | 0.81 |    0.80    | 0.81  | 0.85 |     0.77     |   0.79   | 0.70  |
-| Bert-wwm + BiLstm + Crf |  0.61   | 0.77 |  0.78   | 0.81 |    0.80    | 0.81  | 0.85 |     0.77     |   0.79   | 0.70  |
+|              | precision | recall | f1-score | support |
+|--------------|-----------|--------|----------|---------|
+| address      | 0.59      | 0.64   | 0.62     | 373     |
+| book         | 0.60      | 0.78   | 0.68     | 154     |
+| company      | 0.76      | 0.79   | 0.77     | 378     |
+| game         | 0.67      | 0.87   | 0.75     | 295     |
+| government   | 0.73      | 0.83   | 0.78     | 247     |
+| movie        | 0.70      | 0.79   | 0.74     | 151     |
+| name         | 0.77      | 0.89   | 0.83     | 465     |
+| organization | 0.74      | 0.78   | 0.76     | 367     |
+| position     | 0.76      | 0.78   | 0.77     | 433     |
+| scene        | 0.67      | 0.66   | 0.67     | 209     |
 
-Bert-wwm：chinese-bert-wwm-ext
++ Roberta-wwm-ext+BiLstm+Crf
+
+|              | precision | recall | f1-score | support |
+|--------------|-----------|--------|----------|---------|
+| address      | 0.62      | 0.66   | 0.64     | 373     |
+| book         | 0.78      | 0.76   | 0.77     | 154     |
+| company      | 0.79      | 0.81   | 0.80     | 378     |
+| game         | 0.77      | 0.84   | 0.81     | 295     |
+| government   | 0.80      | 0.86   | 0.83     | 247     |
+| movie        | 0.80      | 0.77   | 0.79     | 151     |
+| name         | 0.85      | 0.89   | 0.87     | 465     |
+| organization | 0.76      | 0.80   | 0.78     | 367     |
+| position     | 0.76      | 0.80   | 0.78     | 433     |
+| scene        | 0.70      | 0.65   | 0.67     | 209     |
+
++ 汇总（F1-score）
+
+| 模型                         | address | book | company | game | govern | movie | name | org  | position | scene | micro avg |
+|----------------------------|:-------:|:----:|:-------:|:----:|:------:|:-----:|:----:|:----:|:--------:|:-----:|:---------:| 
+| Bert+Crf                   |  0.59   | 0.75 |  0.77   | 0.75 |  0.77  | 0.76  | 0.75 | 0.71 |   0.74   | 0.65  |   0.72    |
+| Bert+BiLstm+Crf            |  0.62   | 0.77 |  0.78   | 0.81 |  0.79  | 0.82  | 0.84 | 0.77 |   0.79   | 0.71  |   0.77    |
+| Bert-wwm-ext+BiLstm+Crf    |  0.62   | 0.68 |  0.77   | 0.75 |  0.77  | 0.74  | 0.82 | 0.76 |   0.77   | 0.68  |   0.74    |
+| Roberta-wwm-ext+BiLstm+Crf |  0.64   | 0.77 |  0.80   | 0.81 |  0.83  | 0.78  | 0.87 | 0.78 |   0.79   | 0.67  |   0.78    |
+
 Bert：bert-base-chinese
+Bert-wwm-ext：chinese-bert-wwm-ext
+Roberta-wwm-ext：chinese-roberta-wwm-ext

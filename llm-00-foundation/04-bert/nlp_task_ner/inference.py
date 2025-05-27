@@ -18,9 +18,11 @@ from nlp_task_ner.model.bert_bilstm_crf import BertBiLstmCrf
 
 def load_model_by_name(config: DictConfig,
                        device: str = "cpu") -> BaseNerModel:
-    if config.model_name == "BertCrf":
+    # 命名格式：模型名称_预训练模型
+    model_name = config.model_name.split("_")[0]
+    if model_name.__contains__("BertCrf"):
         model = BertCrf(pretrain_path=config.pretrain_path, num_labels=config.num_labels)
-    elif config.model_name == "BertBiLstmCrf":
+    elif model_name.__contains__("BertBiLstmCrf"):
         model = BertBiLstmCrf(pretrain_path=config.pretrain_path, num_labels=config.num_labels,
                               lstm_num_layers=config.lstm_num_layers, lstm_hidden_size=config.lstm_hidden_size)
     else:
@@ -87,6 +89,7 @@ if __name__ == "__main__":
         "价格高昂的大钻和翡翠消费为何如此火？通灵珠宝总裁沈东军认为，这与原料稀缺有直接关系。"
     ]
     # predictor = Predictor("conf/BertCrf.yaml")
-    predictor = Predictor("conf/BertBiLstmCrf.yaml")
+    # predictor = Predictor("conf/BertBiLstmCrf.yaml")
+    predictor = Predictor("conf/BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
     for item in predictor.predict(_sentences):
         print(item)

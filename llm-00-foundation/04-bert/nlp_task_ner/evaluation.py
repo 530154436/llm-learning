@@ -36,7 +36,7 @@ def evaluate(config_path: str):
         xy_tuple: tuple = tuple(x.to(config.device) for x in xy)
         y_pred: torch.Tensor = model.predict(*xy_tuple[:-1])  # 不传label
         y_true: torch.Tensor = xy_tuple[-1]
-        print(y_true.shape, y_pred.shape)
+        print(step, y_true.shape, y_pred.shape)
         assert y_pred.shape == y_true.shape
         # 转为实体标签
         for y_pred_i, y_true_i in zip(y_pred.tolist(), y_true.tolist()):
@@ -47,6 +47,7 @@ def evaluate(config_path: str):
 
 if __name__ == '__main__':
     # evaluate("conf/BertCrf.yaml")
-    evaluate("conf/BertBiLstmCrf.yaml")
-    evaluate("conf/BertWwmBiLstmCrf.yaml")
+    # evaluate("conf/BertBiLstmCrf.yaml")
+    # evaluate("conf/BertBiLstmCrf_chinese-bert-wwm-ext.yaml")
+    evaluate("conf/BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
 

@@ -1,4 +1,9 @@
 
+locust 性能测试
+
+基于 Qwen2.5-0.5B 微调训练 Ner 命名实体识别任务
+https://blog.csdn.net/qq_43692950/article/details/142631780
+
 评估指标工具库
 https://blog.csdn.net/mzpmzk/article/details/134424122
 
