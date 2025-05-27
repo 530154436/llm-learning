@@ -12,6 +12,7 @@ from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader
 from torchmetrics import MetricCollection
 from modeling_util import BaseModel
+from modeling_util.callbacks import EarlyStopper
 from modeling_util.loss_func import CRFLoss
 
 
@@ -58,6 +59,7 @@ class MyTrainer(object):
         self.scheduler: LRScheduler = scheduler
         # 训练优化配置
         self.clip_grad = clip_grad
+        self.early_stopper = EarlyStopper(patience=early_stop_patience)
 
         # 设置评估指标
         self.metrics = metrics.to(device) if metrics is not None else None
@@ -150,9 +152,11 @@ class MyTrainer(object):
             val_metric_info = ", ".join(map(lambda x: f"{x[0]}: {x[1]}", val_result.items()))
             logging.info(f'epoch: {epoch}, Current lr : {round(lr, 6)}, train_loss: {train_loss}, {val_metric_info}')
 
-            # if self.early_stopper.stop_training(val_loss, self.model.state_dict(), mode='min'):
-            #     self.model.load_state_dict(self.early_stopper.best_weights)
-            #     logging.info('Current loss: %.6f, Best Value: %.6f\n' % (val_loss, self.early_stopper.best_value))
-            #     break
+            # 早停
+            val_loss = val_result.get("val_loss")
+            if self.early_stopper.stop_training(val_loss, self.model.state_dict()):
+                self.model.load_state_dict(self.early_stopper.best_weights)
+                logging.info('Current loss: %.6f, Best val_loss: %.6f\n' % (val_loss, self.early_stopper.best_value))
+                break
         torch.save(self.model.state_dict(), self.model_path)
-        # logging.info('Saved model\'s loss: %.6f' % self.early_stopper.best_value)
+        logging.info('Saved model\'s loss: %.6f' % self.early_stopper.best_value)
