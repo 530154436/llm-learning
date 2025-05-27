@@ -1,4 +1,8 @@
 
+在使用RAG时，【语义相关性的关键点】
+1）语义向量那里，召回用的双塔模型，匹配&排序要用单塔模型
+2）最后几十条结果，可以使用LLM进行相关性打分（LLM性能开销大，不能计算太大量）
+
 天池-基于LLM智能问答系统学习赛
 https://tianchi.aliyun.com/competition/entrance/532172/information
 https://github.com/Tongyi-EconML/FinQwen?spm=a2c22.12281976.0.0.3ff94ea4Wg1dNy

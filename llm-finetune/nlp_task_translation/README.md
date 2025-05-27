@@ -10,3 +10,7 @@ BLEU、COMET
 
 Paper Reading (LLM-MT #1)：基于Prompt和LLM的机器翻译案例分析
 https://zhuanlan.zhihu.com/p/600500042
+
+
+05-Qwen3-8B-LoRA及SwanLab可视化记录.md
+https://github.com/datawhalechina/self-llm/blob/master/models/Qwen3/05-Qwen3-8B-LoRA%E5%8F%8ASwanLab%E5%8F%AF%E8%A7%86%E5%8C%96%E8%AE%B0%E5%BD%95.md
