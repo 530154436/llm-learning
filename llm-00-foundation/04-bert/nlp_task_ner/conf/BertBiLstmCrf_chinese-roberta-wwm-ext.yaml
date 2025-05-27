@@ -18,6 +18,9 @@ num_labels: 31
 lstm_num_layers: 1
 lstm_hidden_size: 128
 
+# 模型优化
+clip_grad: 5.0
+
 defaults:
   - _self_
   - override hydra/job_logging: custom

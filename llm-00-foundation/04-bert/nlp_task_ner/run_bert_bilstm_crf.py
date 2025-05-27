@@ -78,7 +78,7 @@ def train(config: DictConfig):
     logging.info("训练模型...")
     trainer = MyTrainer(model=model, loss_fn=loss_fn, optimizer=optimizer, scheduler=scheduler,
                         n_epoch=config.epoch_num, device=device, model_path=config.model_path,
-                        metrics=metrics)
+                        metrics=metrics, clip_grad=config.get("clip_grad"))
     trainer.fit(train_dataloader, dev_dataloader)
 
 

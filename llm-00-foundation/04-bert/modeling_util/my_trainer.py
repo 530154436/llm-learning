@@ -44,7 +44,8 @@ class MyTrainer(object):
         device: str = "cpu",
         model_path: str = "model.pth",
         metrics: MetricCollection = None,
-        early_stop_patience=10
+        early_stop_patience=10,
+        clip_grad: float = None,
     ):
         self.model: BaseModel = model.to(device)
         self.device = torch.device(device)
@@ -55,6 +56,8 @@ class MyTrainer(object):
         self.loss_fn = loss_fn
         self.optimizer: Optimizer = optimizer
         self.scheduler: LRScheduler = scheduler
+        # 训练优化配置
+        self.clip_grad = clip_grad
 
         # 设置评估指标
         self.metrics = metrics.to(device) if metrics is not None else None
@@ -90,6 +93,11 @@ class MyTrainer(object):
 
             self.model.zero_grad()
             loss.backward()
+
+            # 梯度裁剪
+            if self.clip_grad is not None:
+                nn.utils.clip_grad_norm_(parameters=self.model.parameters(), max_norm=self.clip_grad)
+
             self.optimizer.step()
             self.scheduler.step()  # 更新lr
 
