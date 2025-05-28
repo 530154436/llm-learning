@@ -1,4 +1,7 @@
 
+很棒，有文档+代码
+https://github.com/chatchat-space/Langchain-Chatchat/tree/master
+
 在使用RAG时，【语义相关性的关键点】
 1）语义向量那里，召回用的双塔模型，匹配&排序要用单塔模型
 2）最后几十条结果，可以使用LLM进行相关性打分（LLM性能开销大，不能计算太大量）

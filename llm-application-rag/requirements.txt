@@ -1,0 +1,3 @@
+# Python 3.10.12
+langchain_text_splitters==0.3.8
+

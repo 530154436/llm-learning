@@ -1,3 +1,6 @@
+qwen3 finetune
+https://qwen.readthedocs.io/zh-cn/latest/training/llama_factory.html
+
 RoBERTa中文预训练模型：RoBERTa for Chinese
 https://mp.weixin.qq.com/s/K2zLEbWzDGtyOj7yceRdFQ
 https://github.com/ymcui/Chinese-BERT-wwm
