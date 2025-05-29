@@ -1,4 +1,6 @@
 
+
+### 基于Transformers+peft框架
 利用大模型做NER实践(总结版)
 https://mp.weixin.qq.com/s/LBlzFm8wxK7Aj7YXhCoXgQ
 https://github.com/cjymz886/LLM-NER
@@ -6,6 +8,21 @@ https://github.com/cjymz886/LLM-NER
 指令微调-命名实体识别
 博客：https://blog.csdn.net/SoulmateY/article/details/139831606
 代码：https://github.com/Zeyi-Lin/LLM-Finetune
+
+05-Qwen3-8B-LoRA及SwanLab可视化记录.md
+https://github.com/datawhalechina/self-llm/blob/master/models/Qwen3/05-Qwen3-8B-LoRA%E5%8F%8ASwanLab%E5%8F%AF%E8%A7%86%E5%8C%96%E8%AE%B0%E5%BD%95.md
+
+
+### LLaMA-Factory
+官网教程：https://llamafactory.readthedocs.io/zh-cn/latest/getting_started/sft.html
+
+参数配置：https://github.com/hiyouga/LLaMA-Factory/blob/main/src/llamafactory/hparams/data_args.py#L38
+查看提示词模板：https://github.com/hiyouga/LLaMA-Factory/blob/main/README_zh.md
+
+大模型参数高效微调技术原理综述（一）-背景、参数高效微调简介
+https://github.com/liguodongiot/llm-action?tab=readme-ov-file
+https://zhuanlan.zhihu.com/p/635152813
+
 
 Qwen2.5大模型微调实战：医疗命名实体识别任务（完整代码）
 https://zhuanlan.zhihu.com/p/19682001982

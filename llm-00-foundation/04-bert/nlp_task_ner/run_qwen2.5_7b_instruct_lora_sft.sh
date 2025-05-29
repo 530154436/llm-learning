@@ -1,0 +1,1 @@
+llamafactory-cli train conf/Qwen2.5-7B-Instruct-lora-sft.yaml
