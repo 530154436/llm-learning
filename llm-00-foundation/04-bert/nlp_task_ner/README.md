@@ -1,3 +1,18 @@
+
+利用大模型做NER实践(总结版)
+https://mp.weixin.qq.com/s/LBlzFm8wxK7Aj7YXhCoXgQ
+https://github.com/cjymz886/LLM-NER
+
+指令微调-命名实体识别
+博客：https://blog.csdn.net/SoulmateY/article/details/139831606
+代码：https://github.com/Zeyi-Lin/LLM-Finetune
+
+Qwen2.5大模型微调实战：医疗命名实体识别任务（完整代码）
+https://zhuanlan.zhihu.com/p/19682001982
+
+基于 Qwen2.5-0.5B 微调训练 Ner 命名实体识别任务
+https://blog.csdn.net/qq_43692950/article/details/142631780
+
 qwen3 finetune
 https://qwen.readthedocs.io/zh-cn/latest/training/llama_factory.html
 

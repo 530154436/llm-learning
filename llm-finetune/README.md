@@ -1,8 +1,4 @@
 
-
-Qwen2.5大模型微调实战：医疗命名实体识别任务（完整代码）
-https://zhuanlan.zhihu.com/p/19682001982
-
 05-Qwen3-8B-LoRA及SwanLab可视化记录.md
 https://github.com/datawhalechina/self-llm/blob/master/models/Qwen3/05-Qwen3-8B-LoRA%E5%8F%8ASwanLab%E5%8F%AF%E8%A7%86%E5%8C%96%E8%AE%B0%E5%BD%95.md
 
