@@ -17,9 +17,7 @@ name, organization, scene, company, movie, book, government, position, address, 
 <输出格式要求>
 ```json
 [{{"label": "实体类别", "text": "实体名称"}}]
-```
-
-<输入>"""
+```"""
 
 
 def convert_clue_ner_to_prompt1(file: str):
