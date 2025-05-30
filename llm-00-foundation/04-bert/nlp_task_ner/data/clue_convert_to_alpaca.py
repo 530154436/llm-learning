@@ -38,7 +38,6 @@ def convert_clue_ner_to_prompt1(file: str):
                 entities.append({"label": ent_type, "text": name})
 
         alpaca_item = {
-            "system": "你是一个文本实体识别领域的专家，请从给定的句子中识别并提取出以下指定类别的实体。",
             "instruction": INSTRUCTION_1,
             "input": text,
             "output": json.dumps(entities, ensure_ascii=False)

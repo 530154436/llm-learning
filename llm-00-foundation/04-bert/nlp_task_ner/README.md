@@ -16,8 +16,11 @@ https://github.com/datawhalechina/self-llm/blob/master/models/Qwen3/05-Qwen3-8B-
 ### LLaMA-Factory
 官网教程：https://llamafactory.readthedocs.io/zh-cn/latest/getting_started/sft.html
 
-参数配置：https://github.com/hiyouga/LLaMA-Factory/blob/main/src/llamafactory/hparams/data_args.py#L38
+数据集参数：https://github.com/hiyouga/LLaMA-Factory/blob/main/src/llamafactory/hparams/data_args.py#L38
+参数配置：https://llamafactory.readthedocs.io/zh-cn/latest/advanced/arguments.html
 查看提示词模板：https://github.com/hiyouga/LLaMA-Factory/blob/main/README_zh.md
+
+
 
 大模型参数高效微调技术原理综述（一）-背景、参数高效微调简介
 https://github.com/liguodongiot/llm-action?tab=readme-ov-file
@@ -170,3 +173,11 @@ https://github.com/lemonhu/NER-BERT-pytorch
 Bert：bert-base-chinese
 Bert-wwm-ext：chinese-bert-wwm-ext
 Roberta-wwm-ext：chinese-roberta-wwm-ext
+
+
+在进行模型微调时，是否应该将 system 消息也包含在训练数据中？
+🎯 控制角色一致性	包含 system 可以帮助模型更稳定地记住自己的任务角色（比如：实体识别专家），避免在不同任务之间混淆。
+🤖 更贴近实际使用场景	如果你在部署或推理阶段使用了 system 来设定角色，那么在训练时也应该保留它，这样训练和推理的上下文才一致。
+🧩 提升泛化能力	模型能更好地理解“我是一个实体识别助手”，而不是一个通用问答模型，从而在新句子上表现更准确。
+🧪 多任务训练支持	如果你未来计划训练多个任务（如实体识别 + 关系抽取），可以通过不同的 system 来区分任务类型，提升模型可控性。
+transformer gpt 输入的mask和bert的mask好像是相反的？

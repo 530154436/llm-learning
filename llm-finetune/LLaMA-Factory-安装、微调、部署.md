@@ -52,6 +52,20 @@ llamafactory-cli version
 ## 三、
 
 
+`max_samples`决定了模型训练时从数据集中采样的最大样本数量，当设置为1000时，意味着训练过程中最多使用1000条数据进行模型训练。
+
+在实际项目应用中，需要注意以下几点： 
++ 完整训练需求：对于生产环境或正式研究，通常建议移除该参数或设置为足够大的值，以确保模型能够学习到数据集的完整特征 
++ 数据采样影响：当数据集规模超过max_samples设定值时，框架会自动进行采样，可能导致模型无法充分学习数据分布 
++ 性能权衡：较小的max_samples值会牺牲模型性能换取训练速度，需要根据具体场景进行权衡
+
+针对不同使用场景，建议采取以下策略： 
++ 开发调试阶段：可设置为500-1000，快速验证训练流程
++ 小规模实验：建议设置为5000-10000，平衡训练速度与模型性能 
++ 正式训练：应注释掉该参数或设置为None，使用完整数据集
+
+per_device_train_batch_size (int, optional, defaults to 8):
+每一个GPU/TPU 或者CPU核心训练的批次大小
 
 ## 参考引用
 [1] [LLaMA-Factory-官方文档](https://llamafactory.readthedocs.io/zh-cn/latest/getting_started/installation.html)<br>
