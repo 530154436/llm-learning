@@ -67,6 +67,13 @@ llamafactory-cli version
 per_device_train_batch_size (int, optional, defaults to 8):
 每一个GPU/TPU 或者CPU核心训练的批次大小
 
+
+|===============================+======================+======================|
+|   0  NVIDIA A100-PCI...  Off  | 00000000:65:00.0 Off |                    0 |
+| N/A   65C    P0   278W / 250W |  37348MiB / 40536MiB |     89%      Default |
+|                               |                      |             Disabled |
++-------------------------------+----------------------+----------------------+
+
 ## 参考引用
 [1] [LLaMA-Factory-官方文档](https://llamafactory.readthedocs.io/zh-cn/latest/getting_started/installation.html)<br>
 [2] [LLaMA-Factory-官方Github](https://github.com/hiyouga/LLaMA-Factory/blob/main/README_zh.md)<br>
