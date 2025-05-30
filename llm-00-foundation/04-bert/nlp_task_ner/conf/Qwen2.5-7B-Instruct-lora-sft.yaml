@@ -11,7 +11,7 @@ lora_target: all
 
 ### dataset
 dataset_dir: data
-dataset: alpaca_en_demo
+dataset: alpaca_clue_train
 template: qwen  # Qwen (1-2.5)
 cutoff_len: 2048
 max_samples: 1000
