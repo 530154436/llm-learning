@@ -45,6 +45,7 @@ def convert_clue_ner_to_prompt1(file: str):
         alpaca_data.append(alpaca_item)
 
     # 写出结果文件
+    print("number of train: ", len(alpaca_data))
     save_name = "dataset/" + "alpaca_" + '_'.join(file.split(".")[:-1]) + ".json"
     with open(save_name, 'w', encoding='utf-8') as f:
         json.dump(alpaca_data, f, indent=2, ensure_ascii=False)
