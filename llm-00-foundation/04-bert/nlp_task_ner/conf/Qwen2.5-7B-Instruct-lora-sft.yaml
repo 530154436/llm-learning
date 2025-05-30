@@ -10,7 +10,7 @@ lora_rank: 8
 lora_target: all
 
 ### dataset
-dataset_dir: data
+dataset_dir: data/dataset
 dataset: alpaca_clue_train
 template: qwen  # Qwen (1-2.5)
 cutoff_len: 2048
