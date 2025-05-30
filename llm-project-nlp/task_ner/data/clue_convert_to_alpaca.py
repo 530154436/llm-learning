@@ -20,7 +20,7 @@ name, organization, scene, company, movie, book, government, position, address, 
 ```"""
 
 
-def convert_clue_ner_to_prompt1(file: str):
+def convert_clue_ner_to_prompt1(file: str) -> list:
     with open(file, 'r', encoding='utf-8') as f:
         lines = [json.loads(line.strip()) for line in f]
 
@@ -40,13 +40,13 @@ def convert_clue_ner_to_prompt1(file: str):
             "output": json.dumps(entities, ensure_ascii=False)
         }
         alpaca_data.append(alpaca_item)
-
-    # 写出结果文件
-    print("number of train: ", len(alpaca_data))
-    save_name = "dataset/" + "alpaca_" + '_'.join(file.split(".")[:-1]) + ".json"
-    with open(save_name, 'w', encoding='utf-8') as f:
-        json.dump(alpaca_data, f, indent=2, ensure_ascii=False)
+    return alpaca_data
 
 
 if __name__ == "__main__":
-    convert_clue_ner_to_prompt1('clue.train.jsonl')
+    _alpaca_data = convert_clue_ner_to_prompt1('clue.train.jsonl')
+    # 写出结果文件
+    print("number of data: ", len(_alpaca_data))
+    save_name = "dataset/alpaca_clue_train.json"
+    with open(save_name, 'w', encoding='utf-8') as f:
+        json.dump(_alpaca_data, f, indent=2, ensure_ascii=False)

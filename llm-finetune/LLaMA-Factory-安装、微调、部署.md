@@ -189,7 +189,7 @@ nohup python -m vllm.entrypoints.openai.api_server \
 --gpu-memory-utilization 0.8 \
 --max-model-len 1024 \
 --disable-log-requests \
---lora-modules ner-lora=data/experiment/Qwen2.5-7B-Instruct-lora-sft \
+--lora-modules clue-ner-lora=data/experiment/Qwen2.5-7B-Instruct-lora-sft \
 > server.log &
 ```
 
@@ -197,7 +197,7 @@ nohup python -m vllm.entrypoints.openai.api_server \
 
 ```shell
 curl http://localhost:8000/v1/chat/completions -H "Content-Type: application/json" -d '{
-  "model": "Qwen2.5-7B-Instruct",
+  "model": "clue-ner-lora",
   "messages": [
     {"role": "system", "content": "你是Qwen，由阿里云创建。你是一个乐于助人的助手。"},
     {"role": "user", "content": "你是谁？"}
