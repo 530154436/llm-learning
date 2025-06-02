@@ -8,12 +8,12 @@ BERT（Bidirectional Encoder Representations from Transformers） 是 Google 提
 
 在本项目中，我们使用了多个中文 BERT 预训练版本，包括：
 
-| 版本                      | 适用场景                          | 特点                                                                                | 
-|-------------------------|-------------------------------|-----------------------------------------------------------------------------------|
-| bert-base-uncased       | 大小写不敏感的任务，如一般的文本分类任务          | 所有输入文本都会被转换为小写，减少了词汇表的大小                                                          |
-| bert-base-cased         | 需要区分大小写的任务，例如命名实体识别(NER)或语法分析 | 保持了文本中的大小写信息，有助于捕捉更多文本结构细节                                                        |
-| chinese-bert-wwm-ext    | 中文命名实体识别、文本分类、句法分析等           | 由哈工大讯飞联合实验室开发<br>通过全词掩码（wwm，Whole Word Masking）技术增强了对中文语境的理解                      |
-| chinese-roberta-wwm-ext | 中文文本分类、命名实体识别、问答系统等           | 预训练阶段采用wwm策略进行mask（但没有使用dynamic masking）<br> 取消了Next Sentence Prediction（NSP）<br> |
+| 版本                      | 适用场景                     | 特点                                                  | 
+|-------------------------|--------------------------|-----------------------------------------------------|
+| bert-base-uncased       | 大小写不敏感的任务，如一般的文本分类任务     | 所有输入文本都会被转换为小写，减少了词汇表的大小                            |
+| bert-base-cased         | 需要区分大小写的任务，例如命名实体识别(NER) | 保持了文本中的大小写信息，有助于捕捉更多文本结构细节                          |
+| chinese-bert-wwm-ext    | 中文命名实体识别、文本分类、句法分析等      | 通过全词掩码（wwm，Whole Word Masking）技术增强了对中文语境的理解         |
+| chinese-roberta-wwm-ext | 中文文本分类、命名实体识别、问答系统等      | 预训练阶段采用wwm策略进行mask，取消了NSP（Next Sentence Prediction） |
 
 注意：chinese-roberta-wwm-ext 模型在使用上与中文BERT系列模型完全一致，无需任何代码调整即可使用。
 
@@ -67,7 +67,7 @@ S-XX：表示单独成实体的 token（适用于单字实体）。<br>
 + [CLS]：每个序列开头都会加入这个特殊 token，用于表示整个句子的聚合信息，常用于分类任务。
 + [SEP]：用于分隔两个句子或标记一个句子的结束。
 + token_type_ids （segment_ids）：用于区分句子对中的不同句子。第1个句子的所有 token 标记为 0；第2个句子的所有 token 标记为 1；单独使用时全部为 0。
-+ attention_mask （segment_ids）： 用于指示哪些位置是真实 token（1），哪些是 padding（0）。
++ attention_mask： 用于指示哪些位置是真实 token（1），哪些是 padding（0）。
 
 **示例2 BERT 输入格式转换**：<br>
 ```
@@ -78,7 +78,7 @@ S-XX：表示单独成实体的 token（适用于单字实体）。<br>
     label_ids: 		0    1    2    2    0   0  0  0  0  0
 ```
 
-### 2.2 训练模型
+### 2.2 模型训练
 #### 2.2.1 模型定义
 BertBiLstmCrf(
   (bert): BertModel(
@@ -127,6 +127,26 @@ BertBiLstmCrf(
   (linear): Linear(in_features=128, out_features=31, bias=True)
   (crf): CRF(num_tags=31)
 )
+
+```mermaid
+graph TD
+    A[Input IDs<br>(B, L)] --> B[BERT Embeddings<br>Output: (B, L, 768)]
+    B --> C[BERT Encoder<br>Output: (B, L, 768)]
+    C --> D[BiLSTM<br>Output: (B, L, 128)]
+    D --> E[Dropout<br>Output: (B, L, 128)]
+    E --> F[Linear Layer<br>Output: (B, L, 31)]
+    F --> G[CRF Decoding<br>Output: (B, L)]
+
+    style A fill:#FFE4B5,stroke:#333
+    style G fill:#98FB98,stroke:#333
+
+    classDef input fill:#FFE4B5,stroke:#333;
+    classDef output fill:#98FB98,stroke:#333;
+    classDef layer fill:#87CEEB,stroke:#333;
+
+    class A input
+    class G output
+```
 #### 2.2.2 损失函数
 通常使用交叉熵损失函数来计算预测标签与真实标签之间的差异。忽略 padding 部分的损失计算。
 
