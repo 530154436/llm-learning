@@ -18,8 +18,8 @@ BERT（Bidirectional Encoder Representations from Transformers） 是 Google 提
 注意：chinese-roberta-wwm-ext 模型在使用上与中文BERT系列模型完全一致，无需任何代码调整即可使用。
 
 ## 二、训练流程
-### 2.1 数据预处理
-原始数据格式：
+### 2.1 数据处理
+#### 原始数据格式
 ```
 {
 	"text": "北京城.",
@@ -28,23 +28,155 @@ BERT（Bidirectional Encoder Representations from Transformers） 是 Google 提
 	}
 }
 ```
+其中：<br>
+"text" 表示原始文本；<br>
+"label" 是一个嵌套字典，表示实体类型（如 NT）及其对应的实体名称和出现的位置索引。<br>
 
-BIOS格式：
+#### BIOS 标注格式转换
+将原始标注信息转换为逐 token 的 BIOS 格式标签，BIOS 是命名实体识别任务中常用的标注方式：
 ```
 北 B-NT
 京 I-NT
 城 I-NT
 .  O
 ```
-collate_fn：
-1、截断：如果输入长度超过限制，则截断至允许的最大长度（减去特殊标记长度）
-2、将 token 转换为 id，并加上特殊标记 [CLS] 和 [SEP]
-3、padding：填充到固定长度 min_max_seq_length
+说明：<br>
+B-XX：表示某个实体的开始；<br>
+I-XX：表示某个实体的中间或结尾；<br>
+O：非实体。<br>
+S-XX：表示单独成实体的 token（适用于单字实体）。<br>
+
+#### DataLoader.collate_fn 说明
+在构建 DataLoader 时使用自定义 collate_fn 对 batch 数据进行处理，从而满足 Bert 的输入格式，主要包括以下步骤：<br>
+
+1、截断（Truncation）：如果输入长度超过模型最大限制（如512），则截断至允许的最大长度（需减去 [CLS] 和 [SEP] 所占位置）。<br>
+2、token 转 id：使用 tokenizer 将 token 转换为对应 token_id。
+3、添加特殊标记（Special Tokens）：在序列前后分别加上 [CLS] 和 [SEP] 标记。<br>
+4、padding：填充到固定长度 min_max_seq_length。
+5、生成 attention_mask 和 token_type_ids。<br>
+
+**示例1 BERT 输入格式转换**：<br>
+```
+(a) 对于句子对（sequence pairs）：
+    tokens:          [CLS] 是 这 jack ##son ##ville ? [SEP] 不 是 的 . [SEP]
+    token_type_ids:    0   0  0   0    0     0     0    0   1  1  1  1  1
+(b) 对于单个句子（single sequences）：
+    tokens:          [CLS] 这只 狗 很 茸毛 . [SEP]
+    token_type_ids :   0   0   0  0   0  0   0
+```
++ [CLS]：每个序列开头都会加入这个特殊 token，用于表示整个句子的聚合信息，常用于分类任务。
++ [SEP]：用于分隔两个句子或标记一个句子的结束。
++ token_type_ids （segment_ids）：用于区分句子对中的不同句子。第1个句子的所有 token 标记为 0；第2个句子的所有 token 标记为 1；单独使用时全部为 0。
++ attention_mask （segment_ids）： 用于指示哪些位置是真实 token（1），哪些是 padding（0）。
+
+**示例2 BERT 输入格式转换**：<br>
+```
+    tokens: 		[CLS] 北   京   城  [SEP]
+    input_ids: 		101 1266 776 1814  102  0  0  0  0  0
+    attention_mask: 1    1    1    1    1   0  0  0  0  0
+    token_type_ids: 0    0    0    0    0   0  0  0  0  0
+    label_ids: 		0    1    2    2    0   0  0  0  0  0
+```
 
 ### 2.2 模型架构
 
 ### 
 
+BertCrf(
+  (bert): BertModel(
+    (embeddings): BertEmbeddings(
+      (word_embeddings): Embedding(21128, 768, padding_idx=0)
+      (position_embeddings): Embedding(512, 768)
+      (token_type_embeddings): Embedding(2, 768)
+      (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+    (encoder): BertEncoder(
+      (layer): ModuleList(
+        (0-11): 12 x BertLayer(
+          (attention): BertAttention(
+            (self): BertSdpaSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): BertSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): BertIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+            (intermediate_act_fn): GELUActivation()
+          )
+          (output): BertOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (pooler): BertPooler(
+      (dense): Linear(in_features=768, out_features=768, bias=True)
+      (activation): Tanh()
+    )
+  )
+  (dropout): Dropout(p=0.3, inplace=False)
+  (linear): Linear(in_features=768, out_features=31, bias=True)
+  (crf): CRF(num_tags=31)
+)
+
+
+BertBiLstmCrf(
+  (bert): BertModel(
+    (embeddings): BertEmbeddings(
+      (word_embeddings): Embedding(21128, 768, padding_idx=0)
+      (position_embeddings): Embedding(512, 768)
+      (token_type_embeddings): Embedding(2, 768)
+      (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+    (encoder): BertEncoder(
+      (layer): ModuleList(
+        (0-11): 12 x BertLayer(
+          (attention): BertAttention(
+            (self): BertSdpaSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): BertSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): BertIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+            (intermediate_act_fn): GELUActivation()
+          )
+          (output): BertOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (pooler): BertPooler(
+      (dense): Linear(in_features=768, out_features=768, bias=True)
+      (activation): Tanh()
+    )
+  )
+  (bilstm): LSTM(768, 64, batch_first=True, bidirectional=True)
+  (dropout): Dropout(p=0.3, inplace=False)
+  (linear): Linear(in_features=128, out_features=31, bias=True)
+  (crf): CRF(num_tags=31)
+)
 
 [哈工大讯飞联合实验室发布中文RoBERTa-wwm-ext预训练模型](https://cogskl.iflytek.com/archives/924)<br>
 [RoBERTa中文预训练模型：RoBERTa for Chinese](https://mp.weixin.qq.com/s/K2zLEbWzDGtyOj7yceRdFQ)
