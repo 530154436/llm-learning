@@ -183,13 +183,13 @@ API_PORT=8000 llamafactory-cli api examples/inference/llama3.yaml infer_backend=
 nohup python -m vllm.entrypoints.openai.api_server \
 --host 0.0.0.0 \
 --port 8000 \
---model /data/dev-nfs/zhengchubin/models/Qwen2.5-7B-Instruct \
+--model ../model_hub/Qwen2.5-7B-Instruct \
 --served-model-name Qwen2.5-7B-Instruct \
 --enable-lora \
 --gpu-memory-utilization 0.8 \
 --max-model-len 1024 \
 --disable-log-requests \
---lora-modules clue-ner-lora-sft=data/experiment/Qwen2.5-7B-Instruct-lora-sft \
+--lora-modules clue-ner-lora-sft=data/outputs/Qwen2.5-7B-Instruct-clue-ner-lora-sft \
 > server.log &
 ```
 
@@ -197,7 +197,7 @@ nohup python -m vllm.entrypoints.openai.api_server \
 
 ```shell
 curl http://localhost:8000/v1/chat/completions -H "Content-Type: application/json" -d '{
-  "model": "clue-ner-lora",
+  "model": "clue-ner-lora-sft",
   "messages": [
     {"role": "system", "content": "你是Qwen，由阿里云创建。你是一个乐于助人的助手。"},
     {"role": "user", "content": "你是谁？"}
