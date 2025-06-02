@@ -9,9 +9,9 @@ from loguru import logger
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 from transformers import BertTokenizer
-from nlp_task_ner.data_loader import NERDataset
-from nlp_task_ner.inference import load_model_by_name
-from nlp_task_ner.model import BaseNerModel
+from task_ner.data_loader import NERDataset
+from task_ner.inference import load_model_by_name
+from task_ner.model import BaseNerModel
 from seqeval.metrics.v1 import classification_report
 
 

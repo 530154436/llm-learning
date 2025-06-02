@@ -10,10 +10,10 @@ from loguru import logger
 from omegaconf import DictConfig, OmegaConf
 from transformers import BertTokenizer
 from seqeval.metrics.sequence_labeling import get_entities
-from nlp_task_ner.data_process import convert_text_to_features
-from nlp_task_ner.model import BaseNerModel
-from nlp_task_ner.model.bert_crf import BertCrf
-from nlp_task_ner.model.bert_bilstm_crf import BertBiLstmCrf
+from task_ner.data_process import convert_text_to_features
+from task_ner.model import BaseNerModel
+from task_ner.model.bert_crf import BertCrf
+from task_ner.model.bert_bilstm_crf import BertBiLstmCrf
 
 
 def load_model_by_name(config: DictConfig,
@@ -90,6 +90,7 @@ if __name__ == "__main__":
     ]
     # predictor = Predictor("conf/BertCrf.yaml")
     # predictor = Predictor("conf/BertBiLstmCrf.yaml")
-    predictor = Predictor("conf/BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
+    predictor = Predictor("conf/BertBiLstmCrf_chinese-bert-wwm-ext.yaml")
+    # predictor = Predictor("conf/BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
     for item in predictor.predict(_sentences):
         print(item)

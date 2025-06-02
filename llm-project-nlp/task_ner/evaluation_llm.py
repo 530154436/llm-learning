@@ -4,18 +4,13 @@
 # @time: 2025/5/24 9:45
 # @function:
 import json
-import os
 from pathlib import Path
-
 import pandas as pd
-from typing import List
 from llm_util.llm_api import ChatClient
 from llm_util.resolver import convert_json_array_in_text_to_list
-from nlp_task_ner.data.clue_convert_to_alpaca import convert_clue_ner_to_prompt1
+from task_ner.data.clue_convert_to_alpaca import convert_clue_ner_to_prompt1
 from collections import defaultdict
 
-
-from collections import defaultdict
 
 def batch_evaluate(y_true_list, y_pred_list):
     # 初始化全局统计
@@ -111,7 +106,7 @@ def metrics_to_dataframe(metrics) -> pd.DataFrame:
 
 
 def evaluate_llm(base_url: str, api_key: str, model: str):
-    save_file = Path('data/evaluation_llm.jsonl')
+    save_file = Path(f'data/outputs/eval_{model}.jsonl')
     data = []
     if save_file.exists():
         with open(save_file, 'r', encoding='utf-8') as f:
@@ -122,7 +117,7 @@ def evaluate_llm(base_url: str, api_key: str, model: str):
                                  timeout=60, temperature=0.01, max_tokens=512, top_p=None,
                                  frequency_penalty=None, presence_penalty=None)
         writer = save_file.open('w', encoding='utf-8')
-        for i, line in enumerate(convert_clue_ner_to_prompt1('data/clue.dev.jsonl'), start=1):
+        for i, line in enumerate(convert_clue_ner_to_prompt1('data/dataset/clue.dev.jsonl'), start=1):
             prompt = line['instruction'] + "\n\n<输入>\n" + line['input']
             y_true = json.loads(line['output'])
             y_pred = convert_json_array_in_text_to_list(chat_client.completion(prompt).get("content"))
@@ -143,9 +138,5 @@ def evaluate_llm(base_url: str, api_key: str, model: str):
 
 
 if __name__ == '__main__':
-    # evaluate("conf/BertCrf.yaml")
-    # evaluate("conf/BertBiLstmCrf.yaml")
-    # evaluate("conf/BertBiLstmCrf_chinese-bert-wwm-ext.yaml")
-    # evaluate("conf/BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
-    evaluate_llm(base_url="http://172.19.190.6:31833/v1", api_key="<KEY>", model="clue-ner-lora")
-
+    # Qwen2.5-7B-Instruct-ner-lora-sft
+    evaluate_llm(base_url="http://172.19.190.6:31833/v1", api_key="<KEY>", model="clue-ner-lora-sft")

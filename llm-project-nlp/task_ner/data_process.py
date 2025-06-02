@@ -142,7 +142,7 @@ if __name__ == '__main__':
         (['藏', '家', '1', '2', '条', '收', '藏', '秘', '籍'], ['B-p', 'I-p', 'O', 'O', 'O', 'O', 'O', 'O', 'O'])
     ]
     _label2id = {"O": 0, "B-NT": 1, "I-NT": 2, "B-p": 3, "I-p": 4}
-    _tokenizer = AutoTokenizer.from_pretrained("data/pretrain/bert-base-chinese")
+    _tokenizer = AutoTokenizer.from_pretrained("../model_hub/bert-base-chinese")
     for item in convert_examples_to_feature(_examples, _label2id, _tokenizer, max_seq_length=10):
         print(item.to_dict())
 

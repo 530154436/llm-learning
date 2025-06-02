@@ -9,7 +9,7 @@ import torch
 from functorch.dim import Tensor
 from transformers import BertTokenizer
 from torch.utils.data import Dataset
-from nlp_task_ner.data_process import convert_examples_to_feature
+from task_ner.data_process import convert_examples_to_feature
 
 
 class NERDataset(Dataset):
@@ -80,7 +80,7 @@ class NERDataset(Dataset):
 
 if __name__ == '__main__':
     _tokenizer = BertTokenizer.from_pretrained(
-        pretrained_model_name_or_path="data/pretrain/bert-base-chinese",
+        pretrained_model_name_or_path="../model_hub/bert-base-chinese",
         do_lower_case=True
     )
     _dataset = NERDataset("data/dataset/clue/train.jsonl",

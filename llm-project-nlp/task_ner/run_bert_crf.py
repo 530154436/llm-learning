@@ -10,8 +10,8 @@ from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 from torchmetrics import F1Score, MetricCollection, Accuracy
 from transformers import BertTokenizer, get_linear_schedule_with_warmup
-from nlp_task_ner.data_loader import NERDataset
-from nlp_task_ner.model.bert_crf import BertCrf
+from task_ner.data_loader import NERDataset
+from task_ner.model.bert_crf import BertCrf
 from modeling_util.loss_func import CRFLoss
 from modeling_util.my_trainer import MyTrainer
 from modeling_util.model_util import count_trainable_parameters, build_optimizer

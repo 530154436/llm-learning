@@ -10,16 +10,16 @@ from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 from torchmetrics import F1Score, MetricCollection, Accuracy
 from transformers import BertTokenizer, get_linear_schedule_with_warmup
-from nlp_task_ner.data_loader import NERDataset
-from nlp_task_ner.model.bert_bilstm_crf import BertBiLstmCrf
+from task_ner.data_loader import NERDataset
+from task_ner.model.bert_bilstm_crf import BertBiLstmCrf
 from modeling_util.loss_func import CRFLoss
 from modeling_util.my_trainer import MyTrainer
 from modeling_util.model_util import count_trainable_parameters, build_optimizer
 
 
-# @hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf.yaml")
+@hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf.yaml")
 # @hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf_chinese-bert-wwm-ext.yaml")
-@hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
+# @hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
 def train(config: DictConfig):
     """ 模型训练
     data_dir: ./data

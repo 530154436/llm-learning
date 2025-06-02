@@ -8,9 +8,9 @@ num_labels: 31
 
 # 模型设置
 model_name: "BertCrf"
-model_path: "${data_dir}/experiment/${model_name}.pth"
+model_path: "${data_dir}/outputs/${model_name}.pth"
 device: "cuda:0"
-pretrain_path: "${data_dir}/pretrain/bert-base-chinese"
+pretrain_path: "../model_hub/bert-base-chinese"
 batch_size: 64
 dropout: 0.3
 epoch_num: 50
@@ -19,3 +19,7 @@ learning_rate: 3e-5
 defaults:
   - _self_
   - override hydra/job_logging: custom
+
+hydra:
+  run:
+    dir: ${data_dir}/experiment/${hydra.job.name}/${now:%Y-%m-%d}

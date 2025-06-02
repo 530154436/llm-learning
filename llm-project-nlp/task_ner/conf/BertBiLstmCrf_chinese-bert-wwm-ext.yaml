@@ -7,13 +7,13 @@ label_data_path: "${data_dir}/dataset/clue/label.json"
 
 # 模型设置
 model_name: "BertBiLstmCrf_chinese-bert-wwm-ext"
-model_path: "${data_dir}/experiment/${model_name}.pth"
+model_path: "${data_dir}/outputs/${model_name}.pth"
 device: "cuda:0"
 batch_size: 64
 dropout: 0.3
 epoch_num: 50
 learning_rate: 3e-5
-pretrain_path: "${data_dir}/pretrain/chinese-bert-wwm-ext"
+pretrain_path: "../model_hub/chinese-bert-wwm-ext"
 num_labels: 31
 lstm_num_layers: 1
 lstm_hidden_size: 128
@@ -21,3 +21,7 @@ lstm_hidden_size: 128
 defaults:
   - _self_
   - override hydra/job_logging: custom
+
+hydra:
+  run:
+    dir: ${data_dir}/experiment/${hydra.job.name}/${now:%Y-%m-%d}

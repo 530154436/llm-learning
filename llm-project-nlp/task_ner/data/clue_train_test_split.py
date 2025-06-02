@@ -45,10 +45,8 @@ def pipeline(
     2、文本格式转换为命名实体识别BIOS格式
     3、记录所有实体标签
     """
-    if not os.path.exists("./dataset"):
-        os.mkdir("./dataset")
-    if not os.path.exists("./dataset/clue"):
-        os.mkdir("./dataset/clue")
+    if not os.path.exists("./clue"):
+        os.mkdir("./clue")
     # 标签全集
     all_labels = set()
 
@@ -68,7 +66,7 @@ def pipeline(
         for dataset, name, suffix in zip([train_data, dev_data],
                                          ["train", "dev"],
                                          ['jsonl', 'jsonl']):
-            with open(f"./dataset/clue/{name}.{suffix}", 'w', encoding='utf-8') as writer:
+            with open(f"./clue/{name}.{suffix}", 'w', encoding='utf-8') as writer:
                 for line in dataset:
                     words, labels = process_line(line)
                     for label in labels:
@@ -77,7 +75,7 @@ def pipeline(
                     writer.write("\n".join(f"{w} {l}" for w, l in zip(words, labels)))
                     writer.write("\n\n")
                     writer.flush()
-        with open(f"./dataset/clue/label.json", 'w', encoding='utf-8') as writer:
+        with open(f"./clue/label.json", 'w', encoding='utf-8') as writer:
             sub_labels = ["O"]
             for i, label in enumerate(all_labels):
                 sub_labels.extend([f"B-{label}", f"I-{label}", f"S-{label}"])
@@ -89,7 +87,7 @@ def pipeline(
     # 原始验证集作为测试集
     with open(dev_file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
-        with open("./dataset/clue/test.jsonl", 'w', encoding='utf-8') as writer:
+        with open("./clue/test.jsonl", 'w', encoding='utf-8') as writer:
             for line in lines:
                 words, labels = process_line(line)
                 writer.write("\n".join(f"{w} {l}" for w, l in zip(words, labels)))
@@ -99,4 +97,4 @@ def pipeline(
 if __name__ == '__main__':
     # 任务详情：CLUENER2020
     # 训练集：10748 验证集：1343
-    pipeline('clue.train.jsonl', 'clue.dev.jsonl')
+    pipeline('clue/clue.train.jsonl', 'clue/clue.dev.jsonl')

@@ -11,7 +11,7 @@ lora_rank: 8
 lora_target: all
 
 ### dataset
-dataset_dir: data/dataset  # 存储数据集的文件夹路径。
+dataset_dir: data/dataset/alpaca  # 存储数据集的文件夹路径。
 dataset: alpaca_clue_train
 template: qwen  # Qwen (1-2.5)
 cutoff_len: 1024  # 输入的最大 token 数，超过该长度会被截断。
@@ -21,7 +21,7 @@ preprocessing_num_workers: 16
 dataloader_num_workers: 8
 
 ### output
-output_dir: data/experiment/Qwen2.5-7B-Instruct-lora-sft
+output_dir: data/outputs/Qwen2.5-7B-Instruct-clue-ner-lora-sft
 logging_steps: 10
 save_steps: 500
 plot_loss: true

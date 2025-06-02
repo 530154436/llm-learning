@@ -44,9 +44,9 @@ def convert_clue_ner_to_prompt1(file: str) -> list:
 
 
 if __name__ == "__main__":
-    _alpaca_data = convert_clue_ner_to_prompt1('clue.train.jsonl')
+    _alpaca_data = convert_clue_ner_to_prompt1('dataset/clue.train.jsonl')
     # 写出结果文件
     print("number of data: ", len(_alpaca_data))
-    save_name = "dataset/alpaca_clue_train.json"
+    save_name = "dataset/alpaca/alpaca_clue_train.json"
     with open(save_name, 'w', encoding='utf-8') as f:
         json.dump(_alpaca_data, f, indent=2, ensure_ascii=False)

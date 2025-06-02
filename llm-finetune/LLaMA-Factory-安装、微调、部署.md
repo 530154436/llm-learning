@@ -189,7 +189,7 @@ nohup python -m vllm.entrypoints.openai.api_server \
 --gpu-memory-utilization 0.8 \
 --max-model-len 1024 \
 --disable-log-requests \
---lora-modules clue-ner-lora=data/experiment/Qwen2.5-7B-Instruct-lora-sft \
+--lora-modules clue-ner-lora-sft=data/experiment/Qwen2.5-7B-Instruct-lora-sft \
 > server.log &
 ```
 

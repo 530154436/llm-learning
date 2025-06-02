@@ -8,7 +8,7 @@ import torch
 from torch import nn
 from transformers import BertModel, BertConfig
 from torchcrf import CRF
-from nlp_task_ner.model import BaseNerModel
+from task_ner.model import BaseNerModel
 import warnings
 warnings.filterwarnings("ignore", message="where received a uint8 condition tensor")
 
@@ -64,7 +64,7 @@ class BertCrf(BaseNerModel):
 
 
 if __name__ == "__main__":
-    _pretrain_path = "../data/pretrain/bert-base-chinese"
+    _pretrain_path = "../../model_hub/bert-base-chinese"
     _model = BertCrf(_pretrain_path, num_labels=31)
     # for name, param in list(_model.named_parameters()):
     #     print(name)
