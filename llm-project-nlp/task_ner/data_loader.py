@@ -14,11 +14,13 @@ from task_ner.data_process import convert_examples_to_feature
 
 class NERDataset(Dataset):
     def __init__(self, data_path: str, label_path: str,
-                 tokenizer: BertTokenizer, pad_token_id: int = 0):
+                 tokenizer: BertTokenizer, pad_token_id: int = 0,
+                 max_seq_len: int = 512):
         self.data_path = data_path
         self.label_path = label_path
         self.tokenizer = tokenizer
         self.pad_token_id = pad_token_id
+        self.max_seq_len = max_seq_len
 
         self.label2id = json.load(open(label_path, 'r', encoding='utf-8'))
         self.dataset = self.load_raw()
@@ -67,7 +69,8 @@ class NERDataset(Dataset):
         """
         all_input_ids, all_input_mask, all_token_type_ids, all_label_ids = [], [], [], []
         for feature in convert_examples_to_feature(batch, label2id=self.label2id,
-                                                   tokenizer=self.tokenizer, pad_token_id=self.pad_token_id):
+                                                   tokenizer=self.tokenizer, pad_token_id=self.pad_token_id,
+                                                   max_seq_len=self.max_seq_len):
             all_input_ids.append(feature.input_ids)
             all_input_mask.append(feature.input_mask)
             all_token_type_ids.append(feature.token_type_ids)

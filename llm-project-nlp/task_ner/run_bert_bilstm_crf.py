@@ -60,7 +60,6 @@ def train(config: DictConfig):
     logging.info("初始化模型")
     model: BertBiLstmCrf = BertBiLstmCrf(pretrain_path=config.pretrain_path, num_labels=num_labels, dropout=config.dropout,
                                          lstm_num_layers=config.lstm_num_layers, lstm_hidden_size=config.lstm_hidden_size)
-    logging.info(f'模型训练参数: {count_trainable_parameters(model)}')
     print(summary(model, input_shape=[(config.max_seq_len, ),
                                       (config.max_seq_len, ),
                                       (config.max_seq_len, )]))

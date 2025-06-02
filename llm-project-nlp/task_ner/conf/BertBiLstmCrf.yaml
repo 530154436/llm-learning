@@ -17,6 +17,7 @@ pretrain_path: "../model_hub/bert-base-chinese"
 num_labels: 31
 lstm_num_layers: 1
 lstm_hidden_size: 128
+max_seq_len: 512
 
 defaults:
   - _self_

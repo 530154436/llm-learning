@@ -53,7 +53,7 @@ def convert_text_to_features(sentences: List[Union[str, List[str]]],
 def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
                                 label2id: Dict[str, int],
                                 tokenizer: PreTrainedTokenizer,
-                                max_seq_length: int = 512,
+                                max_seq_len: int = 512,
                                 pad_token_id: int = 0,
                                 cls_token: str = "[CLS]",
                                 sep_token: str = "[SEP]",
@@ -90,7 +90,7 @@ def convert_examples_to_feature(examples: Iterable[Tuple[List[str], List[str]]],
     """
     # 找到满足所有文本的最小最大长度
     special_tokens_count = 2  # [CLS]、[SEP]
-    min_max_seq_length = min(max(map(lambda x: len(x[0]), examples)) + special_tokens_count, max_seq_length)
+    min_max_seq_length = min(max(map(lambda x: len(x[0]), examples)) + special_tokens_count, max_seq_len)
     idx = 0
     for idx, (tokens, labels) in enumerate(examples, start=1):
 
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     ]
     _label2id = {"O": 0, "B-NT": 1, "I-NT": 2, "B-p": 3, "I-p": 4}
     _tokenizer = AutoTokenizer.from_pretrained("../model_hub/bert-base-chinese")
-    for item in convert_examples_to_feature(_examples, _label2id, _tokenizer, max_seq_length=10):
+    for item in convert_examples_to_feature(_examples, _label2id, _tokenizer, max_seq_len=10):
         print(item.to_dict())
 
     _sentences = ["北京城", "藏家12条收藏秘籍"]
