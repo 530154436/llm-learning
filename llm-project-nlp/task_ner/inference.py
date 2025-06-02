@@ -27,9 +27,8 @@ def load_model_by_name(config: DictConfig,
                               lstm_num_layers=config.lstm_num_layers, lstm_hidden_size=config.lstm_hidden_size)
     else:
         raise ValueError(f"Unknown model name: {config.model_name}")
-    model.load_state_dict(torch.load(config.model_path,
-                                     weights_only=False,
-                                     map_location=torch.device(device)))
+    model.load_state_dict(torch.load(config.model_path, weights_only=False))
+    model.to(torch.device(device))
     return model
 
 
@@ -90,7 +89,7 @@ if __name__ == "__main__":
     ]
     # predictor = Predictor("conf/BertCrf.yaml")
     # predictor = Predictor("conf/BertBiLstmCrf.yaml")
-    predictor = Predictor("conf/BertBiLstmCrf_chinese-bert-wwm-ext.yaml")
-    # predictor = Predictor("conf/BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
+    # predictor = Predictor("conf/BertBiLstmCrf_chinese-bert-wwm-ext.yaml")
+    predictor = Predictor("conf/BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
     for item in predictor.predict(_sentences):
         print(item)
