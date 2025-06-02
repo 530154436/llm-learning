@@ -1,5 +1,5 @@
 ### model
-model_name_or_path: /data/dev-nfs/zhengchubin/models/Qwen2.5-7B-Instruct
+model_name_or_path: ../model_hub/Qwen2.5-7B-Instruct
 trust_remote_code: true
 
 ### method
