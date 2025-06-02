@@ -52,39 +52,112 @@ CLUENER2020共有10个不同的类别，包括：
 
 整体性能对比（Micro Average F1-score）
 
-| 模型                             | address | book | company | game | govern | movie | name | org  | position | scene | micro avg |
-|--------------------------------|:-------:|:----:|:-------:|:----:|:------:|:-----:|:----:|:----:|:--------:|:-----:|:---------:| 
-| Bert + Crf                     |  0.59   | 0.75 |  0.77   | 0.75 |  0.77  | 0.76  | 0.75 | 0.71 |   0.74   | 0.65  |   0.72    |
-| Bert + BiLSTM + CRF            |  0.62   | 0.77 |  0.78   | 0.81 |  0.79  | 0.82  | 0.84 | 0.77 |   0.79   | 0.71  |   0.77    |
-| Bert-WWM-ext + BiLSTM + CRF    |  0.62   | 0.68 |  0.77   | 0.75 |  0.77  | 0.74  | 0.82 | 0.76 |   0.77   | 0.68  |   0.74    |
-| Roberta-WWM-ext + BiLSTM + CRF |  0.64   | 0.77 |  0.80   | 0.81 |  0.83  | 0.78  | 0.87 | 0.78 |   0.79   | 0.67  |   0.78    |
-| Qwen2.5-7B-Instruct + Lora     |  0.61   | 0.81 |  0.81   | 0.88 |  0.84  | 0.84  | 0.88 | 0.79 |   0.79   | 0.66  |   0.79    |
+| 模型                             | address | book  | company | game  | govern | movie | name  | org   | position | scene | micro avg |
+|--------------------------------|---------|-------|---------|-------|--------|-------|-------|-------|----------|-------|-----------|
+| Bert + CRF                     | 0.61    | 0.71  | 0.76    | 0.74  | 0.78   | 0.74  | 0.72  | 0.68  | 0.74     | 0.69  | 0.72      |
+| Bert + BiLSTM + CRF            | 0.60    | 0.77  | 0.79    | 0.80  | 0.78   | 0.81  | 0.80  | 0.77  | 0.81     | 0.64  | 0.76      |
+| Bert-WWM-ext + BiLSTM + CRF    | 0.63    | 0.73  | 0.77    | 0.80  | 0.79   | 0.80  | 0.85  | 0.80  | 0.78     | 0.68  | 0.77      |
+| Roberta-WWM-ext + BiLSTM + CRF | 0.61    | 0.81  | 0.80    | 0.81  | 0.82   | 0.78  | 0.86  | 0.79  | 0.79     | 0.68  | 0.78      |
+| Qwen2.5-7B-Instruct + LoRA     | 0.612   | 0.816 | 0.819   | 0.881 | 0.845  | 0.845 | 0.888 | 0.794 | 0.799    | 0.666 | 0.798     |
 
-> Bert：bert-base-chinese
-> Bert-WWM-ext：chinese-bert-wwm-ext
-> Roberta-WWM-ext：chinese-roberta-wwm-ext
-
+> Bert：bert-base-chinese <br>
+> Bert-WWM-ext：chinese-bert-wwm-ext <br>
+> Roberta-WWM-ext：chinese-roberta-wwm-ext <br>
 
 ### 2.1 结果明细
 + Bert+Crf
 ```
+              precision    recall  f1-score   support
+
+     address       0.64      0.59      0.61       373
+        book       0.66      0.77      0.71       154
+     company       0.73      0.80      0.76       378
+        game       0.73      0.74      0.74       295
+  government       0.72      0.85      0.78       247
+       movie       0.70      0.80      0.74       151
+        name       0.61      0.88      0.72       465
+organization       0.68      0.68      0.68       367
+    position       0.74      0.75      0.74       433
+       scene       0.68      0.69      0.69       209
+
+   micro avg       0.68      0.76      0.72      3072
+   macro avg       0.69      0.76      0.72      3072
+weighted avg       0.69      0.76      0.72      3072
 ```
 
 + Bert+BiLstm+Crf
 ```
+              precision    recall  f1-score   support
+
+     address       0.56      0.65      0.60       373
+        book       0.76      0.77      0.77       154
+     company       0.75      0.83      0.79       378
+        game       0.77      0.84      0.80       295
+  government       0.76      0.80      0.78       247
+       movie       0.83      0.79      0.81       151
+        name       0.73      0.89      0.80       465
+organization       0.74      0.80      0.77       367
+    position       0.81      0.81      0.81       433
+       scene       0.65      0.63      0.64       209
+
+   micro avg       0.73      0.79      0.76      3072
+   macro avg       0.74      0.78      0.76      3072
+weighted avg       0.73      0.79      0.76      3072
 ```
 
 + Bert-wwm-ext+BiLstm+Crf
 ```
+              precision    recall  f1-score   support
 
+     address       0.62      0.65      0.63       373
+        book       0.69      0.78      0.73       154
+     company       0.76      0.78      0.77       378
+        game       0.75      0.84      0.80       295
+  government       0.75      0.83      0.79       247
+       movie       0.81      0.79      0.80       151
+        name       0.80      0.90      0.85       465
+organization       0.81      0.79      0.80       367
+    position       0.76      0.79      0.78       433
+       scene       0.66      0.70      0.68       209
+
+   micro avg       0.74      0.79      0.77      3072
+   macro avg       0.74      0.79      0.76      3072
+weighted avg       0.74      0.79      0.77      3072
 ```
 + Roberta-wwm-ext+BiLstm+Crf
 ```
+              precision    recall  f1-score   support
+     address       0.56      0.67      0.61       373
+        book       0.86      0.77      0.81       154
+     company       0.79      0.82      0.80       378
+        game       0.76      0.87      0.81       295
+  government       0.78      0.87      0.82       247
+       movie       0.81      0.74      0.78       151
+        name       0.84      0.89      0.86       465
+organization       0.76      0.82      0.79       367
+    position       0.76      0.82      0.79       433
+       scene       0.68      0.67      0.68       209
+
+   micro avg       0.75      0.80      0.78      3072
+   macro avg       0.76      0.79      0.77      3072
+weighted avg       0.75      0.80      0.78      3072
 ```
 
 + Qwen2.5-7B-Instruct + Lora
 ```
-
+       Label Precision  Recall     F1
+     address    0.6104  0.6154 0.6129
+        name    0.8686  0.9091 0.8884
+organization     0.814  0.7762 0.7946
+        game    0.8484  0.9164 0.8811
+       scene    0.6919  0.6432 0.6667
+        book    0.8299  0.8026 0.8161
+    position    0.8127  0.7859 0.7990
+     company    0.8255  0.8142 0.8198
+  government    0.8168   0.877 0.8458
+       movie    0.8723    0.82 0.8454
+  Macro Avg.         -       - 0.7970
+  Micro Avg.    0.7986  0.7991 0.7988
 ```
 
 ## 参考引用

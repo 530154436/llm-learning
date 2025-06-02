@@ -5,16 +5,16 @@
 # @function:
 import logging
 import hydra
-import torch
 from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 from torchmetrics import F1Score, MetricCollection, Accuracy
 from transformers import BertTokenizer, get_linear_schedule_with_warmup
+from modeling_util.summary import summary
 from task_ner.data_loader import NERDataset
 from task_ner.model.bert_bilstm_crf import BertBiLstmCrf
 from modeling_util.loss_func import CRFLoss
 from modeling_util.my_trainer import MyTrainer
-from modeling_util.model_util import count_trainable_parameters, build_optimizer
+from modeling_util.model_util import count_trainable_parameters, build_optimizer, auto_device
 
 
 # @hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf.yaml")
@@ -42,7 +42,7 @@ def train(config: DictConfig):
     logging.info(f"开始训练模型")
     logging.info("配置信息:\n{}".format(OmegaConf.to_yaml(config, resolve=True)))
     logging.info("加载Dataset和Tokenizer.")
-    device = torch.device("cuda:0") if torch.cuda.is_available() else "cpu"
+    device = auto_device()
     tokenizer = BertTokenizer.from_pretrained(
         pretrained_model_name_or_path=config.pretrain_path,
         do_lower_case=True
@@ -61,7 +61,7 @@ def train(config: DictConfig):
     model: BertBiLstmCrf = BertBiLstmCrf(pretrain_path=config.pretrain_path, num_labels=num_labels, dropout=config.dropout,
                                          lstm_num_layers=config.lstm_num_layers, lstm_hidden_size=config.lstm_hidden_size)
     logging.info(f'模型训练参数: {count_trainable_parameters(model)}')
-    print(model)
+    print(summary(model))
 
     logging.info("配置优化器、学习率调整器、损失函数、评估指标")
     optimizer = build_optimizer(model, learning_rate=config.learning_rate)

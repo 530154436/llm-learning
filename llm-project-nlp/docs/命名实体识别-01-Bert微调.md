@@ -17,7 +17,7 @@ BERT（Bidirectional Encoder Representations from Transformers） 是 Google 提
 
 注意：chinese-roberta-wwm-ext 模型在使用上与中文BERT系列模型完全一致，无需任何代码调整即可使用。
 
-## 二、训练流程
+## 二、整体流程
 ### 2.1 数据处理
 #### 2.1.1 原始数据格式
 ```
@@ -79,102 +79,120 @@ S-XX：表示单独成实体的 token（适用于单字实体）。<br>
 ```
 
 ### 2.2 模型训练
-#### 2.2.1 模型定义
-BertBiLstmCrf(
-  (bert): BertModel(
-    (embeddings): BertEmbeddings(
-      (word_embeddings): Embedding(21128, 768, padding_idx=0)
-      (position_embeddings): Embedding(512, 768)
-      (token_type_embeddings): Embedding(2, 768)
-      (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
-      (dropout): Dropout(p=0.1, inplace=False)
-    )
-    (encoder): BertEncoder(
-      (layer): ModuleList(
-        (0-11): 12 x BertLayer(
-          (attention): BertAttention(
-            (self): BertSdpaSelfAttention(
-              (query): Linear(in_features=768, out_features=768, bias=True)
-              (key): Linear(in_features=768, out_features=768, bias=True)
-              (value): Linear(in_features=768, out_features=768, bias=True)
-              (dropout): Dropout(p=0.1, inplace=False)
-            )
-            (output): BertSelfOutput(
-              (dense): Linear(in_features=768, out_features=768, bias=True)
-              (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
-              (dropout): Dropout(p=0.1, inplace=False)
-            )
-          )
-          (intermediate): BertIntermediate(
-            (dense): Linear(in_features=768, out_features=3072, bias=True)
-            (intermediate_act_fn): GELUActivation()
-          )
-          (output): BertOutput(
-            (dense): Linear(in_features=3072, out_features=768, bias=True)
-            (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
-            (dropout): Dropout(p=0.1, inplace=False)
-          )
-        )
-      )
-    )
-    (pooler): BertPooler(
-      (dense): Linear(in_features=768, out_features=768, bias=True)
-      (activation): Tanh()
-    )
-  )
-  (bilstm): LSTM(768, 64, batch_first=True, bidirectional=True)
-  (dropout): Dropout(p=0.3, inplace=False)
-  (linear): Linear(in_features=128, out_features=31, bias=True)
-  (crf): CRF(num_tags=31)
-)
+#### 2.2.1 模型结构（以BertBiLstmCRF为例）
 
-```mermaid
-graph TD
-    A[Input IDs<br>(B, L)] --> B[BERT Embeddings<br>Output: (B, L, 768)]
-    B --> C[BERT Encoder<br>Output: (B, L, 768)]
-    C --> D[BiLSTM<br>Output: (B, L, 128)]
-    D --> E[Dropout<br>Output: (B, L, 128)]
-    E --> F[Linear Layer<br>Output: (B, L, 31)]
-    F --> G[CRF Decoding<br>Output: (B, L)]
-
-    style A fill:#FFE4B5,stroke:#333
-    style G fill:#98FB98,stroke:#333
-
-    classDef input fill:#FFE4B5,stroke:#333;
-    classDef output fill:#98FB98,stroke:#333;
-    classDef layer fill:#87CEEB,stroke:#333;
-
-    class A input
-    class G output
-```
 #### 2.2.2 损失函数
-通常使用交叉熵损失函数来计算预测标签与真实标签之间的差异。忽略 padding 部分的损失计算。
+使用`负对数似然损失`（Negative Log Likelihood Loss），由 CRF 层自动计算。
+```
+loss = -self.crf(logits, labels, mask=attention_mask.bool(), reduction='mean')
+```
 
 #### 2.2.3 优化器与学习率调度
-使用 AdamW 优化器。 使用线性预热（warmup）和余弦/线性衰减的学习率调度器。
+使用 AdamW 优化器和线性预热（warmup）和余弦/线性衰减的学习率调度器。
+```python
+from torch.optim import AdamW
+from transformers import get_linear_schedule_with_warmup
 
-#### 2.2.4
+optimizer = AdamW(params, lr=learning_rate)
+train_steps_per_epoch = train_size // config.batch_size
+scheduler = get_linear_schedule_with_warmup(optimizer=optimizer,
+                                            num_warmup_steps=(config.epoch_num // 10) * train_steps_per_epoch,
+                                            num_training_steps=config.epoch_num * train_steps_per_epoch)
+```
+
+### 2.3 模型评估
+常见的评估指标包括 准确率（Accuracy） 和 F1 分数（F1 Score），尤其在类别不平衡的情况下，F1 分数更具参考价值。
+使用 torchmetrics 构建评估指标集合，方便在训练、验证过程中高效计算多个指标。
+```python
+from torchmetrics import F1Score, MetricCollection, Accuracy
+
+metrics = MetricCollection({
+    'acc': Accuracy(task="multiclass", num_classes=num_labels),
+    'f1': F1Score(task="multiclass", num_classes=num_labels)
+})
+```
+
+## 三、实验结果
+
+训练日志
+```
+run_bert_bilstm_crf.py[:42] 开始训练模型
+run_bert_bilstm_crf.py[:43] 配置信息:
+data_dir: ./data
+train_data_path: ./data/dataset/clue/train.jsonl
+dev_data_path: ./data/dataset/clue/dev.jsonl
+test_data_path: ./data/dataset/clue/test.jsonl
+label_data_path: ./data/dataset/clue/label.json
+model_name: BertBiLstmCrf_chinese-roberta-wwm-ext
+model_path: ./data/outputs/BertBiLstmCrf_chinese-roberta-wwm-ext.pth
+device: cuda:0
+batch_size: 64
+dropout: 0.3
+epoch_num: 50
+learning_rate: 3.0e-05
+pretrain_path: ../model_hub/chinese-roberta-wwm-ext
+num_labels: 31
+lstm_num_layers: 1
+lstm_hidden_size: 128
+clip_grad: 5.0
+run_bert_bilstm_crf.py[:44] 加载Dataset和Tokenizer.
+run_bert_bilstm_crf.py[:55] 加载DataLoader
+run_bert_bilstm_crf.py[:60] 初始化模型
+run_bert_bilstm_crf.py[:63] 模型训练参数: 102699678
+run_bert_bilstm_crf.py[:66] 配置优化器、学习率调整器、损失函数、评估指标
+run_bert_bilstm_crf.py[:78] 训练模型...
+my_trainer.py[:153] epoch: 1, Current lr : 0.0, train_loss: 104.08669, val_loss: 55.19459, val_acc: 0.80742, val_f1: 0.80742
+my_trainer.py[:153] epoch: 2, Current lr : 6e-06, train_loss: 43.44882, val_loss: 30.66795, val_acc: 0.88152, val_f1: 0.88152
+my_trainer.py[:153] epoch: 3, Current lr : 1.2e-05, train_loss: 25.88252, val_loss: 19.61042, val_acc: 0.9322, val_f1: 0.9322
+my_trainer.py[:153] epoch: 4, Current lr : 1.8e-05, train_loss: 17.6796, val_loss: 15.44608, val_acc: 0.9485, val_f1: 0.9485
+my_trainer.py[:153] epoch: 5, Current lr : 2.4e-05, train_loss: 13.20995, val_loss: 13.15177, val_acc: 0.95016, val_f1: 0.95016
+my_trainer.py[:153] epoch: 6, Current lr : 3e-05, train_loss: 10.24443, val_loss: 12.30117, val_acc: 0.94918, val_f1: 0.94918
+my_trainer.py[:153] epoch: 7, Current lr : 2.9e-05, train_loss: 8.17817, val_loss: 11.69731, val_acc: 0.95208, val_f1: 0.95208
+my_trainer.py[:153] epoch: 8, Current lr : 2.9e-05, train_loss: 6.79995, val_loss: 10.98749, val_acc: 0.95036, val_f1: 0.95036
+my_trainer.py[:153] epoch: 9, Current lr : 2.8e-05, train_loss: 5.683, val_loss: 10.85063, val_acc: 0.95385, val_f1: 0.95385
+my_trainer.py[:153] epoch: 10, Current lr : 2.7e-05, train_loss: 4.8795, val_loss: 11.26778, val_acc: 0.95154, val_f1: 0.95154
+my_trainer.py[:153] epoch: 11, Current lr : 2.7e-05, train_loss: 4.16538, val_loss: 11.37653, val_acc: 0.95152, val_f1: 0.95152
+my_trainer.py[:153] epoch: 12, Current lr : 2.6e-05, train_loss: 3.6833, val_loss: 11.83993, val_acc: 0.95148, val_f1: 0.95148
+my_trainer.py[:153] epoch: 13, Current lr : 2.5e-05, train_loss: 3.18895, val_loss: 11.87034, val_acc: 0.95159, val_f1: 0.95159
+my_trainer.py[:153] epoch: 14, Current lr : 2.5e-05, train_loss: 2.87335, val_loss: 11.73891, val_acc: 0.95247, val_f1: 0.95247
+my_trainer.py[:153] epoch: 15, Current lr : 2.4e-05, train_loss: 2.57749, val_loss: 11.99193, val_acc: 0.95206, val_f1: 0.95206
+my_trainer.py[:153] epoch: 16, Current lr : 2.3e-05, train_loss: 2.32171, val_loss: 12.20675, val_acc: 0.95113, val_f1: 0.95113
+my_trainer.py[:153] epoch: 17, Current lr : 2.3e-05, train_loss: 2.08853, val_loss: 12.93478, val_acc: 0.94898, val_f1: 0.94898
+my_trainer.py[:153] epoch: 18, Current lr : 2.2e-05, train_loss: 1.87674, val_loss: 12.79549, val_acc: 0.952, val_f1: 0.952
+my_trainer.py[:153] epoch: 19, Current lr : 2.1e-05, train_loss: 1.74081, val_loss: 12.8339, val_acc: 0.95143, val_f1: 0.95143
+my_trainer.py[:159] Current loss: 12.833900, Best val_loss: 10.850630
+my_trainer.py[:162] Saved model's loss: 10.850630
+```
++ Bert+BiLstm+Crf在CLUENER2020的评测结果（验证集）
+```
+              precision    recall  f1-score   support
+
+     address       0.56      0.65      0.60       373
+        book       0.76      0.77      0.77       154
+     company       0.75      0.83      0.79       378
+        game       0.77      0.84      0.80       295
+  government       0.76      0.80      0.78       247
+       movie       0.83      0.79      0.81       151
+        name       0.73      0.89      0.80       465
+organization       0.74      0.80      0.77       367
+    position       0.81      0.81      0.81       433
+       scene       0.65      0.63      0.64       209
+
+   micro avg       0.73      0.79      0.76      3072
+   macro avg       0.74      0.78      0.76      3072
+weighted avg       0.73      0.79      0.76      3072
+```
+
+## 参考引用
+
+[1] [Chinese NER Project](https://github.com/hemingkx/CLUENER2020)<br>
+[2] [CLUENER2020 官方Baseline](https://github.com/lemonhu/NER-BERT-pytorch)<br>
+[3] [Chinese-BERT-wwm](https://github.com/ymcui/Chinese-BERT-wwm)<br>
+[4] [RoBERTa中文预训练模型：RoBERTa for Chinese](https://mp.weixin.qq.com/s/K2zLEbWzDGtyOj7yceRdFQ)<br>
+[5] [NLP（二十三）序列标注算法评估模块seqeval的使用](https://www.cnblogs.com/jclian91/p/12913042.html)<br>
+[6] [哈工大讯飞联合实验室发布中文RoBERTa-wwm-ext预训练模型](https://cogskl.iflytek.com/archives/924)<br>
+[7] [用BERT做NER？教你用PyTorch轻松入门Roberta！](https://zhuanlan.zhihu.com/p/346828049)<br>
+[8] [一文看懂如何使用 Hydra 框架高效地跑各种超参数配置的深度学习实验](https://zhuanlan.zhihu.com/p/662221581?share_code=1blPCxRD9j5Z4&utm_psn=1905046521625425673)<br>
 
 
-[哈工大讯飞联合实验室发布中文RoBERTa-wwm-ext预训练模型](https://cogskl.iflytek.com/archives/924)<br>
-[RoBERTa中文预训练模型：RoBERTa for Chinese](https://mp.weixin.qq.com/s/K2zLEbWzDGtyOj7yceRdFQ)
 
-
-
-
-
-https://github.com/ymcui/Chinese-BERT-wwm
-
-NLP（二十三）序列标注算法评估模块seqeval的使用
-https://www.cnblogs.com/jclian91/p/12913042.html
-
-用BERT做NER？教你用PyTorch轻松入门Roberta！
-https://zhuanlan.zhihu.com/p/346828049
-https://github.com/hemingkx/CLUENER2020
-
-
-一文看懂如何使用 Hydra 框架高效地跑各种超参数配置的深度学习实验
-https://zhuanlan.zhihu.com/p/662221581?share_code=1blPCxRD9j5Z4&utm_psn=1905046521625425673
-
-[CLUENER2020 官方Baseline](https://github.com/lemonhu/NER-BERT-pytorch)<br>
-[Chinese NER Project](https://github.com/hemingkx/CLUENER2020)<br>

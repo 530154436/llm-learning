@@ -3,8 +3,20 @@
 # @author: zhengchubin
 # @time: 2025/5/6 17:39
 # @function:
+import torch
 from torch import nn
 from torch.optim import AdamW, Optimizer
+
+
+def auto_device() -> str:
+    """ 根据设备获取设备
+    """
+    if torch.cuda.is_available():
+        return "cuda:0"
+    elif torch.backends.mps.is_available():
+        return "mps"
+    else:
+        return "cpu"
 
 
 def initialize_weights(model: nn.Module):
