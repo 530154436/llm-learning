@@ -19,7 +19,7 @@ BERT（Bidirectional Encoder Representations from Transformers） 是 Google 提
 
 ## 二、训练流程
 ### 2.1 数据处理
-#### 原始数据格式
+#### 2.1.1 原始数据格式
 ```
 {
 	"text": "北京城.",
@@ -32,7 +32,7 @@ BERT（Bidirectional Encoder Representations from Transformers） 是 Google 提
 "text" 表示原始文本；<br>
 "label" 是一个嵌套字典，表示实体类型（如 NT）及其对应的实体名称和出现的位置索引。<br>
 
-#### BIOS 标注格式转换
+#### 2.1.2 BIOS 标注格式转换
 将原始标注信息转换为逐 token 的 BIOS 格式标签，BIOS 是命名实体识别任务中常用的标注方式：
 ```
 北 B-NT
@@ -46,7 +46,7 @@ I-XX：表示某个实体的中间或结尾；<br>
 O：非实体。<br>
 S-XX：表示单独成实体的 token（适用于单字实体）。<br>
 
-#### DataLoader.collate_fn 说明
+#### 2.1.3 数据加载和批处理（DataLoader.collate_fn）
 在构建 DataLoader 时使用自定义 collate_fn 对 batch 数据进行处理，从而满足 Bert 的输入格式，主要包括以下步骤：<br>
 
 1、截断（Truncation）：如果输入长度超过模型最大限制（如512），则截断至允许的最大长度（需减去 [CLS] 和 [SEP] 所占位置）。<br>
@@ -78,58 +78,8 @@ S-XX：表示单独成实体的 token（适用于单字实体）。<br>
     label_ids: 		0    1    2    2    0   0  0  0  0  0
 ```
 
-### 2.2 模型架构
-
-### 
-
-BertCrf(
-  (bert): BertModel(
-    (embeddings): BertEmbeddings(
-      (word_embeddings): Embedding(21128, 768, padding_idx=0)
-      (position_embeddings): Embedding(512, 768)
-      (token_type_embeddings): Embedding(2, 768)
-      (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
-      (dropout): Dropout(p=0.1, inplace=False)
-    )
-    (encoder): BertEncoder(
-      (layer): ModuleList(
-        (0-11): 12 x BertLayer(
-          (attention): BertAttention(
-            (self): BertSdpaSelfAttention(
-              (query): Linear(in_features=768, out_features=768, bias=True)
-              (key): Linear(in_features=768, out_features=768, bias=True)
-              (value): Linear(in_features=768, out_features=768, bias=True)
-              (dropout): Dropout(p=0.1, inplace=False)
-            )
-            (output): BertSelfOutput(
-              (dense): Linear(in_features=768, out_features=768, bias=True)
-              (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
-              (dropout): Dropout(p=0.1, inplace=False)
-            )
-          )
-          (intermediate): BertIntermediate(
-            (dense): Linear(in_features=768, out_features=3072, bias=True)
-            (intermediate_act_fn): GELUActivation()
-          )
-          (output): BertOutput(
-            (dense): Linear(in_features=3072, out_features=768, bias=True)
-            (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
-            (dropout): Dropout(p=0.1, inplace=False)
-          )
-        )
-      )
-    )
-    (pooler): BertPooler(
-      (dense): Linear(in_features=768, out_features=768, bias=True)
-      (activation): Tanh()
-    )
-  )
-  (dropout): Dropout(p=0.3, inplace=False)
-  (linear): Linear(in_features=768, out_features=31, bias=True)
-  (crf): CRF(num_tags=31)
-)
-
-
+### 2.2 训练模型
+#### 2.2.1 模型定义
 BertBiLstmCrf(
   (bert): BertModel(
     (embeddings): BertEmbeddings(
@@ -177,6 +127,14 @@ BertBiLstmCrf(
   (linear): Linear(in_features=128, out_features=31, bias=True)
   (crf): CRF(num_tags=31)
 )
+#### 2.2.2 损失函数
+通常使用交叉熵损失函数来计算预测标签与真实标签之间的差异。忽略 padding 部分的损失计算。
+
+#### 2.2.3 优化器与学习率调度
+使用 AdamW 优化器。 使用线性预热（warmup）和余弦/线性衰减的学习率调度器。
+
+#### 2.2.4
+
 
 [哈工大讯飞联合实验室发布中文RoBERTa-wwm-ext预训练模型](https://cogskl.iflytek.com/archives/924)<br>
 [RoBERTa中文预训练模型：RoBERTa for Chinese](https://mp.weixin.qq.com/s/K2zLEbWzDGtyOj7yceRdFQ)
