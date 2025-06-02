@@ -18,6 +18,7 @@ from seqeval.metrics.v1 import classification_report
 def evaluate(config_path: str):
     config: DictConfig = OmegaConf.load(config_path)
     config.device = "cuda" if torch.cuda.is_available() else "cpu"
+    config.pop("hydra")  # 评估阶段不需要
     logger.info("配置信息:\n{}".format(OmegaConf.to_yaml(config, resolve=True)))
 
     # 加载模型
@@ -46,8 +47,8 @@ def evaluate(config_path: str):
 
 
 if __name__ == '__main__':
-    # evaluate("conf/BertCrf.yaml")
+    evaluate("conf/BertCrf.yaml")
     # evaluate("conf/BertBiLstmCrf.yaml")
     # evaluate("conf/BertBiLstmCrf_chinese-bert-wwm-ext.yaml")
-    evaluate("conf/BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
+    # evaluate("conf/BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
 
