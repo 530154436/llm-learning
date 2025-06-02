@@ -61,8 +61,8 @@ def train(config: DictConfig):
     logging.info("初始化模型")
     model: BertBiLstmCrf = BertBiLstmCrf(pretrain_path=config.pretrain_path, num_labels=num_labels, dropout=config.dropout,
                                          lstm_num_layers=config.lstm_num_layers, lstm_hidden_size=config.lstm_hidden_size)
-    print(summary(model, input_shape=[(config.max_seq_len, ), (config.max_seq_len, ), (config.max_seq_len, )],
-                  input_dtype=torch.LongTensor))
+    summary(model, input_shape=[(config.max_seq_len,), (config.max_seq_len,), (config.max_seq_len,)],
+            input_dtype=torch.LongTensor)
 
     logging.info("配置优化器、学习率调整器、损失函数、评估指标")
     optimizer = build_optimizer(model, learning_rate=config.learning_rate)
