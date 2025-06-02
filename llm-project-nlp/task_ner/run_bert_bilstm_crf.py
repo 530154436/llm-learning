@@ -9,11 +9,11 @@ from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 from torchmetrics import F1Score, MetricCollection, Accuracy
 from transformers import BertTokenizer, get_linear_schedule_with_warmup
-from modeling_util.summary import summary
 from task_ner.data_loader import NERDataset
 from task_ner.model.bert_bilstm_crf import BertBiLstmCrf
 from modeling_util.loss_func import CRFLoss
 from modeling_util.my_trainer import MyTrainer
+from modeling_util.summary import summary
 from modeling_util.model_util import count_trainable_parameters, build_optimizer, auto_device
 
 
@@ -61,7 +61,9 @@ def train(config: DictConfig):
     model: BertBiLstmCrf = BertBiLstmCrf(pretrain_path=config.pretrain_path, num_labels=num_labels, dropout=config.dropout,
                                          lstm_num_layers=config.lstm_num_layers, lstm_hidden_size=config.lstm_hidden_size)
     logging.info(f'模型训练参数: {count_trainable_parameters(model)}')
-    print(summary(model))
+    print(summary(model, input_shape=[(config.max_seq_len, ),
+                                      (config.max_seq_len, ),
+                                      (config.max_seq_len, )]))
 
     logging.info("配置优化器、学习率调整器、损失函数、评估指标")
     optimizer = build_optimizer(model, learning_rate=config.learning_rate)
