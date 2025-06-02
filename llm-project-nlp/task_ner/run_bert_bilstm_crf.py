@@ -17,8 +17,8 @@ from modeling_util.my_trainer import MyTrainer
 from modeling_util.model_util import count_trainable_parameters, build_optimizer
 
 
-@hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf.yaml")
-# @hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf_chinese-bert-wwm-ext.yaml")
+# @hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf.yaml")
+@hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf_chinese-bert-wwm-ext.yaml")
 # @hydra.main(version_base=None, config_path="conf", config_name="BertBiLstmCrf_chinese-roberta-wwm-ext.yaml")
 def train(config: DictConfig):
     """ 模型训练
