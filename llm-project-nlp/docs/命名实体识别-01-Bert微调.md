@@ -135,6 +135,8 @@ class BertBiLstmCrf(BaseNerModel):
 | Linear  | linear     | (B, L, 128) | (B, L, 31)  | - 投影到标签空间：128→31（如NER的31类标签）                                      |
 | CRF     | crf        | (B, L, 31)  | (B, L)      | - 条件随机场建模标签转移概率<br>- 输出最优标签序列（非概率分布）                              |
 
+> B表示：batch_size，L表示：最大输入长度，一般为512，受位置嵌入长度限制。
+
 #### 2.2.2 损失函数
 使用`负对数似然损失`（Negative Log Likelihood Loss），由 CRF 层自动计算。
 ```
