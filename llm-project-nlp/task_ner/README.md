@@ -165,3 +165,4 @@ organization     0.814  0.7762 0.7946
 [2] [CLUENER 细粒度命名实体识别-Github](https://github.com/CLUEbenchmark/CLUENER2020)<br>
 [3] [CLUENER2020 官方排行榜](https://www.cluebenchmarks.com/ner.html)<br>
 [4] [CLUENER2020 官方Baseline](https://github.com/lemonhu/NER-BERT-pytorch)<br>
+[5] [Chinese NER Project](https://github.com/hemingkx/CLUENER2020)<br>

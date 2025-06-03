@@ -1,4 +1,7 @@
 
+[happy-llm 重点看看]
+https://github.com/datawhalechina/happy-llm
+
 [Bert+深度自然语言处理实战]
 cs244n
 https://blog.showmeai.tech/cs224n/
