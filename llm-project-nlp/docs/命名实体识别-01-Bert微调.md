@@ -80,6 +80,60 @@ S-XX：表示单独成实体的 token（适用于单字实体）。<br>
 
 ### 2.2 模型训练
 #### 2.2.1 模型结构（以BertBiLstmCRF为例）
+Torch 实现:
+```python
+class BertBiLstmCrf(BaseNerModel):
+
+    def __init__(self, pretrain_path: str, num_labels: int, dropout: float = 0.3,
+                 lstm_num_layers: int = 2, lstm_hidden_size: int = 256):
+
+        super().__init__(pretrain_path, num_labels)
+        self.bert_config = BertConfig.from_pretrained(pretrain_path)
+        self.bert = BertModel.from_pretrained(pretrain_path)
+        self.bilstm = nn.LSTM(input_size=self.bert_config.hidden_size,
+                              bidirectional=True,
+                              num_layers=lstm_num_layers,
+                              hidden_size=lstm_hidden_size // 2,
+                              batch_first=True)
+        self.dropout = nn.Dropout(dropout)
+        self.linear = nn.Linear(lstm_hidden_size, num_labels)
+        self.crf = CRF(num_tags=num_labels, batch_first=True)
+
+    def forward(self,
+                input_ids: torch.Tensor,
+                attention_mask: torch.Tensor,
+                token_type_ids: torch.Tensor) -> torch.FloatTensor:
+        """
+        正向传播
+        :param input_ids: [batch_size, seq_len]
+        :param attention_mask: [batch_size, seq_len]
+        :param token_type_ids: [batch_size, seq_len]
+
+        :return: [batch_size, seq_len, num_labels]
+        """
+        # [batch_size, seq_len] => [batch_size, seq_len, embedding_size]
+        output = self.bert(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)[0]
+
+        # [batch_size, seq_len, lstm_hidden_size]
+        lstm_out, _ = self.bilstm(output)
+        lstm_out = self.dropout(lstm_out)
+
+        # [batch_size, seq_len, num_labels]
+        logits = self.linear(lstm_out)
+
+        return logits
+```
+各模块明细： 
+ 
+| 模块      | 子模块/组件     | 输入 Shape    | 输出 Shape    | 关键参数与功能                                                           |
+|---------|------------|-------------|-------------|-------------------------------------------------------------------|
+| BERT    | embeddings | (B, L)      | (B, L, 768) | - 词嵌入：21128×768<br>- 位置嵌入：512×768<br>- 分段嵌入：2×768<br>- 归一化后输出统一维度 |
+|         | encoder    | (B, L, 768) | (B, L, 768) | - 共12层，每层含自注意力（768→768）<br>- 前馈网络扩展至 3072 维后降回 768<br>- 残差连接+层归一化 |
+|         | pooler     | (B, 768)    | (B, 768)    | - 线性层+Tanh 激活，生成句子级表示（可能未直接使用）                                    |
+| BiLSTM  | bilstm     | (B, L, 768) | (B, L, 128) | - 双向LSTM，隐藏层 64 维，双向拼接为 128<br>- batch_first=True 适配BERT输出        |
+| Dropout | dropout    | (B, L, 128) | (B, L, 128) | - 丢弃概率 p=0.3，防止过拟合                                                |
+| Linear  | linear     | (B, L, 128) | (B, L, 31)  | - 投影到标签空间：128→31（如NER的31类标签）                                      |
+| CRF     | crf        | (B, L, 31)  | (B, L)      | - 条件随机场建模标签转移概率<br>- 输出最优标签序列（非概率分布）                              |
 
 #### 2.2.2 损失函数
 使用`负对数似然损失`（Negative Log Likelihood Loss），由 CRF 层自动计算。
