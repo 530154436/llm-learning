@@ -8,7 +8,7 @@ from pathlib import Path
 import pandas as pd
 from llm_util.llm_api import ChatClient
 from llm_util.resolver import convert_json_array_in_text_to_list
-from task_ner.data.clue_convert_to_alpaca import convert_clue_ner_to_prompt1
+from task_ner_llm.data.clue_convert_to_alpaca import convert_clue_ner_to_prompt1
 from collections import defaultdict
 
 

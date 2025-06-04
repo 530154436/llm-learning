@@ -46,10 +46,11 @@ llamafactory-cli version
 | Project page: https://github.com/hiyouga/LLaMA-Factory |
 ----------------------------------------------------------
 ```
-
+> 官方文档是 git clone 整个项目以便支持最新的模型。
 
 ## 二、数据集格式
 
+### 2.1 Alpaca格式
 
 inputs:
 ```
