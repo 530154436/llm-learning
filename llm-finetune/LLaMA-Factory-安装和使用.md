@@ -60,18 +60,49 @@ Alpaca格式：alpaca_zh_demo.json
   }
 ]
 ```
-注册自定义数据集，将数据集添加到全局配置：dataset_info.json
+注册自定义数据集，将数据集添加到全局配置：dataset_info.json；**columns字段可以不加**。
 ```
 {
   "alpaca_zh_demo": {
-    "file_name": "alpaca_zh_demo.json"
+    "file_name": "alpaca_zh_demo.json",
+    "columns": {
+        "prompt": "instruction",
+        "query": "input",
+        "response": "output",
+        "system": "system",
+        "history": "history"
+    }
   }
 }
 ```
 ### 2.2 配置文件
 
-`max_samples`决定了模型训练时从数据集中采样的最大样本数量，当设置为1000时，意味着训练过程中最多使用1000条数据进行模型训练。
+#### 2.2.1 template参数
 
+对于所有“基座”（Base）模型，`template` 参数可以是 `default`, `alpaca`, `vicuna` 等任意值。但“对话”（Instruct/Chat）模型请务必使用**对应的模板**。
+
+| 模型名                                                             | 参数量                              | Template    |
+|-----------------------------------------------------------------|----------------------------------|-------------|
+| [ChatGLM3](https://huggingface.co/THUDM)                        | 6B                               | chatglm3    |
+| [DeepSeek (Code/MoE)](https://huggingface.co/deepseek-ai)       | 7B/16B/67B/236B                  | deepseek    |
+| [DeepSeek 2.5/3](https://huggingface.co/deepseek-ai)            | 236B/671B                        | deepseek3   |
+| [DeepSeek R1 (Distill)](https://huggingface.co/deepseek-ai)     | 1.5B/7B/8B/14B/32B/70B/671B      | deepseekr1  |
+| [Llama](https://github.com/facebookresearch/llama)              | 7B/13B/33B/65B                   | -           |
+| [Llama 2](https://huggingface.co/meta-llama)                    | 7B/13B/70B                       | llama2      |
+| [Llama 3-3.3](https://huggingface.co/meta-llama)                | 1B/3B/8B/70B                     | llama3      |
+| [Llama 4](https://huggingface.co/meta-llama)                    | 109B/402B                        | llama4      |
+| [Llama 3.2 Vision](https://huggingface.co/meta-llama)           | 11B/90B                          | mllama      |
+| [Qwen (1-2.5) (Code/Math/MoE/QwQ)](https://huggingface.co/Qwen) | 0.5B/1.5B/3B/7B/14B/32B/72B/110B | qwen        |
+| [Qwen3 (MoE)](https://huggingface.co/Qwen)                      | 0.6B/1.7B/4B/8B/14B/32B/235B     | qwen3       |
+| [Qwen2-Audio](https://huggingface.co/Qwen)                      | 7B                               | qwen2_audio |
+| [Qwen2.5-Omni](https://huggingface.co/Qwen)                     | 3B/7B                            | qwen2_omni  |
+| [Qwen2-VL/Qwen2.5-VL/QVQ](https://huggingface.co/Qwen)          | 2B/3B/7B/32B/72B                 | qwen2_vl    |
+
+> 详见：[LLaMa-Factory README_zh.md](https://github.com/hiyouga/LLaMA-Factory/blob/main/README_zh.md)
+
+#### 2.2.2 max_samples参数
+
+`max_samples`决定了模型训练时从数据集中采样的最大样本数量，当设置为1000时，意味着训练过程中最多使用1000条数据进行模型训练。
 在实际项目应用中，需要注意以下几点： 
 + 完整训练需求：对于生产环境或正式研究，通常建议移除该参数或设置为足够大的值，以确保模型能够学习到数据集的完整特征 
 + 数据采样影响：当数据集规模超过max_samples设定值时，框架会自动进行采样，可能导致模型无法充分学习数据分布 
@@ -86,47 +117,9 @@ Alpaca格式：alpaca_zh_demo.json
 ```shell
 llamafactory-cli train conf/Qwen2.5-7B-Instruct-lora-sft.yaml
 ```
-
-
-
-
-
-## 四、部署
 ```shell
-API_PORT=8000 llamafactory-cli api examples/inference/llama3.yaml infer_backend=vllm vllm_enforce_eager=true
+#API_PORT=8000 llamafactory-cli api conf/Qwen2.5-7B-Instruct-lora-sft.yaml infer_backend=vllm vllm_enforce_eager=true
 ```
-
-
-```shell
-nohup python -m vllm.entrypoints.openai.api_server \
---host 0.0.0.0 \
---port 8000 \
---model ../model_hub/Qwen2.5-7B-Instruct \
---served-model-name Qwen2.5-7B-Instruct \
---enable-lora \
---gpu-memory-utilization 0.8 \
---max-model-len 1024 \
---disable-log-requests \
---lora-modules clue-ner-lora-sft=data/outputs/Qwen2.5-7B-Instruct-clue-ner-lora-sft \
-> server.log &
-```
-
-## 五、调用
-
-```shell
-curl http://localhost:8000/v1/chat/completions -H "Content-Type: application/json" -d '{
-  "model": "clue-ner-lora-sft",
-  "messages": [
-    {"role": "system", "content": "你是Qwen，由阿里云创建。你是一个乐于助人的助手。"},
-    {"role": "user", "content": "你是谁？"}
-  ],
-  "temperature": 0.7,
-  "top_p": 0.8,
-  "repetition_penalty": 1.05,
-  "max_tokens": 512
-}'
-```
-
 
 ## 参考引用
 [1] [LLaMA-Factory-官方文档](https://llamafactory.readthedocs.io/zh-cn/latest/getting_started/installation.html)<br>

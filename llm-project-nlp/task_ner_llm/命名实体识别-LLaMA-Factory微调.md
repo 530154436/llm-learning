@@ -1,3 +1,16 @@
+<nav>
+<a href="#一环境配置">一、环境配置</a><br/>
+<a href="#二准备工作">二、准备工作</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#21-基座模型下载">2.1 基座模型下载</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#22-数据集构建alpaca格式">2.2 数据集构建（alpaca格式）</a><br/>
+<a href="#三整体流程">三、整体流程</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#31-配置文件">3.1 配置文件</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#32-训练过程">3.2 训练过程</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#33-vllm部署和调用">3.3 vllm部署和调用</a><br/>
+<a href="#四模型评估">四、模型评估</a><br/>
+<a href="#参考引用">参考引用</a><br/>
+</nav>
+
 ## 一、环境配置
 docker镜像
 ```
@@ -54,7 +67,7 @@ snapshot_download('Qwen/Qwen2.5-7B-Instruct', cache_dir='models', revision='mast
 }
 ```
 
-## 三、训练流程
+## 三、整体流程
 ### 3.1 配置文件
 conf/Qwen2.5-7B-Instruct-clue-ner-lora-sft.yaml
 ```
@@ -159,33 +172,61 @@ GPU显存占用情况：
 [INFO|trainer.py:2412] 2025-05-30 02:56:21,268 >>   Gradient Accumulation steps = 8
 [INFO|trainer.py:2413] 2025-05-30 02:56:21,268 >>   Total optimization steps = 906
 [INFO|trainer.py:2414] 2025-05-30 02:56:21,274 >>   Number of trainable parameters = 20,185,088
+....
+{"current_steps": 900, "total_steps": 906, "loss": 0.0331, "lr": 1.337e-08, "epoch": 2.979, "percentage": 99.34, "elapsed_time": "1:44:23", "remaining_time": "0:00:41"}
+{"current_steps": 906, "total_steps": 906, "epoch": 2.9987598181066555, "percentage": 100.0, "elapsed_time": "1:45:06", "remaining_time": "0:00:00"}
 ```
-loss变化
+loss变化<br>
+<img src="data/images/training_loss-Qwen2.5-7B-Instruct-clue-ner-lora-sft.png" width="40%" height="40%" alt="">
 
 
-### LLaMA-Factory
-官网教程：https://llamafactory.readthedocs.io/zh-cn/latest/getting_started/sft.html
-数据集参数：https://github.com/hiyouga/LLaMA-Factory/blob/main/src/llamafactory/hparams/data_args.py#L38
-参数配置：https://llamafactory.readthedocs.io/zh-cn/latest/advanced/arguments.html
-查看提示词模板：https://github.com/hiyouga/LLaMA-Factory/blob/main/README_zh.md
+### 3.3 vllm部署和调用
++ 服务部署
+```shell
+nohup python -m vllm.entrypoints.openai.api_server \
+--host 0.0.0.0 \
+--port 8000 \
+--model ../model_hub/Qwen2.5-7B-Instruct \
+--served-model-name Qwen2.5-7B-Instruct \
+--enable-lora \
+--gpu-memory-utilization 0.8 \
+--max-model-len 1024 \
+--disable-log-requests \
+--lora-modules clue-ner-lora-sft=data/outputs/Qwen2.5-7B-Instruct-clue-ner-lora-sft \
+> server.log &
+```
++ 调用示例
+```shell
+curl http://localhost:8000/v1/chat/completions -H "Content-Type: application/json" -d '{
+  "model": "clue-ner-lora-sft",
+  "messages": [
+    {"role": "system", "content": "你是Qwen，由阿里云创建。你是一个乐于助人的助手。"},
+    {"role": "user", "content": "你是谁？"}
+  ],
+  "temperature": 0.7,
+  "top_p": 0.8,
+  "repetition_penalty": 1.05,
+  "max_tokens": 512
+}'
+```
+## 四、模型评估
+```
+       Label Precision  Recall     F1
+     address    0.6104  0.6154 0.6129
+        name    0.8686  0.9091 0.8884
+organization     0.814  0.7762 0.7946
+        game    0.8484  0.9164 0.8811
+       scene    0.6919  0.6432 0.6667
+        book    0.8299  0.8026 0.8161
+    position    0.8127  0.7859 0.7990
+     company    0.8255  0.8142 0.8198
+  government    0.8168   0.877 0.8458
+       movie    0.8723    0.82 0.8454
+  Macro Avg.         -       - 0.7970
+  Micro Avg.    0.7986  0.7991 0.7988
+```
 
-大模型参数高效微调技术原理综述（一）-背景、参数高效微调简介
-https://github.com/liguodongiot/llm-action?tab=readme-ov-file
-https://zhuanlan.zhihu.com/p/635152813
-
-Qwen2.5大模型微调实战：医疗命名实体识别任务（完整代码）
-https://zhuanlan.zhihu.com/p/19682001982
-
-基于 Qwen2.5-0.5B 微调训练 Ner 命名实体识别任务
-https://blog.csdn.net/qq_43692950/article/details/142631780
-
-qwen3 finetune
-https://qwen.readthedocs.io/zh-cn/latest/training/llama_factory.html
-
-
-在进行模型微调时，是否应该将 system 消息也包含在训练数据中？
-🎯 控制角色一致性	包含 system 可以帮助模型更稳定地记住自己的任务角色（比如：实体识别专家），避免在不同任务之间混淆。
-🤖 更贴近实际使用场景	如果你在部署或推理阶段使用了 system 来设定角色，那么在训练时也应该保留它，这样训练和推理的上下文才一致。
-🧩 提升泛化能力	模型能更好地理解“我是一个实体识别助手”，而不是一个通用问答模型，从而在新句子上表现更准确。
-🧪 多任务训练支持	如果你未来计划训练多个任务（如实体识别 + 关系抽取），可以通过不同的 system 来区分任务类型，提升模型可控性。
-transformer gpt 输入的mask和bert的mask好像是相反的？
+## 参考引用
+[1] [LLaMA-Factory 官网教程](https://llamafactory.readthedocs.io/zh-cn/latest/getting_started/sft.html)<br>
+[2] [LLaMA-Factory 参数配置](https://llamafactory.readthedocs.io/zh-cn/latest/advanced/arguments.html)<br>
+[3] [LLaMA-Factory 提示词模板](https://github.com/hiyouga/LLaMA-Factory/blob/main/README_zh.md)<br>

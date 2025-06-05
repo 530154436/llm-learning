@@ -5,3 +5,8 @@ https://aws.amazon.com/cn/blogs/china/practical-series-on-fine-tuning-large-lang
 
 Torchtune是由PyTorch团队开发的一个专门用于LLM微调的库。它旨在简化LLM的微调流程,提供了一系列高级API和预置的最佳实践,使得研究人员和开发者能够更加便捷地对LLM进行调试、训练和部署。Torchtune基于PyTorch生态系统构建,充分利用了PyTorch的灵活性和可扩展性,同时针对LLM微调的特点进行了优化和改进。
 https://zhuanlan.zhihu.com/p/4704857199
+
+
+大模型参数高效微调技术原理综述（一）-背景、参数高效微调简介
+https://github.com/liguodongiot/llm-action?tab=readme-ov-file
+https://zhuanlan.zhihu.com/p/635152813

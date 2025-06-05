@@ -15,3 +15,9 @@ https://github.com/datawhalechina/self-llm/blob/master/models/Qwen3/05-Qwen3-8B-
 
 chinese_ner_sft数据集
 https://hf-mirror.com/datasets/qgyd2021/chinese_ner_sft
+
+Qwen2.5大模型微调实战：医疗命名实体识别任务（完整代码）
+https://zhuanlan.zhihu.com/p/19682001982
+
+基于 Qwen2.5-0.5B 微调训练 Ner 命名实体识别任务
+https://blog.csdn.net/qq_43692950/article/details/142631780
