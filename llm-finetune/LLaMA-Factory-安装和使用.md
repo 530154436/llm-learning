@@ -1,3 +1,16 @@
+<nav>
+<a href="#一环境配置">一、环境配置</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#11-cuda安装">1.1 CUDA安装</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#12-llama-factory-安装">1.2 LLaMA-Factory 安装</a><br/>
+<a href="#二llama-factory-微调">二、LLaMA-Factory 微调</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#21-构建数据集">2.1 构建数据集</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#22-配置文件">2.2 配置文件</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#221-template参数">2.2.1 template参数</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#222-max_samples参数">2.2.2 max_samples参数</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#23-llamafactory-cli">2.3 llamafactory-cli</a><br/>
+<a href="#参考引用">参考引用</a><br/>
+</nav>
+
 
 ## 一、环境配置
 当前使用的环境是基于`cuda:12.2.2-cudnn8-devel-ubuntu22.04`镜像构建的，基本能满足条件。
@@ -76,6 +89,57 @@ Alpaca格式：alpaca_zh_demo.json
 }
 ```
 ### 2.2 配置文件
+```
+### model
+model_name_or_path: ../model_hub/Qwen2.5-7B-Instruct
+trust_remote_code: true
+
+### method
+stage: sft
+do_train: true
+finetuning_type: lora
+flash_attn: auto
+lora_rank: 8
+lora_target: all
+
+### dataset
+dataset_dir: data/dataset/alpaca  # 存储数据集的文件夹路径。
+dataset: alpaca_clue_train
+template: qwen  # Qwen (1-2.5)
+cutoff_len: 1024  # 输入的最大 token 数，超过该长度会被截断。
+max_samples: 15000  # 每个数据集的最大样本数：设置后，每个数据集的样本数将被截断至指定的 max_samples。
+overwrite_cache: true  # 是否覆盖缓存的训练和评估数据集。
+preprocessing_num_workers: 16
+dataloader_num_workers: 8
+
+### output
+output_dir: data/outputs/Qwen2.5-7B-Instruct-clue-ner-lora-sft
+logging_steps: 10
+save_steps: 500
+plot_loss: true
+overwrite_output_dir: true
+save_only_model: false
+
+### train
+per_device_train_batch_size: 4  # 每设备训练批次大小, 默认 8
+gradient_accumulation_steps: 8
+learning_rate: 1.0e-4
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+resume_from_checkpoint: null
+
+### eval
+#eval_dataset:
+val_size: 0.1
+per_device_eval_batch_size: 1
+eval_strategy: steps
+eval_steps: 500
+```
+
+> [LLaMA-Factory 完整参数列表](https://llamafactory.readthedocs.io/zh-cn/latest/advanced/arguments.html)
 
 #### 2.2.1 template参数
 
@@ -113,14 +177,37 @@ Alpaca格式：alpaca_zh_demo.json
 + 小规模实验：建议设置为5000-10000，平衡训练速度与模型性能 
 + 正式训练：应注释掉该参数或设置为None，使用完整数据集
 
-### 2.3 训练
+### 2.3 llamafactory-cli
++ 训练
 ```shell
 llamafactory-cli train conf/Qwen2.5-7B-Instruct-lora-sft.yaml
 ```
++ 推理 api
 ```shell
-#API_PORT=8000 llamafactory-cli api conf/Qwen2.5-7B-Instruct-lora-sft.yaml infer_backend=vllm vllm_enforce_eager=true
+llamafactory-cli api \
+  --model_name_or_path ../model_hub/Qwen2.5-7B-Instruct \
+  --adapter_name_or_path data/outputs/Qwen2.5-7B-Instruct-clue-ner-lora-sft \
+  --infer_backend vllm \
+  --template qwen \
+  --finetuning_type lora \
+  --vllm_enforce_eager=true
+```
++ 调用 api
+```shell
+curl http://localhost:8000/v1/chat/completions -H "Content-Type: application/json" -d '{
+  "model": "../model_hub/Qwen2.5-7B-Instruct",
+  "messages": [
+    {"role": "system", "content": "你是Qwen，由阿里云创建。你是一个乐于助人的助手。"},
+    {"role": "user", "content": "你是谁？"}
+  ],
+  "temperature": 0.7,
+  "top_p": 0.8,
+  "repetition_penalty": 1.05,
+  "max_tokens": 512
+}'
 ```
 
 ## 参考引用
 [1] [LLaMA-Factory-官方文档](https://llamafactory.readthedocs.io/zh-cn/latest/getting_started/installation.html)<br>
 [2] [LLaMA-Factory-官方Github](https://github.com/hiyouga/LLaMA-Factory/blob/main/README_zh.md)<br>
+[3] [llamafactory-cli 推理](https://llamafactory.readthedocs.io/zh-cn/latest/getting_started/inference.html)<br>
