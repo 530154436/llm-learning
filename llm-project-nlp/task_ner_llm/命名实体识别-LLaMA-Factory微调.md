@@ -26,15 +26,16 @@ from modelscope import snapshot_download
 snapshot_download('Qwen/Qwen2.5-7B-Instruct', cache_dir='models', revision='master')
 ```
 ### 2.2 数据集构建（alpaca格式）
-data/dataset/alpaca/dataset_info.json
-```
+原始数据
+```json lines
 {
-  "alpaca_clue_train": {
-    "file_name": "alpaca_clue_train.json"
-  }
+	"text": "北京城.",  // 表示原始文本
+	"label": {
+		"NT": {"北京城": [[0, 2]]}  // "label" 表示实体类型（如 NT）及其对应的实体名称和出现的位置索引。
+	}
 }
 ```
-data/dataset/alpaca/alpaca_clue_train.json
+转换为alpaca格式：data/dataset/alpaca/alpaca_clue_train.json
 ```
 [
   {
@@ -44,9 +45,18 @@ data/dataset/alpaca/alpaca_clue_train.json
   }
 ]
 ```
+注册自定义数据集，将数据集添加到全局配置：data/dataset/alpaca/dataset_info.json
+```
+{
+  "alpaca_clue_train": {
+    "file_name": "alpaca_clue_train.json"
+  }
+}
+```
 
-## 三、开始训练
-使用配置文件：conf/Qwen2.5-7B-Instruct-clue-ner-lora-sft.yaml
+## 三、训练流程
+### 3.1 配置文件
+conf/Qwen2.5-7B-Instruct-clue-ner-lora-sft.yaml
 ```
 ### model
 model_name_or_path: ../model_hub/Qwen2.5-7B-Instruct
@@ -79,7 +89,7 @@ overwrite_output_dir: true
 save_only_model: false
 
 ### train
-per_device_train_batch_size: 4  # 每设备训练批次大小
+per_device_train_batch_size: 4  # 每设备训练批次大小, 默认 8
 gradient_accumulation_steps: 8
 learning_rate: 1.0e-4
 num_train_epochs: 3.0
@@ -96,33 +106,61 @@ per_device_eval_batch_size: 1
 eval_strategy: steps
 eval_steps: 500
 ```
+### 3.2 训练过程
+启动训练：
+```shell
+llamafactory-cli train conf/Qwen2.5-7B-Instruct-lora-sft.yaml
+```
+训练时框架会将alpaca格式数据集转换为不同大模型的对话模板，数据示例如下：
++ `inputs`
+```
+<|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+你是一个文本实体识别领域的专家，请从给定的句子中识别并提取出以下指定类别的实体。
 
+<实体类别集合>
+name, organization, scene, company, movie, book, government, position, address, game
 
+<任务说明>
+1. 仅提取属于上述类别的实体，忽略其他类型的实体。
+2. 以json格式输出，对于每个识别出的实体，请提供：
+   - label: 实体类型，必须严格使用原始类型标识（不可更改）
+   - text: 实体在原文中的中文内容
 
+<输出格式要求>
+``json
+[{{"label": "实体类别", "text": "实体名称"}}]
+``
 
-
-
-
-
-
-
-
-### 基于Transformers+peft框架
-利用大模型做NER实践(总结版)
-https://mp.weixin.qq.com/s/LBlzFm8wxK7Aj7YXhCoXgQ
-https://github.com/cjymz886/LLM-NER
-
-LLM Finetune：
-指令微调-文本分类
-指令微调-命名实体识别
-博客：https://blog.csdn.net/SoulmateY/article/details/139831606
-代码：https://github.com/Zeyi-Lin/LLM-Finetune
-
-05-Qwen3-8B-LoRA及SwanLab可视化记录.md
-https://github.com/datawhalechina/self-llm/blob/master/models/Qwen3/05-Qwen3-8B-LoRA%E5%8F%8ASwanLab%E5%8F%AF%E8%A7%86%E5%8C%96%E8%AE%B0%E5%BD%95.md
-
-chinese_ner_sft数据集
-https://hf-mirror.com/datasets/qgyd2021/chinese_ner_sft
+浙商银行企业信贷部叶老桂博士则从另一个角度对五道门槛进行了解读。叶老桂认为，对目前国内商业银行而言，<|im_end|>
+<|im_start|>assistant
+[{"label": "name", "text": "叶老桂"}, {"label": "company", "text": "浙商银行"}]<|im_end|>
+```
++ `labels`
+```
+[{"label": "name", "text": "叶老桂"}, {"label": "company", "text": "浙商银行"}]<|im_end|>
+```
+GPU显存占用情况：
+```
+|===============================+======================+======================|
+|   0  NVIDIA A100-PCI...  Off  | 00000000:65:00.0 Off |                    0 |
+| N/A   67C    P0   193W / 250W |  30756MiB / 40536MiB |     48%      Default |
+|                               |                      |             Disabled |
++-------------------------------+----------------------+----------------------+
+```
+训练日志：
+```
+[INFO|trainer.py:2405] 2025-05-30 02:56:21,267 >> ***** Running training *****
+[INFO|trainer.py:2406] 2025-05-30 02:56:21,268 >>   Num examples = 9,673
+[INFO|trainer.py:2407] 2025-05-30 02:56:21,268 >>   Num Epochs = 3
+[INFO|trainer.py:2408] 2025-05-30 02:56:21,268 >>   Instantaneous batch size per device = 4
+[INFO|trainer.py:2411] 2025-05-30 02:56:21,268 >>   Total train batch size (w. parallel, distributed & accumulation) = 32
+[INFO|trainer.py:2412] 2025-05-30 02:56:21,268 >>   Gradient Accumulation steps = 8
+[INFO|trainer.py:2413] 2025-05-30 02:56:21,268 >>   Total optimization steps = 906
+[INFO|trainer.py:2414] 2025-05-30 02:56:21,274 >>   Number of trainable parameters = 20,185,088
+```
+loss变化
 
 
 ### LLaMA-Factory
