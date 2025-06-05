@@ -36,7 +36,7 @@ CLUENER2020共有10个不同的类别，包括：
 + 验证集：1343 条（作为测试集使用）
 + 测试集：1345 条（未公开）
 
-详情参考 [CLUENER 细粒度命名实体识别](https://github.com/CLUEbenchmark/CLUENER2020)<br>
+下载链接： [cluener_public.zip](https://storage.googleapis.com/cluebenchmark/tasks/cluener_public.zip)，详情参考 [CLUENER 细粒度命名实体识别](https://www.cluebenchmarks.com/introduce.html)<br>
 
 ## 二、模型设计和实验结果
 
