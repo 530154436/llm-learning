@@ -8,9 +8,9 @@ from pathlib import Path
 from modelscope import snapshot_download
 
 if sys.platform == 'win32':
-    DATA_DIR = Path('E:/data/models')
+    DATA_DIR = Path('./')
 else:
-    DATA_DIR = Path('/data/models')
+    DATA_DIR = Path('./')
 
 # snapshot_download("AI-ModelScope/bge-large-zh-v1.5",
 #                   revision='master',
@@ -29,9 +29,9 @@ else:
 #                   revision='master',
 #                   cache_dir=DATA_DIR)
 
-snapshot_download("dienstag/chinese-roberta-wwm-ext",
-                  revision='master',
-                  cache_dir=DATA_DIR)
+# snapshot_download("dienstag/chinese-roberta-wwm-ext",
+#                   revision='master',
+#                   cache_dir=DATA_DIR)
 
 # snapshot_download("openai-community/gpt2",
 #                   revision='master',
@@ -39,3 +39,6 @@ snapshot_download("dienstag/chinese-roberta-wwm-ext",
 # snapshot_download("AI-ModelScope/t5-small",
 #                   revision='master',
 #                   cache_dir=DATA_DIR)
+snapshot_download("Qwen/Qwen2.5-0.5B-Instruct",
+                  revision='master',
+                  cache_dir=DATA_DIR)
