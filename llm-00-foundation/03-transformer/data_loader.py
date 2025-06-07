@@ -103,6 +103,8 @@ class MTDataset(Dataset):
         # Encoder训练时的输入部分
         src_input = src_tensor
         src_mask = create_padding_mask(src_input, pad_token_id=self.src_tokenizer.pad_id())
+
+        # shift-right构造标签
         # Decoder训练时的输入部分
         tgt_input = tgt_tensor[:, :-1]  # 去除每个序列的最后一个token
         tgt_mask = create_sequence_mask(tgt_input, pad_token_id=self.tgt_tokenizer.pad_id())
