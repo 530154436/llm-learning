@@ -48,7 +48,7 @@ def train(pretrain_path: str):
 
     # 训练参数配置
     args = TrainingArguments(
-        output_dir="./output/Qwen2.5-7b",
+        output_dir="./data/output/Qwen2.5-7B-Instruct-clue-ner-lora-sft-peft",
         per_device_train_batch_size=4,
         gradient_accumulation_steps=4,
         logging_steps=10,
@@ -69,4 +69,4 @@ def train(pretrain_path: str):
 
 
 if __name__ == '__main__':
-    train("../model_hub/Qwen2.5-0.5B-Instruct")
+    train("../model_hub/Qwen2.5-7B-Instruct")
