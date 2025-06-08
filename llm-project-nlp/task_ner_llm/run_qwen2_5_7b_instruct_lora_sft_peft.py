@@ -22,7 +22,7 @@ def train(pretrain_path: str, model_path: str):
     dataset: Dataset = data_ds.map(partial(convert_alpaca_to_qwen_chat_template, tokenizer=tokenizer),
                                    remove_columns=data_ds.column_names)
     # 拆分数据集
-    split_dataset = dataset.train_test_split(test_size=0.2, shuffle=True, seed=1024)
+    split_dataset = dataset.train_test_split(test_size=0.1, shuffle=True, seed=1024)
     # 获取训练集和验证集
     train_dataset = split_dataset['train']
     eval_dataset = split_dataset['test']
@@ -56,8 +56,8 @@ def train(pretrain_path: str, model_path: str):
     # 训练参数配置
     args = TrainingArguments(
         output_dir=f"{model_path}/checkpoints",
-        per_device_train_batch_size=4,      # 每块GPU上的批次大小
-        gradient_accumulation_steps=4,      # 累积梯度步数
+        per_device_train_batch_size=2,      # 每块GPU上的批次大小
+        gradient_accumulation_steps=2,      # 累积梯度步数
         num_train_epochs=2,                 # 训练轮数
         logging_steps=10,                   # 日志记录间隔
         learning_rate=1e-4,                 # 微调学习率，一般比预训练时小
@@ -68,7 +68,7 @@ def train(pretrain_path: str, model_path: str):
         save_total_limit=2,                 # 最多保留的检查点数
         eval_strategy="steps",              # 评估触发方式（steps或epoch）
         eval_steps=50,                      # 评估步数
-        metric_for_best_model="loss",       # 使用验证 loss 判断最佳模型
+        metric_for_best_model="eval_loss",  # 使用验证 loss 判断最佳模型
         load_best_model_at_end=True
     )
     trainer = Trainer(
