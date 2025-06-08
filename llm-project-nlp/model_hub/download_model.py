@@ -39,6 +39,6 @@ else:
 # snapshot_download("AI-ModelScope/t5-small",
 #                   revision='master',
 #                   cache_dir=DATA_DIR)
-snapshot_download("Qwen/Qwen2.5-0.5B-Instruct",
+snapshot_download("Qwen/Qwen2.5-7B-Instruct",
                   revision='master',
                   cache_dir=DATA_DIR)

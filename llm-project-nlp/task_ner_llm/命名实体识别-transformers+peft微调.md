@@ -1,9 +1,5 @@
 
 
-
-
-
-
 微调输入格式：
 ```shell
 # qwen对话模板
@@ -19,7 +15,17 @@ labels:       : [-100, -100, -100, ..., 100358, 151645, 151643]
 ```
 
 ```
-
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 470.57.02    Driver Version: 470.57.02    CUDA Version: 12.2     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA A100-PCI...  Off  | 00000000:65:00.0 Off |                    0 |
+| N/A   66C    P0   168W / 250W |  25250MiB / 40536MiB |     61%      Default |
+|                               |                      |             Disabled |
++-------------------------------+----------------------+----------------------+
 
 1、在构造模型输入 input_ids 时，不仅包含了用户输入（query），还把标签（response）也拼接进去了。
 因为语言模型是通过上下文预测下一个 token，所以必须把完整的历史上下文（包括 input 和 response）都传给模型。
@@ -37,6 +43,8 @@ def __init__(self, weight: Optional[Tensor] = None, size_average=None, ignore_in
 推理时不需要 labels，只需要 input，模型会自回归地生成 response。
 
 
+大模型微调新手全流程友好指南
+https://cloud.tencent.com/developer/article/2517177
 
 ### 基于Transformers+peft框架
 利用大模型做NER实践(总结版)
