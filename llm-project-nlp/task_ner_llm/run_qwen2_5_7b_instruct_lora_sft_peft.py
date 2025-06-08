@@ -14,13 +14,20 @@ from llm_util.chat_template import convert_alpaca_to_qwen_chat_template
 
 def train(pretrain_path: str):
     # 加载源数据 (10748, 3)
-    train_raw = json.load(open("data/dataset/alpaca/alpaca_clue_train.json", mode='r', encoding='utf-8'))
-    train_ds: Dataset = Dataset.from_list(train_raw)
+    data_raw = json.load(open("data/dataset/alpaca/alpaca_clue_train.json", mode='r', encoding='utf-8'))
+    data_ds: Dataset = Dataset.from_list(data_raw)
     # 加载分词器
     tokenizer = AutoTokenizer.from_pretrained(pretrain_path, use_fast=False, trust_remote_code=True)
     # 生成数据集
-    train_dataset: Dataset = train_ds.map(partial(convert_alpaca_to_qwen_chat_template, tokenizer=tokenizer),
-                                          remove_columns=train_ds.column_names)
+    dataset: Dataset = data_ds.map(partial(convert_alpaca_to_qwen_chat_template, tokenizer=tokenizer),
+                                   remove_columns=data_ds.column_names)
+    # 拆分数据集
+    split_dataset = dataset.train_test_split(test_size=0.2, shuffle=True, seed=1024)
+    # 获取训练集和验证集
+    train_dataset = split_dataset['train']
+    eval_dataset = split_dataset['test']
+    print("Train dataset:", train_dataset.shape)
+    print("Eval dataset:", eval_dataset.shape)
 
     # Lora配置
     # bfloat16 是一种 16 位浮点数格式（Brain Floating Point），相比标准的 float32：
@@ -48,24 +55,32 @@ def train(pretrain_path: str):
 
     # 训练参数配置
     args = TrainingArguments(
-        output_dir="./data/output/Qwen2.5-7B-Instruct-clue-ner-lora-sft-peft",
+        output_dir="./data/outputs/Qwen2.5-7B-Instruct-clue-ner-lora-sft-peft",
         per_device_train_batch_size=4,
         gradient_accumulation_steps=4,
         logging_steps=10,
         num_train_epochs=2,
-        save_steps=100,
         learning_rate=1e-4,
         save_on_each_node=True,
         gradient_checkpointing=True,
         report_to="none",
+        save_steps=500,
+        save_total_limit=2,
+        save_strategy="best",
+        metric_for_best_model="eval_loss",  # 使用验证 loss 判断最佳模型
     )
     trainer = Trainer(
         model=model,
         args=args,
         train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
         data_collator=DataCollatorForSeq2Seq(tokenizer=tokenizer, padding=True)
     )
     trainer.train()
+
+    # 获取最佳模型的路径
+    best_checkpoint = trainer.state.best_model_checkpoint
+    print(f"Best model saved at: {best_checkpoint}")
 
 
 if __name__ == '__main__':
