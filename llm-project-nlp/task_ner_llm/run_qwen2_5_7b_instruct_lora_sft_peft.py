@@ -67,7 +67,7 @@ def train(pretrain_path: str, model_path: str):
         save_steps=200,                     # 模型保存间隔
         save_total_limit=2,                 # 最多保留的检查点数
         eval_strategy="steps",              # 评估触发方式（steps或epoch）
-        eval_steps=50,                      # 评估步数
+        eval_steps=200,                     # 评估步数
         metric_for_best_model="eval_loss",  # 使用验证 loss 判断最佳模型
         load_best_model_at_end=True
     )
