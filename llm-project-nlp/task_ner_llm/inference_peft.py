@@ -31,7 +31,7 @@ def load_adapter_model() -> PeftModel:
     pretrain_path = "../model_hub/Qwen2.5-7B-Instruct"
     adapter_model_path = "./data/outputs/Qwen2.5-7B-Instruct-clue-ner-lora-sft-peft"
     # 加载基础模型和分词器
-    model = AutoModelForCausalLM.from_pretrained(pretrain_path)
+    model = AutoModelForCausalLM.from_pretrained(pretrain_path, device_map="auto")
     tokenizer = AutoTokenizer.from_pretrained(pretrain_path)
     model = PeftModel.from_pretrained(model, adapter_model_path)
     print(type(model), type(tokenizer))
