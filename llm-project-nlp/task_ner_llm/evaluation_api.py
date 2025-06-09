@@ -128,15 +128,18 @@ def evaluate_llm(base_url: str, api_key: str, model: str):
             print(y_pred)
             print()
             writer.write(json.dumps(item, ensure_ascii=False) + "\n")
+            data.append(item)
 
     # 评测
     y_trues = [i.get("y_true") for i in data]
     y_preds = [i.get("y_pred") for i in data]
     metrics = batch_evaluate(y_trues, y_preds)
     df = metrics_to_dataframe(metrics)
+    df.sort_values(by=["Label"], ascending=False, inplace=True)
     print(df.to_string(index=False))
 
 
 if __name__ == '__main__':
     # Qwen2.5-7B-Instruct-ner-lora-sft
-    evaluate_llm(base_url="http://172.19.190.6:31833/v1", api_key="<KEY>", model="clue-ner-lora-sft")
+    # evaluate_llm(base_url="http://172.19.190.6:31833/v1", api_key="<KEY>", model="clue-ner-lora-sft")
+    evaluate_llm(base_url="http://172.19.190.6:31833/v1", api_key="<KEY>", model="clue-ner-lora-sft-peft")

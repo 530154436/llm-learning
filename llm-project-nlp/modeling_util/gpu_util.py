@@ -4,6 +4,7 @@
 # @time: 2025/5/23 13:47
 # @function:
 import functools
+import gc
 import subprocess
 import torch
 from loguru import logger
