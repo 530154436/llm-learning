@@ -69,8 +69,45 @@ snapshot_download('Qwen/Qwen2.5-7B-Instruct', cache_dir='models', revision='mast
 <|im_start|>assistant
 {response2}<|im_end|><|endoftext|>
 ```
+输入
+```
+<|im_start|>system\n你是一个文本实体识别领域的专家，擅长从自然语言中提取不同类别的实体名称。<|im_end|>\n<|im_start|>user\n请从给定的句子中识别并提取出以下指定类别的实体。\n\n<实体类别集合>\nname, organization, scene, company, movie, book, government, position, address, game\n\n<任务说明>\n1. 仅提取属于上述类别的实体，忽略其他类型的实体。\n2. 以json格式输出，对于每个识别出的实体，请提供：\n   - label: 实体类型，必须严格使用原始类型标识（不可更改）\n   - text: 实体在原文中的中文内容\n\n<输出格式要求>\n```json\n[{\"label\": \"实体类别\", \"text\": \"实体名称\"}]\n```\n\n<输入文本>\n凯尔特人在苏格兰赛场连胜7场，不过连胜含金量要打折扣。双方首回合交锋奥尔堡客场逼平凯尔特人。<|im_end|>\n<|im_start|>assistant\n
+```
+输出
+```
+"[{\"label\": \"organization\", \"text\": \"苏格兰\"}, {\"label\": \"organization\", \"text\": \"奥尔堡\"}, {\"label\": \"organization\", \"text\": \"凯尔特人\"}]<|im_end|><|endoftext|>"
+```
+
 在实际 tokenization 阶段，该模板将被转换为特定的词元序列，例如：
 ```shell
+<|im_start|>system
+你是一个文本实体识别领域的专家，擅长从自然语言中提取不同类别的实体名称。<|im_end|>
+<|im_start|>user
+请从给定的句子中识别并提取出以下指定类别的实体。
+
+<实体类别集合>
+name, organization, scene, company, movie, book, government, position, address, game
+
+<任务说明>
+1. 仅提取属于上述类别的实体，忽略其他类型的实体。
+2. 以json格式输出，对于每个识别出的实体，请提供：
+   - label: 实体类型，必须严格使用原始类型标识（不可更改）
+   - text: 实体在原文中的中文内容
+
+<输出格式要求>
+```json
+[{"label": "实体类别", "text": "实体名称"}]
+```
+
+<输入文本>
+凯尔特人在苏格兰赛场连胜7场，不过连胜含金量要打折扣。双方首回合交锋奥尔堡客场逼平凯尔特人。<|im_end|>
+<|im_start|>assistant
+
+[{"label": "organization", "text": "苏格兰"}, {"label": "organization", "text": "奥尔堡"}, {"label": "organization", "text": "凯尔特人"}]<|im_end|><|endoftext|>
+
+
+
+
 input_text    : <|im_start|>system\n请从给定的句子中识别并提取出以下指定类别的实体。浙商银行企业<|im_end|>\n<|im_start|>user\n{input}<|im_end|>\n<|im_start|>assistant\n
 input_token   : ['<|im_start|>', 'system', 'Ċ', ..., 'éĵ¶è¡Į', '<|im_end|>', '<|endoftext|>']
 input_ids     : [151644, 8948, 198, ..., 100358, 151645, 151643]
