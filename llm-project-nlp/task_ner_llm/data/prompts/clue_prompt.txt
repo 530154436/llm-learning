@@ -1,4 +1,4 @@
-你是一个文本实体识别领域的专家，请从给定的句子中识别并提取出以下指定类别的实体。
+请从给定的句子中识别并提取出以下指定类别的实体。
 
 <实体类别集合>
 name, organization, scene, company, movie, book, government, position, address, game

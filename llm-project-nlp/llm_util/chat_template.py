@@ -52,8 +52,8 @@ if __name__ == "__main__":
         print(_token, _token_id)
 
     _example = {
-        "instruction": "请从给定的句子中识别并提取出以下指定类别的实体。",
-        "input": "浙商银行企业",
+        "instruction": "请从给定的句子中识别并提取出以下指定类别的实体。浙商银行企业",
+        "input": "",
         "output": "浙商银行"
     }
     convert_alpaca_to_qwen_chat_template(_example, _tokenizer)

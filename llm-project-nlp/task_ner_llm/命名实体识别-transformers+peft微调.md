@@ -1,16 +1,78 @@
 
-### 微调训练
-数据集（alpaca）：
-```
 
+## 一、环境配置
+docker镜像
 ```
-格式转换（对话模板、词元化、掩码等）：
+FROM nvidia/cuda:12.2.2-cudnn8-runtime-ubuntu22.04
+```
+CUDA版本
 ```shell
-# qwen对话模板
-input_template: "<|im_start|>system\n{instruction}<|im_end|>\n<|im_start|>user\n{input}<|im_end|>\n<|im_start|>assistant\n{output}<|im_end|><|endoftext|>"
+nvcc -V
+# Cuda compilation tools, release 12.2, V12.2.140
+# Build cuda_12.2.r12.2/compiler.33191640_0
+```
+PYTHON版本和主要依赖库
+```
+Python 3.10.12 (main, Sep 11 2024, 15:47:36) [GCC 11.4.0] on linux
+--------------------------------- -------------- -----
+accelerate                        1.7.0
+datasets                          3.6.0
+torch                             2.4.0
+tqdm                              4.66.5
+traitlets                         5.14.3
+transformers                      4.51.0
+vllm                              0.6.3.post1
+```
 
-# 模型输入特征
-input_id_token: ['<|im_start|>', 'system', 'Ċ', ..., 'éĵ¶è¡Į', '<|im_end|>', '<|endoftext|>']
+## 二、准备工作
+
+### 2.1 基座模型下载
+```python
+from modelscope import snapshot_download
+snapshot_download('Qwen/Qwen2.5-7B-Instruct', cache_dir='models', revision='master')
+```
+
+### 2.2 数据集构建
+原始数据：data/dataset/clue.train.jsonl
+```json lines
+{
+	"text": "北京城.",  // 表示原始文本
+	"label": {
+		"NT": {"北京城": [[0, 2]]}  // "label" 表示实体类型（如 NT）及其对应的实体名称和出现的位置索引。
+	}
+}
+```
+转换为alpaca格式：data/dataset/alpaca/alpaca_clue_train.json
+```
+[
+  {
+    "instruction": "你是一个文本实体识别领域的专家，请从给定的句子中识别并提取出以下指定类别的实体。\n\n<实体类别集合>\nname, organization, scene, company, movie, book, government, position, address, game\n\n<任务说明>\n1. 仅提取属于上述类别的实体，忽略其他类型的实体。\n2. 以json格式输出，对于每个识别出的实体，请提供：\n   - label: 实体类型，必须严格使用原始类型标识（不可更改）\n   - text: 实体在原文中的中文内容\n\n<输出格式要求>\n```json\n[{\"label\": \"实体类别\", \"text\": \"实体名称\"}]\n```\n\n<输入文本>\n北京城.",
+    "input": "",
+    "output": "[{\"label\": \"address\", \"text\": \"北京城\"}]"
+  }
+]
+```
+
+## 三、整体流程
+### 3.1 微调阶段
+### 3.1.1 对话模板适配
+针对 Qwen 模型的对话格式要求，采用如下对话模板对输入数据进行格式化（[通义千问 (Qwen-核心概念-对话模板)](https://qwen.readthedocs.io/zh-cn/latest/getting_started/concepts.html)）：
+```
+<|im_start|>system
+{system}<|im_end|>
+<|im_start|>user
+{query1}<|im_end|>
+<|im_start|>assistant
+{response1}<|im_end|>
+<|im_start|>user
+{query2}<|im_end|>
+<|im_start|>assistant
+{response2}<|im_end|><|endoftext|>
+```
+在实际 tokenization 阶段，该模板将被转换为特定的词元序列，例如：
+```shell
+input_text    : <|im_start|>system\n请从给定的句子中识别并提取出以下指定类别的实体。浙商银行企业<|im_end|>\n<|im_start|>user\n{input}<|im_end|>\n<|im_start|>assistant\n
+input_token   : ['<|im_start|>', 'system', 'Ċ', ..., 'éĵ¶è¡Į', '<|im_end|>', '<|endoftext|>']
 input_ids     : [151644, 8948, 198, ..., 100358, 151645, 151643]
 attention_mask: [1, 1, 1, ..., 1, 1, 1]
 labels:       : [-100, -100, -100, ..., 100358, 151645, 151643]

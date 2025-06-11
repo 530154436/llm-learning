@@ -38,8 +38,8 @@ llamafactory-cli version
 from modelscope import snapshot_download
 snapshot_download('Qwen/Qwen2.5-7B-Instruct', cache_dir='models', revision='master')
 ```
-### 2.2 数据集构建（alpaca格式）
-原始数据
+### 2.2 数据集构建
+原始数据：data/dataset/clue.train.jsonl
 ```json lines
 {
 	"text": "北京城.",  // 表示原始文本
@@ -53,8 +53,8 @@ snapshot_download('Qwen/Qwen2.5-7B-Instruct', cache_dir='models', revision='mast
 [
   {
     "instruction": "你是一个文本实体识别领域的专家，请从给定的句子中识别并提取出以下指定类别的实体。\n\n<实体类别集合>\nname, organization, scene, company, movie, book, government, position, address, game\n\n<任务说明>\n1. 仅提取属于上述类别的实体，忽略其他类型的实体。\n2. 以json格式输出，对于每个识别出的实体，请提供：\n   - label: 实体类型，必须严格使用原始类型标识（不可更改）\n   - text: 实体在原文中的中文内容\n\n<输出格式要求>\n```json\n[{{\"label\": \"实体类别\", \"text\": \"实体名称\"}}]\n```",
-    "input": "浙商银行企业信贷部叶老桂博士则从另一个角度对五道门槛进行了解读。叶老桂认为，对目前国内商业银行而言，",
-    "output": "[{\"label\": \"name\", \"text\": \"叶老桂\"}, {\"label\": \"company\", \"text\": \"浙商银行\"}]"
+    "input": "北京城.",
+    "output": "[{\"label\": \"address\", \"text\": \"北京城\"}]"
   }
 ]
 ```

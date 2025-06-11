@@ -20,8 +20,8 @@ def convert_clue_ner_to_prompt1(file: str) -> list:
                 entities.append({"label": ent_type, "text": name})
 
         alpaca_item = {
-            "instruction": prompt_template.format(text=text),
-            "input": "",
+            "instruction": "你是一个文本实体识别领域的专家，擅长从自然语言中提取不同类别的实体名称。",
+            "input": prompt_template.format(text=text),
             "output": json.dumps(entities, ensure_ascii=False)
         }
         alpaca_data.append(alpaca_item)
