@@ -5,35 +5,6 @@
 # @function:
 from transformers import AutoTokenizer, Qwen2Tokenizer
 
-
-def process_func(example):
-    """
-    将数据集进行预处理
-    """
-    MAX_LENGTH = 384
-    input_ids, attention_mask, labels = [], [], []
-    instruction = tokenizer(
-        f"<|im_start|>system\n{example['instruction']}<|im_end|>\n<|im_start|>user\n{example['input']}<|im_end|>\n<|im_start|>assistant\n",
-        add_special_tokens=False,
-    )
-    response = tokenizer(f"{example['output']}", add_special_tokens=False)
-    input_ids = (
-            instruction["input_ids"] + response["input_ids"] + [tokenizer.pad_token_id]
-    )
-    attention_mask = instruction["attention_mask"] + response["attention_mask"] + [1]
-    labels = (
-            [-100] * len(instruction["input_ids"])
-            + response["input_ids"]
-            + [tokenizer.pad_token_id]
-    )
-    if len(input_ids) > MAX_LENGTH:  # 做一个截断
-        input_ids = input_ids[:MAX_LENGTH]
-        attention_mask = attention_mask[:MAX_LENGTH]
-        labels = labels[:MAX_LENGTH]
-
-    return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": labels}
-
-
 QWEN_QUERY_TEMPLATE = "<|im_start|>system\n{instruction}<|im_end|>\n<|im_start|>user\n{input}<|im_end|>\n<|im_start|>assistant\n"
 QWEN_RESPONSE_TEMPLATE = "{output}<|im_end|><|endoftext|>"
 
