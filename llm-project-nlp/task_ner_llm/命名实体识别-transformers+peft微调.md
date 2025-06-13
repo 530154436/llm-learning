@@ -95,9 +95,9 @@ name, organization, scene, company, movie, book, government, position, address, 
    - text: 实体在原文中的中文内容
 
 <输出格式要求>
-```json
+\```json
 [{"label": "实体类别", "text": "实体名称"}]
-```
+\```
 
 <输入文本>
 凯尔特人在苏格兰赛场连胜7场，不过连胜含金量要打折扣。双方首回合交锋奥尔堡客场逼平凯尔特人。<|im_end|>
@@ -122,15 +122,25 @@ labels:       : [-100, -100, -100, ..., 100358, 151645, 151643]
 {'train_runtime': 8418.1136, 'train_samples_per_second': 2.298, 'train_steps_per_second': 0.574, 'train_loss': 0.05433076250654198, 'epoch': 2.0}                              
 100%|██████████████████████| 4836/4836 [2:20:18<00:00,  1.74s/it]
 Best model saved at: ./data/outputs/Qwen2.5-7B-Instruct-clue-ner-lora-sft-peft/checkpoints/checkpoint-4200
-```
+
 
 |===============================+======================+======================|
 |   0  NVIDIA A100-PCI...  Off  | 00000000:65:00.0 Off |                    0 |
 | N/A   66C    P0   168W / 250W |  35250MiB / 40536MiB |     61%      Default |
 |                               |                      |             Disabled |
 +-------------------------------+----------------------+----------------------+
+```
 
-推理阶段：
+### 3.1 推理阶段
+
+OpenAI接口方式
+```
+[{'role': 'system', 'content': '你是一个文本实体识别领域的专家，擅长从自然语言中提取不同类别的实体名称。'}, {'role': 'user', 'content': '请从给定的句子中识别并提取出以下指定类别的实体。\n\n<实体类别集合>\nname, organization, scene, company, movie, book, government, position, address, game\n\n<任务说明>\n1. 仅提取属于上述类别的实体，忽略其他类型的实体。\n2. 以json格式输出，对于每个识别出的实体，请提供：\n   - label: 实体类型，必须严格使用原始类型标识（不可更改）\n   - text: 实体在原文中的中文内容\n\n<输出格式要求>\n```json\n[{"label": "实体类别", "text": "实体名称"}]\n```\n\n<输入文本>\n现在的阿森纳恐怕不能再给人以强队的信心，但教授的神经也真是够硬，在英超夺冠几无希望的情况下，'}]
+
+[{'label': 'organization', 'text': '阿森纳'}, {'label': 'organization', 'text': '英超'}, {'label': 'position', 'text': '教授'}]
+```
+
+peft
 ```
 <|im_start|>system
 You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>

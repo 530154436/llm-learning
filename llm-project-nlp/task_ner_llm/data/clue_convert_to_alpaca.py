@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import json
+from pathlib import Path
 
 
 def convert_clue_ner_to_prompt1(file: str) -> list:
-    prompt_template = "".join(open("prompts/clue_prompt.txt", encoding="utf-8").readlines())
+    prompt_template = "".join(open(Path(__file__).parent.__str__() +
+                                   "/prompts/clue_prompt.txt", encoding="utf-8").readlines())
 
     with open(file, 'r', encoding='utf-8') as f:
         lines = [json.loads(line.strip()) for line in f]

@@ -118,12 +118,12 @@ def evaluate_llm(base_url: str, api_key: str, model: str):
                                  frequency_penalty=None, presence_penalty=None)
         writer = save_file.open('w', encoding='utf-8')
         for i, line in enumerate(convert_clue_ner_to_prompt1('data/dataset/clue.dev.jsonl'), start=1):
-            prompt = line['instruction'] + line['input']
+            chat_client.system_message = line['instruction']
+            prompt = line['input']
             y_true = json.loads(line['output'])
             y_pred = convert_json_array_in_text_to_list(chat_client.completion(prompt).get("content"))
             item = {'input': line['input'], "y_true": y_true, "y_pred": y_pred}
             print(i)
-            print(line['input'])
             print(y_true)
             print(y_pred)
             print()
