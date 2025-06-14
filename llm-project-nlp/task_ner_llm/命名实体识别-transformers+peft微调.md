@@ -157,7 +157,7 @@ labels:       : [-100, -100, -100, ..., 100358, 151645, 151643]
 > 1、在构造模型输入 input_ids 时，不仅包含了用户输入（query），还把标签（response）也拼接进去了。<br>
 > 因为语言模型是通过上下文预测下一个 token，所以必须把完整的历史上下文（包括 input 和 response）都传给模型。
 > 
-> 2. 为什么 labels 要用 -100 屏蔽 input 部分？<br>
+> 2、为什么 labels 要用 -100 屏蔽 input 部分？<br>
 > 目的： 只让模型对 response（输出回答）部分 进行预测和计算损失，忽略 input（用户输入）部分。<br>
 > 原因： -100 是 PyTorch 中 `torch.nn.CrossEntropyLoss` 的默认 “忽略索引”（ignore index）。 当标签中出现 -100 时，PyTorch 会自动跳过该位置的损失计算。<br>
 > `torch.nn.CrossEntropyLoss 的构造函数 def __init__(self, ..., ignore_index: int = -100, ...)`
