@@ -143,9 +143,9 @@ OpenAI接口方式
 peft
 ```
 <|im_start|>system
-You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>
+你是一个文本实体识别领域的专家，擅长从自然语言中提取不同类别的实体名称。<|im_end|>
 <|im_start|>user
-请从给定的句子中识别并提取出以下指定类别的实体。浙商银行企业<|im_end|>
+请从给定的句子中识别并提取出以下指定类别的实体。\n\n<实体类别集合>\nname, organization, scene, company, movie, book, government, position, address, game\n\n<任务说明>\n1. 仅提取属于上述类别的实体，忽略其他类型的实体。\n2. 以json格式输出，对于每个识别出的实体，请提供：\n   - label: 实体类型，必须严格使用原始类型标识（不可更改）\n   - text: 实体在原文中的中文内容\n\n<输出格式要求>\n```json\n[{"label": "实体类别", "text": "实体名称"}]\n```\n\n<输入文本>\n现在的阿森纳恐怕不能再给人以强队的信心，但教授的神经也真是够硬，在英超夺冠几无希望的情况下，<|im_end|>
 <|im_start|>assistant
 
 {'input_ids': tensor([[151644,   8948,    198,   2610,    525,   1207,  16948,     11,   3465,
