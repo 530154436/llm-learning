@@ -11,20 +11,46 @@ from modeling_util.model_util import auto_device
 
 def predict(messages: List[dict], model: PeftModel, tokenizer):
     device = auto_device()
+    # 获取当前设备（如 cuda:0）
+    device = model.device
+
+    # 构建对话模板文本（用于模型输入）
     text = tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
+        messages,
+        tokenize=False,
+        add_generation_prompt=True
     )
+    print("【DEBUG】构建后的 prompt 文本：")
     print(text)
+    print("\n" + "-" * 80 + "\n")
+
+    # Tokenize 输入文本并转换为张量
     model_inputs = tokenizer([text], return_tensors="pt").to(device)
+    print("【DEBUG】tokenized 输入内容 (input_ids & attention_mask)：")
     print(model_inputs)
+    print("\n" + "-" * 80 + "\n")
+
+    # 模型生成 token ID 序列
     generated_ids = model.generate(model_inputs.input_ids, max_new_tokens=512)
+    print("【DEBUG】原始生成的 token IDs：")
+    print(generated_ids)
+    print("\n" + "-" * 80 + "\n")
+
+    # 截取仅输出部分（去掉 prompt 部分）
     generated_ids = [
         output_ids[len(input_ids):]
         for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
     ]
+    print("【DEBUG】截断后的生成 token IDs（仅回答部分）：")
     print(generated_ids)
+    print("\n" + "-" * 80 + "\n")
+
+    # 解码生成内容为自然语言
     response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    print("【DEBUG】最终解码结果（JSON 格式实体识别结果）：")
     print(response)
+    print("\n" + "-" * 80 + "\n")
+
     return response
 
 
