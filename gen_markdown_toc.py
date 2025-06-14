@@ -68,4 +68,5 @@ if __name__ == "__main__":
     # process_markdown_file("llm-00-nlp/02-tokenization/常用算法.md")
     # process_markdown_file("llm-project-nlp/docs/命名实体识别-01-Bert微调.md")
     # process_markdown_file("llm-project-nlp/task_ner_llm/命名实体识别-LLaMA-Factory微调.md")
-    process_markdown_file("llm-finetune/LLaMA-Factory-安装和使用.md")
+    # process_markdown_file("llm-finetune/LLaMA-Factory-安装和使用.md")
+    process_markdown_file("llm-project-nlp/task_ner_llm/命名实体识别-transformers+peft微调.md")

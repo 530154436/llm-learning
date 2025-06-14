@@ -1,3 +1,29 @@
+<nav>
+<a href="#一环境配置">一、环境配置</a><br/>
+<a href="#二准备工作">二、准备工作</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#21-基座模型下载">2.1 基座模型下载</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#22-数据集构建">2.2 数据集构建</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#原始数据">原始数据</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#提示词模板">提示词模板</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#alpaca-格式转换">Alpaca 格式转换</a><br/>
+<a href="#三整体流程">三、整体流程</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#31-微调阶段">3.1 微调阶段</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#311-对话模板适配">3.1.1 对话模板适配</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#312-tokenization分词与编码">3.1.2 Tokenization（分词与编码）</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#313-主要参数配置">3.1.3 主要参数配置</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#314-训练过程摘要">3.1.4 训练过程摘要</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#32-推理阶段">3.2 推理阶段</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#321-vllm-openai-api的部署方式">3.2.1 vLLM + OpenAI API的部署方式</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#启动服务端命令">启动服务端命令</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#查询模型列表接口">查询模型列表接口</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#示例调用ner-实体识别任务">示例调用：NER 实体识别任务</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#322-基于-transformers-peft-的本地推理部署">3.2.2 基于 transformers + PEFT 的本地推理部署</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#加载模型和分词器">加载模型和分词器</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#输出示例">输出示例</a><br/>
+<a href="#四模型评估结果">四、模型评估结果</a><br/>
+<a href="#参考引用">参考引用</a><br/>
+</nav>
+
 
 
 ## 一、环境配置
@@ -279,15 +305,14 @@ curl http://localhost:8000/v1/chat/completions -H "Content-Type: application/jso
 ```
 返回结果：
 ```
-[{'label': 'organization', 'text': '阿森纳'}, 
- {'label': 'organization', 'text': '英超'}, 
- {'label': 'position', 'text': '教授'}]
+[{'label': 'organization', 'text': '阿森纳'}, {'label': 'organization', 'text': '英超'}, {'label': 'position', 'text': '教授'}]
 ```
 
 #### 3.2.2 基于 transformers + PEFT 的本地推理部署
 除了使用 vLLM 进行高性能服务化部署外，我们也可以通过 HuggingFace 的 transformers 框架结合 `PEFT`（Parameter-Efficient Fine-Tuning） 库实现本地加载和推理 LoRA 微调后的模型。
 这种方式适用于开发调试、小规模部署或对推理过程有更细粒度控制的场景。
 
+##### 加载模型和分词器
 ```python
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
@@ -306,19 +331,47 @@ def load_adapter_model() -> PeftModel:
     return model, tokenizer
 
 def predict(messages: List[dict], model: PeftModel, tokenizer):
-    """ 根据给定的消息列表进行实体识别任务的生成式推理。
-    """
     device = auto_device()
+    # 获取当前设备（如 cuda:0）
+    device = model.device
+
+    # 构建对话模板文本（用于模型输入）
     text = tokenizer.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
+        messages,
+        tokenize=False,
+        add_generation_prompt=True
     )
+    print("【DEBUG】构建后的 prompt 文本：")
+    print(text)
+    print("\n" + "-" * 80 + "\n")
+
+    # Tokenize 输入文本并转换为张量
     model_inputs = tokenizer([text], return_tensors="pt").to(device)
+    print("【DEBUG】tokenized 输入内容 (input_ids & attention_mask)：")
+    print(model_inputs)
+    print("\n" + "-" * 80 + "\n")
+
+    # 模型生成 token ID 序列
     generated_ids = model.generate(model_inputs.input_ids, max_new_tokens=512)
+    print("【DEBUG】原始生成的 token IDs：")
+    print(generated_ids)
+    print("\n" + "-" * 80 + "\n")
+
+    # 截取仅输出部分（去掉 prompt 部分）
     generated_ids = [
         output_ids[len(input_ids):]
         for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
     ]
+    print("【DEBUG】截断后的生成 token IDs（仅回答部分）：")
+    print(generated_ids)
+    print("\n" + "-" * 80 + "\n")
+
+    # 解码生成内容为自然语言
     response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    print("【DEBUG】最终解码结果（JSON 格式实体识别结果）：")
+    print(response)
+    print("\n" + "-" * 80 + "\n")
+
     return response
 
 
@@ -330,14 +383,18 @@ model, tokenizer = load_adapter_model()
 response = predict(messages, model, tokenizer)
 print(response)
 ```
+##### 输出示例
 
+1、构建后的 Prompt 文本：
 ```
 <|im_start|>system
 你是一个文本实体识别领域的专家，擅长从自然语言中提取不同类别的实体名称。<|im_end|>
 <|im_start|>user
 请从给定的句子中识别并提取出以下指定类别的实体。\n\n<实体类别集合>\nname, organization, scene, company, movie, book, government, position, address, game\n\n<任务说明>\n1. 仅提取属于上述类别的实体，忽略其他类型的实体。\n2. 以json格式输出，对于每个识别出的实体，请提供：\n   - label: 实体类型，必须严格使用原始类型标识（不可更改）\n   - text: 实体在原文中的中文内容\n\n<输出格式要求>\n```json\n[{"label": "实体类别", "text": "实体名称"}]\n```\n\n<输入文本>\n现在的阿森纳恐怕不能再给人以强队的信心，但教授的神经也真是够硬，在英超夺冠几无希望的情况下，<|im_end|>
 <|im_start|>assistant
-
+```
+2、生成 input_ids、attention_mask
+```
 {'input_ids': tensor([[151644,   8948,    198,   2610,    525,   1207,  16948,     11,   3465,
             553,  54364,  14817,     13,   1446,    525,    264,  10950,  17847,
              13, 151645,    198, 151644,    872,    198,  14880,  45181,  89012,
@@ -347,15 +404,15 @@ print(response)
  'attention_mask': tensor([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
          1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
          1, 1]], device='cuda:0')}
+```
+3、原始生成的 Token IDs：
+```
 [tensor([ 99487, 109949, 102298,  87752, 101565,  48443,  73218,  13072,   5122,
         100779,  32022, 100358, 151645], device='cuda:0')]
 ```
-
-返回结果：
+4、最终解码结果（NER 实体识别）：
 ```
-[{'label': 'organization', 'text': '阿森纳'}, 
- {'label': 'organization', 'text': '英超'}, 
- {'label': 'position', 'text': '教授'}]
+[{'label': 'organization', 'text': '阿森纳'}, {'label': 'organization', 'text': '英超'}, {'label': 'position', 'text': '教授'}]
 ```
 
 
@@ -369,13 +426,7 @@ Error in model execution: LoRA rank 64 is greater than max_lora_rank 16.
 python -m vllm.entrypoints.openai.api_server --max-lora-rank 64 ...
 ```
 
-
-
-
-
-
-
-
+## 四、模型评估结果
 ```
        Label Precision  Recall     F1
        scene    0.6933  0.5678 0.6243
@@ -392,36 +443,12 @@ organization    0.8102   0.782 0.7959
   Macro Avg.         -       - 0.7920
 ```
 
-
-
-
-
-[] [vllm官方文档](https://docs.vllm.ai/en/v0.5.2/models/lora.html)<br>
-
-
-
-大模型微调新手全流程友好指南
-https://cloud.tencent.com/developer/article/2517177
-
-### 基于Transformers+peft框架
-利用大模型做NER实践(总结版)
-https://mp.weixin.qq.com/s/LBlzFm8wxK7Aj7YXhCoXgQ
-https://github.com/cjymz886/LLM-NER
-
-LLM Finetune：
-指令微调-文本分类
-指令微调-命名实体识别
-博客：https://blog.csdn.net/SoulmateY/article/details/139831606
-代码：https://github.com/Zeyi-Lin/LLM-Finetune
-
-05-Qwen3-8B-LoRA及SwanLab可视化记录.md
-https://github.com/datawhalechina/self-llm/blob/master/models/Qwen3/05-Qwen3-8B-LoRA%E5%8F%8ASwanLab%E5%8F%AF%E8%A7%86%E5%8C%96%E8%AE%B0%E5%BD%95.md
-
-chinese_ner_sft数据集
-https://hf-mirror.com/datasets/qgyd2021/chinese_ner_sft
-
-Qwen2.5大模型微调实战：医疗命名实体识别任务（完整代码）
-https://zhuanlan.zhihu.com/p/19682001982
-
-基于 Qwen2.5-0.5B 微调训练 Ner 命名实体识别任务
-https://blog.csdn.net/qq_43692950/article/details/142631780
+## 参考引用
+[1] [05-Qwen3-8B-LoRA及SwanLab可视化记录.md](https://github.com/datawhalechina/self-llm/blob/master/models/Qwen3/05-Qwen3-8B-LoRA%E5%8F%8ASwanLab%E5%8F%AF%E8%A7%86%E5%8C%96%E8%AE%B0%E5%BD%95.md)<br>
+[2] [LLM Finetune-指令微调-命名实体识别/文本分类-Github](https://github.com/Zeyi-Lin/LLM-Finetune)<br>
+[3] [LLM Finetune-指令微调-博客](https://blog.csdn.net/SoulmateY/article/details/139831606)<br>
+[4] [vllm官方文档](https://docs.vllm.ai/en/v0.5.2/models/lora.html)<br>
+[5] [利用大模型做NER实践(总结版)-Github](https://github.com/cjymz886/LLM-NER)<br>
+[6] [利用大模型做NER实践(总结版)-博客](https://mp.weixin.qq.com/s/LBlzFm8wxK7Aj7YXhCoXgQ)<br>
+[7] [大模型微调新手全流程友好指南](https://cloud.tencent.com/developer/article/2517177)<br>
+[8] [基于 Qwen2.5-0.5B 微调训练 Ner 命名实体识别任务](https://blog.csdn.net/qq_43692950/article/details/142631780)<br>
