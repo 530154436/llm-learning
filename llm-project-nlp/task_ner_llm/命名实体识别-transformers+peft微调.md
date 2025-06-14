@@ -264,6 +264,16 @@ GPU 资源监控信息：
 |                               |                      |             Disabled |
 +-------------------------------+----------------------+----------------------+
 ```
+
+报错：
+```
+Error in model execution: LoRA rank 64 is greater than max_lora_rank 16.
+```
+在部署时，设置允许更高的 max_lora_rank（如 64）。
+```shell
+python -m vllm.entrypoints.openai.api_server --max-lora-rank 64 ...
+```
+
 ##### 查询模型列表接口
 服务启动后，可通过 `/v1/models` 接口查询当前加载的所有模型信息（LoRA 模型及其对应的基础模型）：
 ```shell
@@ -413,17 +423,6 @@ print(response)
 4、最终解码结果（NER 实体识别）：
 ```
 [{'label': 'organization', 'text': '阿森纳'}, {'label': 'organization', 'text': '英超'}, {'label': 'position', 'text': '教授'}]
-```
-
-
-
-报错：
-```
-Error in model execution: LoRA rank 64 is greater than max_lora_rank 16.
-```
-在部署时，设置允许更高的 max_lora_rank（如 64）。
-```shell
-python -m vllm.entrypoints.openai.api_server --max-lora-rank 64 ...
 ```
 
 ## 四、模型评估结果
